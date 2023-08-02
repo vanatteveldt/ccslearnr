@@ -12,3 +12,4 @@ Imports:
     learnr,
     gradethis
 Remotes: rstudio/gradethis
+RoxygenNote: 7.2.3
