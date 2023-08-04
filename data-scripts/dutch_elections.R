@@ -45,14 +45,14 @@ write_csv(results_gm, here("data/dutch_elections_2023ps.csv"))
 # CBS data per gemeente
 
 library(cbsodataR)
-kern_cbs_2023 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2023JJ00")
-kern_cbs_2022 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2022JJ00")
+#kern_cbs_2023 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2023JJ00")
+#kern_cbs_2022 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2022JJ00")
 kern_cbs_2021 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2021JJ00")
 demographics = kern_cbs_2021 |>
   select(gm=RegioS,
          v01_pop="TotaleBevolking_1",
          v57_density="Bevolkingsdichtheid_57",
-         v20_65plus="k_65Tot80Jaar_20",
+         v20_65_80="k_65Tot80Jaar_20",
          v21_80plus="k_80JaarOfOuder_21",
          v43_nl="NederlandseAchtergrond_43",
          v122_disposable="ParticuliereHuishoudensExclStudenten_122",
@@ -60,6 +60,7 @@ demographics = kern_cbs_2021 |>
          v142_wealth="ParticuliereHuishoudensExclStudenten_142",
          v153_uitkering="TotDeAOWLeeftijd_153"
          ) |>
+  mutate(c_65plus=v20_65_80 + v21_80plus, v20_65_80=NULL, v21_80plus=NULL) |>
   semi_join(results_gm)
 
 write_csv(demographics, here("data/dutch_demographics.csv"))
