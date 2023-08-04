@@ -1,0 +1,81 @@
+---
+title: "Tidyverse I: tidy data"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE, remove_for_md=TRUE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.path = "img/")
+library(learnr)
+#gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+
+```{r data}
+library(tidyverse)
+library(here)
+results = read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
+demo = read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+
+results = results |> group_by(gm) |> mutate(votes=votes/sum(votes)) 
+
+anti_immigration_parties = c("JA21", "PVV (Partij voor de Vrijheid)", "Forum voor Democratie", "Belang van Nederland (BVNL)")
+
+r = results |> 
+  mutate(party = case_when(party %in% anti_immigration_parties ~ "Anti-immigration",
+                           T ~ party)) |>
+  filter(party %in% c("BBB", "Anti-immigration")) |>
+  group_by(gm, gemeente, party) |>
+  summarize(votes=sum(votes)) 
+```
+
+```{r plot, exercise=T, exercise.setup='data'}
+inner_join(r, demo) |> 
+  ggplot(aes(x=log10(v57_density), y=votes, color=party, size=v01_pop)) + 
+  geom_point(alpha=.5) + 
+  xlab("Population density (log scale)") + ylab("Relative support for party") +
+  theme(legend.position = "top", legend.title = element_blank()) + 
+  scale_color_manual(values=c("BBB"="green", "Anti-immigration"="blue"))+  scale_size(guide="none") + 
+  ggtitle("Support for BBB and anti-immigration parties per municipality",
+          "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)")
+```
+
+```{r datagis, exercise.setup='data'}
+library(sf)
+download.file("https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_NLD.gpkg", destfile="gadm41_NLD.gpkg")
+gemeentes <- st_read(
+  dsn = here("gadm41_NLD.gpkg"), 
+  layer = "ADM_ADM_2")
+bbb = results |> filter(party == "BBB") 
+
+gemeentes2 = gemeentes |> 
+  mutate(gemeente=case_when(
+    GID_2 == "NLD.7.5_1" ~ "Bergen (L.)",
+    GID_2 == "NLD.9.9_1" ~ "Bergen (NH.)",
+    GID_2 == "NLD.3.5_1" ~ "Dantumadiel",
+    GID_2 == "NLD.8.43_1" ~ "Nuenen, Gerwen en Nederwetten",
+    GID_2 == "NLD.10.19_1" ~ "Rijssen-Holten",
+    GID_2 == "NLD.4.34_1" ~ "Neder-Betuwe",
+    GID_2 == "NLD.9.7_1" ~ "Purmerend",
+    GID_2 %in% c("NLD.9.27_1", "NLD.9.33_1") ~ "Dijk en Waard",
+    GID_2 %in% c("NLD.8.36_1", "NLD.8.59_1") ~ "Maashorst",
+    GID_2 %in% c("NLD.8.54_1", "NLD.8.12_1", "NLD.8.16_1", "NLD.8.28_1", "NLD.8.41_1") ~ "Land van Cuijk",
+    T ~ NAME_2))
+```
+
+```{r datagis2, exercise=T, exercise.setup='datagis'}
+inner_join(gemeentes2, bbb) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
+  ggtitle("Support for BBB per municipality") +
+  scale_fill_gradient(low="white", high="darkgreen")
+```
+
+```{r datagis3, exercise=T, exercise.setup='datagis'}
+pvv = results |> filter(party == "PVV (Partij voor de Vrijheid)") 
+inner_join(gemeentes2, pvv) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
+  ggtitle("Support for PVV per municipality") +
+  scale_fill_gradient(low="white", high="orange")
+```
