@@ -64,3 +64,32 @@ demographics = kern_cbs_2021 |>
   semi_join(results_gm)
 
 write_csv(demographics, here("data/dutch_demographics.csv"))
+
+
+## GIS data per gemeente
+
+library(sf)
+download.file("https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_NLD.gpkg",
+              destfile=here("data-scripts/tmp/gadm41_NLD.gpkg"))
+
+gemeentes <- st_read(
+  dsn = here("data-scripts/tmp/gadm41_NLD.gpkg"),
+  layer = "ADM_ADM_2")
+
+gemeentes = gemeentes |>
+  mutate(gemeente=case_when(
+    GID_2 == "NLD.7.5_1" ~ "Bergen (L.)",
+    GID_2 == "NLD.9.9_1" ~ "Bergen (NH.)",
+    GID_2 == "NLD.3.5_1" ~ "Dantumadiel",
+    GID_2 == "NLD.8.43_1" ~ "Nuenen, Gerwen en Nederwetten",
+    GID_2 == "NLD.10.19_1" ~ "Rijssen-Holten",
+    GID_2 == "NLD.4.34_1" ~ "Neder-Betuwe",
+    GID_2 == "NLD.9.7_1" ~ "Purmerend",
+    GID_2 %in% c("NLD.9.27_1", "NLD.9.33_1") ~ "Dijk en Waard",
+    GID_2 %in% c("NLD.8.36_1", "NLD.8.59_1") ~ "Maashorst",
+    GID_2 %in% c("NLD.8.54_1", "NLD.8.12_1", "NLD.8.16_1", "NLD.8.28_1", "NLD.8.41_1") ~ "Land van Cuijk",
+    T ~ NAME_2)) |>
+  select(GID_2, provincie=NAME_1, gemeente, geom)
+
+write_rds(gemeentes, here("data/sf_nl.rds"))
+

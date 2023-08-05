@@ -20,3 +20,5 @@ unzip -d tmp -n tmp/2022-cbs-pc6huisnr20210801_buurt.zip
 if [ ! -f ../data/dutch_demographics.csv ]; then
     Rscript dutch_elections.R
 fi
+
+wget -P tmp -nc https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_NLD.gpkg
