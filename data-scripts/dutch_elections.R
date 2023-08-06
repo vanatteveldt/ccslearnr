@@ -49,7 +49,7 @@ library(cbsodataR)
 #kern_cbs_2023 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2023JJ00")
 #kern_cbs_2022 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2022JJ00")
 kern_cbs_2021 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2021JJ00")
-#demographics =
+demographics =
   kern_cbs_2021 |>
   select(gm=RegioS,
          v01_pop="TotaleBevolking_1",
@@ -63,6 +63,7 @@ kern_cbs_2021 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2
          v153_uitkering="TotDeAOWLeeftijd_153"
          ) |>
   mutate(c_65plus=v20_65_80 + v21_80plus, v20_65_80=NULL, v21_80plus=NULL,
+         v153_uitkering=v153_uitkering/v01_pop*100,
          gm = case_when(
            gm == "GM0370" ~ "GM0439",
            gm %in% c("GM0756", "GM1684", "GM0786", "GM0815", "GM1702") ~ "GM1982",
@@ -72,8 +73,14 @@ kern_cbs_2021 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2
            T ~ gm
          ))  |>
   inner_join(gm) |>
-  select(gm, gemeente, everything()) |>
-    group_by(gm) |> filter(n() > 1)
+    group_by(gm, gemeente) |>
+    filter(!is.na(v01_pop)) |>
+    filter(n() > 1) |>
+    summarize(
+      v57_density = mean(v57_density),
+      across(v43_nl:c_65plus, ~sum(.*v01_pop)/sum(v01_pop)),
+      v01_pop=sum(v01_pop)) |>
+  select(gm, gemeente, v01_pop,  everything())
 
 
 
