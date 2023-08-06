@@ -49,7 +49,8 @@ library(cbsodataR)
 #kern_cbs_2023 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2023JJ00")
 #kern_cbs_2022 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2022JJ00")
 kern_cbs_2021 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2021JJ00")
-demographics = kern_cbs_2021 |>
+#demographics =
+  kern_cbs_2021 |>
   select(gm=RegioS,
          v01_pop="TotaleBevolking_1",
          v57_density="Bevolkingsdichtheid_57",
@@ -61,9 +62,20 @@ demographics = kern_cbs_2021 |>
          v142_wealth="ParticuliereHuishoudensExclStudenten_142",
          v153_uitkering="TotDeAOWLeeftijd_153"
          ) |>
-  mutate(c_65plus=v20_65_80 + v21_80plus, v20_65_80=NULL, v21_80plus=NULL) |>
+  mutate(c_65plus=v20_65_80 + v21_80plus, v20_65_80=NULL, v21_80plus=NULL,
+         gm = case_when(
+           gm == "GM0370" ~ "GM0439",
+           gm %in% c("GM0756", "GM1684", "GM0786", "GM0815", "GM1702") ~ "GM1982",
+           gm %in% c("GM0398", "GM0416") ~ "GM1980",
+           gm %in% c("GM1685", "GM0856") ~ "GM1991",
+
+           T ~ gm
+         ))  |>
   inner_join(gm) |>
-  select(gm, gemeente, everything())
+  select(gm, gemeente, everything()) |>
+    group_by(gm) |> filter(n() > 1)
+
+
 
 write_csv(demographics, here("data/dutch_demographics.csv"))
 

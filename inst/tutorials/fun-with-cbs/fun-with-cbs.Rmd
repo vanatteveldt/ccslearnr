@@ -17,9 +17,9 @@ tutorial_options(
 
 ```{r data}
 library(tidyverse)
-library(here)
+library(sf)
 results = read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
-demo = read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+demographics = read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
 
 results = results |> group_by(gm) |> mutate(votes=votes/sum(votes)) 
 
@@ -44,38 +44,70 @@ inner_join(r, demo) |>
           "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)")
 ```
 
-```{r datagis, exercise.setup='data'}
-library(sf)
-download.file("https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/gadm41_NLD.gpkg", destfile="gadm41_NLD.gpkg")
-gemeentes <- st_read(
-  dsn = here("gadm41_NLD.gpkg"), 
-  layer = "ADM_ADM_2")
-bbb = results |> filter(party == "BBB") 
+## Plotting maps
 
-gemeentes2 = gemeentes |> 
-  mutate(gemeente=case_when(
-    GID_2 == "NLD.7.5_1" ~ "Bergen (L.)",
-    GID_2 == "NLD.9.9_1" ~ "Bergen (NH.)",
-    GID_2 == "NLD.3.5_1" ~ "Dantumadiel",
-    GID_2 == "NLD.8.43_1" ~ "Nuenen, Gerwen en Nederwetten",
-    GID_2 == "NLD.10.19_1" ~ "Rijssen-Holten",
-    GID_2 == "NLD.4.34_1" ~ "Neder-Betuwe",
-    GID_2 == "NLD.9.7_1" ~ "Purmerend",
-    GID_2 %in% c("NLD.9.27_1", "NLD.9.33_1") ~ "Dijk en Waard",
-    GID_2 %in% c("NLD.8.36_1", "NLD.8.59_1") ~ "Maashorst",
-    GID_2 %in% c("NLD.8.54_1", "NLD.8.12_1", "NLD.8.16_1", "NLD.8.28_1", "NLD.8.41_1") ~ "Land van Cuijk",
-    T ~ NAME_2))
+### Shape files
+
+To look at regional or national differences, it can be very insightful to plot variables on a map.
+To do this, R needs to know the *shape* of the various regions (such as the municipalities used above).
+We can download a cleaned up Dutch 'shapefile' from the tutorial repository:
+
+```{r loadshapes}
+if (!file.exists("sf_nl.rds")) {
+  library(tidyverse)
+  shapes = read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+  write_rds(shapes, "sf_nl.rds")
+} else {
+  shapes = read_rds("sf_nl.rds")
+}
+```
+
+
+```{r datagis, exercise=TRUE}
+library(tidyverse)
+library(sf)
+shapes = read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+shapes
+```
+
+Now, we can plot this map using a regular ggplot command, using the `geom_sg` geometrical object, 
+which can directly use the `geom` column from the shapefile. 
+We can also specify the fill color of regions, for example using the province column:
+
+```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
+ggplot(shapes) + geom_sf(aes(geometry=geom, fill=provincie))
+```
+
+### Combining shapes and demographic information
+
+In the example above, we used only the spatial information to plot a map of Dutch municipalities.
+Of course, it becomes much more interesting (and relevant!) if we can plot sociologically relevant information.
+
+For this end, we need to *join* the spatial and demographic information, and then we can use other columns from the combined data set to color the regions. For example, the code below plots the 
+
+```{r}
+demographics |> filter(gemeente == "Dijk en Waard")
+demographics |> filter(gemeente == "Heerhugowaard")
+
+colnames(demographics)
+inner_join(shapes, demographics) |> filter(is.na(v43_nl))
+inner_join(shapes, demographics) |> 
+  ggplot() + 
+  geom_sf(aes(geometry=geom, fill=v43_nl)) + 
+  scale_fill_gradient(high="white", low="red", name='% Nederlandse\nafkomst')
 ```
 
 ```{r datagis2, exercise=T, exercise.setup='datagis'}
-inner_join(gemeentes2, bbb) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
+bbb = results |> filter(party == "BBB") 
+inner_join(shapes, bbb) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
   ggtitle("Support for BBB per municipality") +
   scale_fill_gradient(low="white", high="darkgreen")
+
 ```
 
 ```{r datagis3, exercise=T, exercise.setup='datagis'}
 pvv = results |> filter(party == "PVV (Partij voor de Vrijheid)") 
-inner_join(gemeentes2, pvv) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
+inner_join(shapes, pvv) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
   ggtitle("Support for PVV per municipality") +
   scale_fill_gradient(low="white", high="orange")
 ```
