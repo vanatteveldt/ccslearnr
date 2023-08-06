@@ -75,7 +75,6 @@ demographics =
   inner_join(gm) |>
     group_by(gm, gemeente) |>
     filter(!is.na(v01_pop)) |>
-    filter(n() > 1) |>
     summarize(
       v57_density = mean(v57_density),
       across(v43_nl:c_65plus, ~sum(.*v01_pop)/sum(v01_pop)),
