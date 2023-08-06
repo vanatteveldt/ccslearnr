@@ -1,4 +1,3 @@
-
 library(tidyverse)
 library(here)
 
@@ -44,6 +43,8 @@ write_csv(results_gm, here("data/dutch_elections_2023ps.csv"))
 
 # CBS data per gemeente
 
+gm = results_gm |> select(gm, gemeente) |> unique()
+
 library(cbsodataR)
 #kern_cbs_2023 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2023JJ00")
 #kern_cbs_2022 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2022JJ00")
@@ -61,7 +62,8 @@ demographics = kern_cbs_2021 |>
          v153_uitkering="TotDeAOWLeeftijd_153"
          ) |>
   mutate(c_65plus=v20_65_80 + v21_80plus, v20_65_80=NULL, v21_80plus=NULL) |>
-  semi_join(results_gm)
+  inner_join(gm) |>
+  select(gm, gemeente, everything())
 
 write_csv(demographics, here("data/dutch_demographics.csv"))
 
