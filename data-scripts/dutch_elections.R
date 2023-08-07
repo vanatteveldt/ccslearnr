@@ -33,11 +33,23 @@ results_name = d |> select(election_id, station_id, gemeente=managing_authority,
     anti_join(results_zip, by="station_id") |>
     left_join(authority_link)
 
-results = bind_rows(results_zip, results_name)
+results <- bind_rows(results_zip, results_name)
 
-results_gm = results |>
+results_gm <- results |>
   group_by(gm, gemeente, party) |>
-  summarize(votes=sum(votes))
+  summarize(votes=sum(votes)) |>
+  mutate(votes = votes/sum(votes) * 100) |>
+  mutate(party = case_when(
+    party == "Belang van Nederland (BVNL)" ~ "BVNL",
+    party == "Partij van de Arbeid (P.v.d.A.)" ~ "PvdA",
+    party == "PVV (Partij voor de Vrijheid) " ~ "PVV",
+    party == "SP (Socialistische Partij)" ~ "SP",
+    party == "Staatkundig Gereformeerde Partij (SGP)" ~ "SGP",
+    party == "Partij van de Arbeid (P.v.d.A.) / GROENLINKS" ~ "PvdA / GROENLINKS",
+    T ~ party
+  ))
+
+results_gm |> group_by(party) |> summarize(votes=sum(votes) / 345) |> arrange(-votes) |> print(n=100)
 
 write_csv(results_gm, here("data/dutch_elections_2023ps.csv"))
 
