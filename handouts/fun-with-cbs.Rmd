@@ -1,22 +1,15 @@
 ---
 title: "Fun with R: A look at the Dutch voter"
-output: 
-  learnr::tutorial:
-    progressive: true
-runtime: shiny_prerendered
-editor_options: 
+output:
+  github_document:
+    toc: yes
+editor_options:
   chunk_output_type: console
-learnr_to_md_options:
-  keep_output: false
 ---
 
-```{r setup, include=FALSE, remove_for_md=TRUE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.path = "img/")
-library(learnr)
-gradethis::gradethis_setup()
-tutorial_options(
-  exercise.reveal_solution = FALSE
-)
+```{r opts, echo = FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.keep = "none", results = FALSE)
+library(printr)
 ```
 <style>
 .Info {
@@ -52,7 +45,7 @@ and each column represents a quantity of information about that row, e.g. a meas
 
 In this case, each row represents a Dutch municipality (*gemeente*), with the columns being a selection of demographic information collected from [CBS regional figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1691399765879):
 
-```{r datademo, exercise=T}
+```{r datademo}
 library(tidyverse)
 demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
 head(demographics)
@@ -92,7 +85,7 @@ What happens if you remove the `desc(..)` function from arrange, i.e. change `ar
 
 **Exercise**: Can you change the code to show the results for the municipality of Amsterdam, ordered by party (starting from A)?
 
-```{r datavotes, exercise=TRUE}
+```{r datavotes}
 library(tidyverse)
 results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
 results |> 
@@ -100,33 +93,9 @@ results |>
   arrange(desc(votes))
 ```
 
-```{r datavotes-solution}
-library(tidyverse)
-results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
-results |> 
-  filter(gemeente == "Amsterdam") |> 
-  arrange(party)
-```
 
-```{r datavotes-code-check}
-grade_code()
-```
 
-```{r datavotes-hint-1}
-# Use gemeente == "Amsterdam" within the filter() command
-```
 
-```{r datavotes-hint-2}
-# Use gemeente == "Amsterdam" within the filter() command
-# Replace the 'votes' in the arrange command by 'party', and remove the 'desc(.)' function
-```
-```{r datavotes-hint-3}
-# Use gemeente == "Amsterdam" within the filter() command
-# Replace the 'votes' in the arrange command by 'party', and remove the 'desc(.)' function
-results |> 
-  filter(gemeente == "Amsterdam") |> 
-  arrange(party)
-```
 ::: Info ::::::
 The code box above is an exercise with a single correct solution. 
 You need to change some code and click the `☑️Submit Answer` button to submit your answer.
@@ -143,11 +112,6 @@ Although this can be hard to master, there are many useful resources to learn mo
 
 For this section, we will use the same data as above:
 
-```{r data, remove_for_md=TRUE}
-library(tidyverse)
-results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
-```
 ```{r dataprep}
 library(tidyverse)
 results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
@@ -160,7 +124,7 @@ Let's make a first minimal scatter plot.
 A scatter plot can be very useful to see the relation between variables, for example between population density and age:
 do older people live mostly in cities or in more rural regions?
 
-```{r scatter, exercise=T, exercise.setup='data'}
+```{r scatter, exercise.setup='data'}
 ggplot(demographics, 
        aes(x=v57_density, y=c_65plus)) + 
   geom_point()
@@ -190,7 +154,7 @@ Take a look at the code below:
 Note: the code box below contains multiple *comments*. 
 Every line starting with a `#` is called a comment, and is simply ignored by R so can be used to explain your code.
 :::
-```{r scatterpretty, exercise=T, exercise.setup='data'}
+```{r scatterpretty, exercise.setup='data'}
 # Basic ggplot 
 #    - data (demographics)
 #    - a mapping of density (y) against income (x), population size (dot size), and migration history (color),
@@ -238,7 +202,7 @@ Fortunately, this is quite easy because they have a common key variable (`gm`) o
 
 So, let's see if we can plot the support for the farmer's party BBB against the population density:
 
-```{r plot, exercise=T, exercise.setup='data'}
+```{r plot, exercise.setup='data'}
 bbb <- filter(results, party == "BBB")
 data <- inner_join(bbb, demographics)
 ggplot(data, aes(x=log10(v57_density), y=votes, color=party, size=v01_pop)) + 
@@ -260,19 +224,9 @@ Finally, to look at regional or national differences, it can be very insightful 
 To do this, R first needs to know the *shape* of the various regions (such as the municipalities used above).
 We can download a cleaned up Dutch 'shapefile' from the tutorial repository:
 
-```{r loadshapes, remove_for_md=TRUE, exercise.setup='data'}
-library(sf)
-if (!file.exists("sf_nl.rds")) {
-  library(tidyverse)
-  shapes = read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
-  write_rds(shapes, "sf_nl.rds")
-} else {
-  shapes = read_rds("sf_nl.rds")
-}
-```
 
 
-```{r datagis, exercise=TRUE}
+```{r datagis}
 library(tidyverse)
 library(sf)
 shapes = read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
@@ -283,7 +237,7 @@ Now, we can plot this map using a regular ggplot command, using the `geom_sg` ge
 which can directly use the `geom` column from the shapefile. 
 We can also specify the fill color of regions, for example using the province column:
 
-```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
+```{r plotshape, exercise.setup='loadshapes'}
 ggplot(shapes) + geom_sf(aes(geometry=geom, fill=provincie))
 ```
 
@@ -294,7 +248,7 @@ Of course, it becomes much more interesting (and relevant!) if we can plot socio
 
 For this end, we need to `join` the spatial and demographic information, and then we can use other columns from the combined data set to color the regions. For example, the code below plots the population density per municipality:
 
-```{r gisdensity, exercise=TRUE, exercise.setup='loadshapes'}
+```{r gisdensity, exercise.setup='loadshapes'}
 inner_join(shapes, demographics) |> 
   ggplot() + 
   geom_sf(aes(geometry=geom, fill=v57_density)) + 
@@ -305,7 +259,7 @@ inner_join(shapes, demographics) |>
 
 We could compare this with the vote share of e.g. the (farmer's) party BBB:
 
-```{r gisbbb, exercise=TRUE, exercise.setup='loadshapes'}
+```{r gisbbb, exercise.setup='loadshapes'}
 bbb = results |> filter(party == "BBB")  
 inner_join(shapes, bbb) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
   ggtitle("Support for BBB per municipality") +
@@ -327,24 +281,20 @@ In this sub section, we will look at some simple statistical results.
 First, let's see how the demographics are correlated. 
 The command `cor` gives the bivariate correlations of all variables, quite useful for quick exploration:
 
-```{r cor, exercise=TRUE, exercise.setup='data'}
+```{r cor, exercise.setup='data'}
 vars <- select(demographics, v01_pop:c_65plus)
 cor(vars, use = "pairwise")
 ```
 
 We can also plot this using the `ggcorrplot` package:
 
-```{r corplot, exercise=TRUE, exercise.setup='data'}
+```{r corplot, exercise.setup='data'}
 library(ggcorrplot)
 vars <- select(demographics, v01_pop:c_65plus)
 correlations <- cor(vars, use = "pairwise")
 ggcorrplot(correlations, method="circle")
 ```
 
-```{r, remove_for_md=T}
-# Somehow shinyapps didn't get the ggcorrplot dependency without this chunk
-library(ggcorrplot)
-```
 
 ### Regression
 
@@ -354,24 +304,14 @@ and use the `lm` function to compute the linear regression model.
 Finally, we use the `tab_model` function from the `sjPlot` package to create a nice looking regression table:
 
 
-```{r lm, exercise=TRUE, exercise.setup='data'}
+```{r lm, exercise.setup='data'}
 library(sjPlot)
 bbb = filter(results, party == "BBB")
 data = inner_join(bbb, demographics)
 m = lm(data, formula=votes ~ v57_density + c_65plus)
 tab_model(m)
 ```
-```{r lm-solution}
-library(sjPlot)
-vvd = filter(results, party == "VVD")
-data = inner_join(vvd, demographics)
-m = lm(data, formula=votes ~ c_65plus + v43_nl + v132_income)
-tab_model(m)
-```
 
-```{r lm-code-check}
-grade_code()
-```
 
 So, BBB's vote share can be predicted from population density (the denser the muncipality, the fewer votes),
 but not by the percentage of people over 65.

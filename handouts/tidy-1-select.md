@@ -108,13 +108,6 @@ respondents <- tibble(resp_id = c(1,2,3),
 respondents
 ```
 
-    ## # A tibble: 3 × 2
-    ##   resp_id gender
-    ##     <dbl> <chr> 
-    ## 1       1 M     
-    ## 2       2 M     
-    ## 3       3 F
-
 ### A note on functions and assignment
 
 In the exercise above, you used the `tibble` function to create a new
@@ -153,22 +146,6 @@ url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-
 gunpolls <- read_csv(url)
 gunpolls
 ```
-
-    ## # A tibble: 57 × 9
-    ##    Question     Start   End     Pollster Population Support `Republican Support`
-    ##    <chr>        <chr>   <chr>   <chr>    <chr>        <dbl>                <dbl>
-    ##  1 age-21       2/20/18 2/23/18 CNN/SSRS Registere…      72                   61
-    ##  2 age-21       2/27/18 2/28/18 NPR/Ips… Adults          82                   72
-    ##  3 age-21       3/1/18  3/4/18  Rasmuss… Adults          67                   59
-    ##  4 age-21       2/22/18 2/26/18 Harris … Registere…      84                   77
-    ##  5 age-21       3/3/18  3/5/18  Quinnip… Registere…      78                   63
-    ##  6 age-21       3/4/18  3/6/18  YouGov   Registere…      72                   65
-    ##  7 age-21       3/1/18  3/5/18  Morning… Registere…      76                   72
-    ##  8 arm-teachers 2/23/18 2/25/18 YouGov/… Registere…      41                   69
-    ##  9 arm-teachers 2/20/18 2/23/18 CBS News Adults          44                   68
-    ## 10 arm-teachers 2/27/18 2/28/18 Rasmuss… Adults          43                   71
-    ## # ℹ 47 more rows
-    ## # ℹ 2 more variables: `Democratic Support` <dbl>, URL <chr>
 
 (Note that you can safely ignore the (red) message, they simply tell you
 how each column was parsed)
@@ -210,22 +187,6 @@ gunpolls <- read_csv(url)
 gunpolls
 ```
 
-    ## # A tibble: 57 × 9
-    ##    Question     Start   End     Pollster Population Support `Republican Support`
-    ##    <chr>        <chr>   <chr>   <chr>    <chr>        <dbl>                <dbl>
-    ##  1 age-21       2/20/18 2/23/18 CNN/SSRS Registere…      72                   61
-    ##  2 age-21       2/27/18 2/28/18 NPR/Ips… Adults          82                   72
-    ##  3 age-21       3/1/18  3/4/18  Rasmuss… Adults          67                   59
-    ##  4 age-21       2/22/18 2/26/18 Harris … Registere…      84                   77
-    ##  5 age-21       3/3/18  3/5/18  Quinnip… Registere…      78                   63
-    ##  6 age-21       3/4/18  3/6/18  YouGov   Registere…      72                   65
-    ##  7 age-21       3/1/18  3/5/18  Morning… Registere…      76                   72
-    ##  8 arm-teachers 2/23/18 2/25/18 YouGov/… Registere…      41                   69
-    ##  9 arm-teachers 2/20/18 2/23/18 CBS News Adults          44                   68
-    ## 10 arm-teachers 2/27/18 2/28/18 Rasmuss… Adults          43                   71
-    ## # ℹ 47 more rows
-    ## # ℹ 2 more variables: `Democratic Support` <dbl>, URL <chr>
-
 ### Selecting columns with `select`
 
 This contains a number of columns that we might not be interested in.
@@ -235,42 +196,12 @@ Using `select`, we can select only the columns we are interested in:
 select(gunpolls, Population, Support, Pollster)
 ```
 
-    ## # A tibble: 57 × 3
-    ##    Population        Support Pollster          
-    ##    <chr>               <dbl> <chr>             
-    ##  1 Registered Voters      72 CNN/SSRS          
-    ##  2 Adults                 82 NPR/Ipsos         
-    ##  3 Adults                 67 Rasmussen         
-    ##  4 Registered Voters      84 Harris Interactive
-    ##  5 Registered Voters      78 Quinnipiac        
-    ##  6 Registered Voters      72 YouGov            
-    ##  7 Registered Voters      76 Morning Consult   
-    ##  8 Registered Voters      41 YouGov/Huffpost   
-    ##  9 Adults                 44 CBS News          
-    ## 10 Adults                 43 Rasmussen         
-    ## # ℹ 47 more rows
-
 You can also specify a range of columns, for example all columns from
 Question to Support:
 
 ``` r
 select(gunpolls, Question:Support)
 ```
-
-    ## # A tibble: 57 × 6
-    ##    Question     Start   End     Pollster           Population        Support
-    ##    <chr>        <chr>   <chr>   <chr>              <chr>               <dbl>
-    ##  1 age-21       2/20/18 2/23/18 CNN/SSRS           Registered Voters      72
-    ##  2 age-21       2/27/18 2/28/18 NPR/Ipsos          Adults                 82
-    ##  3 age-21       3/1/18  3/4/18  Rasmussen          Adults                 67
-    ##  4 age-21       2/22/18 2/26/18 Harris Interactive Registered Voters      84
-    ##  5 age-21       3/3/18  3/5/18  Quinnipiac         Registered Voters      78
-    ##  6 age-21       3/4/18  3/6/18  YouGov             Registered Voters      72
-    ##  7 age-21       3/1/18  3/5/18  Morning Consult    Registered Voters      76
-    ##  8 arm-teachers 2/23/18 2/25/18 YouGov/Huffpost    Registered Voters      41
-    ##  9 arm-teachers 2/20/18 2/23/18 CBS News           Adults                 44
-    ## 10 arm-teachers 2/27/18 2/28/18 Rasmussen          Adults                 43
-    ## # ℹ 47 more rows
 
 Finally, it is also possible to drop columns by placing a minus sign in
 front of the column name. For example, this will drop the URL column and
@@ -279,22 +210,6 @@ keep all other columns:
 ``` r
 select(gunpolls, -URL)
 ```
-
-    ## # A tibble: 57 × 8
-    ##    Question     Start   End     Pollster Population Support `Republican Support`
-    ##    <chr>        <chr>   <chr>   <chr>    <chr>        <dbl>                <dbl>
-    ##  1 age-21       2/20/18 2/23/18 CNN/SSRS Registere…      72                   61
-    ##  2 age-21       2/27/18 2/28/18 NPR/Ips… Adults          82                   72
-    ##  3 age-21       3/1/18  3/4/18  Rasmuss… Adults          67                   59
-    ##  4 age-21       2/22/18 2/26/18 Harris … Registere…      84                   77
-    ##  5 age-21       3/3/18  3/5/18  Quinnip… Registere…      78                   63
-    ##  6 age-21       3/4/18  3/6/18  YouGov   Registere…      72                   65
-    ##  7 age-21       3/1/18  3/5/18  Morning… Registere…      76                   72
-    ##  8 arm-teachers 2/23/18 2/25/18 YouGov/… Registere…      41                   69
-    ##  9 arm-teachers 2/20/18 2/23/18 CBS News Adults          44                   68
-    ## 10 arm-teachers 2/27/18 2/28/18 Rasmuss… Adults          43                   71
-    ## # ℹ 47 more rows
-    ## # ℹ 1 more variable: `Democratic Support` <dbl>
 
 ### Renaming columns and non-standard names
 
@@ -312,21 +227,6 @@ more variables:
 rename(gunpolls, rep = `Republican Support`, dem = `Democratic Support`)
 ```
 
-    ## # A tibble: 57 × 9
-    ##    Question     Start   End     Pollster    Population Support   rep   dem URL  
-    ##    <chr>        <chr>   <chr>   <chr>       <chr>        <dbl> <dbl> <dbl> <chr>
-    ##  1 age-21       2/20/18 2/23/18 CNN/SSRS    Registere…      72    61    86 http…
-    ##  2 age-21       2/27/18 2/28/18 NPR/Ipsos   Adults          82    72    92 http…
-    ##  3 age-21       3/1/18  3/4/18  Rasmussen   Adults          67    59    76 http…
-    ##  4 age-21       2/22/18 2/26/18 Harris Int… Registere…      84    77    92 http…
-    ##  5 age-21       3/3/18  3/5/18  Quinnipiac  Registere…      78    63    93 http…
-    ##  6 age-21       3/4/18  3/6/18  YouGov      Registere…      72    65    80 http…
-    ##  7 age-21       3/1/18  3/5/18  Morning Co… Registere…      76    72    86 http…
-    ##  8 arm-teachers 2/23/18 2/25/18 YouGov/Huf… Registere…      41    69    20 http…
-    ##  9 arm-teachers 2/20/18 2/23/18 CBS News    Adults          44    68    20 http…
-    ## 10 arm-teachers 2/27/18 2/28/18 Rasmussen   Adults          43    71    24 http…
-    ## # ℹ 47 more rows
-
 Very often, a first step in data cleaning is renaming some columns and
 dropping others. This can be combined in a single step by renaming in
 the `select` function:
@@ -334,21 +234,6 @@ the `select` function:
 ``` r
 select(gunpolls, Question, rep = `Republican Support`, dem = `Democratic Support`)
 ```
-
-    ## # A tibble: 57 × 3
-    ##    Question       rep   dem
-    ##    <chr>        <dbl> <dbl>
-    ##  1 age-21          61    86
-    ##  2 age-21          72    92
-    ##  3 age-21          59    76
-    ##  4 age-21          77    92
-    ##  5 age-21          63    93
-    ##  6 age-21          65    80
-    ##  7 age-21          72    86
-    ##  8 arm-teachers    69    20
-    ##  9 arm-teachers    68    20
-    ## 10 arm-teachers    71    24
-    ## # ℹ 47 more rows
 
 Note the difference between the two functions: `rename` keeps all
 variables that are not mentioned, while `select` only keeps the
@@ -375,42 +260,12 @@ gunpolls_clean <- select(gunpolls, Question, rep = `Republican Support`, dem = `
 gunpolls_clean
 ```
 
-    ## # A tibble: 57 × 3
-    ##    Question       rep   dem
-    ##    <chr>        <dbl> <dbl>
-    ##  1 age-21          61    86
-    ##  2 age-21          72    92
-    ##  3 age-21          59    76
-    ##  4 age-21          77    92
-    ##  5 age-21          63    93
-    ##  6 age-21          65    80
-    ##  7 age-21          72    86
-    ##  8 arm-teachers    69    20
-    ##  9 arm-teachers    68    20
-    ## 10 arm-teachers    71    24
-    ## # ℹ 47 more rows
-
 If you assign it to the same name, it will overwrite the data:
 
 ``` r
 gunpolls <- select(gunpolls, Question, rep = `Republican Support`, dem = `Democratic Support`)
 gunpolls
 ```
-
-    ## # A tibble: 57 × 3
-    ##    Question       rep   dem
-    ##    <chr>        <dbl> <dbl>
-    ##  1 age-21          61    86
-    ##  2 age-21          72    92
-    ##  3 age-21          59    76
-    ##  4 age-21          77    92
-    ##  5 age-21          63    93
-    ##  6 age-21          65    80
-    ##  7 age-21          72    86
-    ##  8 arm-teachers    69    20
-    ##  9 arm-teachers    68    20
-    ## 10 arm-teachers    71    24
-    ## # ℹ 47 more rows
 
 This is useful if you will not need to data you discarded. To summarize:
 
@@ -449,22 +304,6 @@ gunpolls <- read_csv(url)
 gunpolls
 ```
 
-    ## # A tibble: 57 × 9
-    ##    Question     Start   End     Pollster Population Support `Republican Support`
-    ##    <chr>        <chr>   <chr>   <chr>    <chr>        <dbl>                <dbl>
-    ##  1 age-21       2/20/18 2/23/18 CNN/SSRS Registere…      72                   61
-    ##  2 age-21       2/27/18 2/28/18 NPR/Ips… Adults          82                   72
-    ##  3 age-21       3/1/18  3/4/18  Rasmuss… Adults          67                   59
-    ##  4 age-21       2/22/18 2/26/18 Harris … Registere…      84                   77
-    ##  5 age-21       3/3/18  3/5/18  Quinnip… Registere…      78                   63
-    ##  6 age-21       3/4/18  3/6/18  YouGov   Registere…      72                   65
-    ##  7 age-21       3/1/18  3/5/18  Morning… Registere…      76                   72
-    ##  8 arm-teachers 2/23/18 2/25/18 YouGov/… Registere…      41                   69
-    ##  9 arm-teachers 2/20/18 2/23/18 CBS News Adults          44                   68
-    ## 10 arm-teachers 2/27/18 2/28/18 Rasmuss… Adults          43                   71
-    ## # ℹ 47 more rows
-    ## # ℹ 2 more variables: `Democratic Support` <dbl>, URL <chr>
-
 ### The `filter` function
 
 The `filter` function can be used to select a subset of rows. In the
@@ -476,18 +315,6 @@ purchage age for guns should be raised to 21:
 age21 <- filter(gunpolls, Question == 'age-21')
 age21
 ```
-
-    ## # A tibble: 7 × 9
-    ##   Question Start   End     Pollster      Population Support `Republican Support`
-    ##   <chr>    <chr>   <chr>   <chr>         <chr>        <dbl>                <dbl>
-    ## 1 age-21   2/20/18 2/23/18 CNN/SSRS      Registere…      72                   61
-    ## 2 age-21   2/27/18 2/28/18 NPR/Ipsos     Adults          82                   72
-    ## 3 age-21   3/1/18  3/4/18  Rasmussen     Adults          67                   59
-    ## 4 age-21   2/22/18 2/26/18 Harris Inter… Registere…      84                   77
-    ## 5 age-21   3/3/18  3/5/18  Quinnipiac    Registere…      78                   63
-    ## 6 age-21   3/4/18  3/6/18  YouGov        Registere…      72                   65
-    ## 7 age-21   3/1/18  3/5/18  Morning Cons… Registere…      76                   72
-    ## # ℹ 2 more variables: `Democratic Support` <dbl>, URL <chr>
 
 This call is typical for a tidyverse function: the first argument is the
 data to be used (`d`), and the remaining argument(s) contain information
@@ -505,13 +332,6 @@ least 80%:
 ``` r
 filter(gunpolls, Question == 'age-21' & Support >= 80)
 ```
-
-    ## # A tibble: 2 × 9
-    ##   Question Start   End     Pollster      Population Support `Republican Support`
-    ##   <chr>    <chr>   <chr>   <chr>         <chr>        <dbl>                <dbl>
-    ## 1 age-21   2/27/18 2/28/18 NPR/Ipsos     Adults          82                   72
-    ## 2 age-21   2/22/18 2/26/18 Harris Inter… Registere…      84                   77
-    ## # ℹ 2 more variables: `Democratic Support` <dbl>, URL <chr>
 
 Note that this command did not assign the result to an object. So, as
 explained above, the result is only displayed on the screen but not
@@ -535,16 +355,6 @@ gunpolls_dirty <- read_csv("https://cssbook.net/d/guns-polls-dirty.csv")
 gunpolls_dirty
 ```
 
-    ## # A tibble: 6 × 8
-    ##   Question     Start   End     Pollster        Population    Support   rep   dem
-    ##   <chr>        <chr>   <chr>   <chr>           <chr>           <dbl> <dbl> <dbl>
-    ## 1 arm-teachers 2/23/18 2/25/18 YouGov/Huffpost Registered V…      41    69    20
-    ## 2 arm-teachers 2/20/18 2/23/18 CBS News        Adults             NA    68    20
-    ## 3 arm-teachers 2/27/18 2/28/18 Rasmussen       Adults             43    71    24
-    ## 4 arm-teachers 2/27/18 2/28/18 NPR/Ipsos       Adults             41    68    18
-    ## 5 arm-teachers 3/3/18  3/5/18  Quinnipiac      Registered V…      40    77    10
-    ## 6 arm-teachers 2/26/18 2/28/18 SurveyMonkey    Registered V…      43    80    11
-
 As you can see, the Support column has a missing value for CBS news. To
 remove rows where Support is missing, `filter` the dataset so only
 non-missing rows are kept, i.e. where `!is.na(Support)` (you can read
@@ -554,30 +364,12 @@ non-missing rows are kept, i.e. where `!is.na(Support)` (you can read
 filter(gunpolls_dirty, !is.na(Support))
 ```
 
-    ## # A tibble: 5 × 8
-    ##   Question     Start   End     Pollster        Population    Support   rep   dem
-    ##   <chr>        <chr>   <chr>   <chr>           <chr>           <dbl> <dbl> <dbl>
-    ## 1 arm-teachers 2/23/18 2/25/18 YouGov/Huffpost Registered V…      41    69    20
-    ## 2 arm-teachers 2/27/18 2/28/18 Rasmussen       Adults             43    71    24
-    ## 3 arm-teachers 2/27/18 2/28/18 NPR/Ipsos       Adults             41    68    18
-    ## 4 arm-teachers 3/3/18  3/5/18  Quinnipiac      Registered V…      40    77    10
-    ## 5 arm-teachers 2/26/18 2/28/18 SurveyMonkey    Registered V…      43    80    11
-
 As a shortcut to remove all rows where any column is missing, you can
 use the `na.omit` function:
 
 ``` r
 na.omit(gunpolls_dirty)
 ```
-
-    ## # A tibble: 5 × 8
-    ##   Question     Start   End     Pollster        Population    Support   rep   dem
-    ##   <chr>        <chr>   <chr>   <chr>           <chr>           <dbl> <dbl> <dbl>
-    ## 1 arm-teachers 2/23/18 2/25/18 YouGov/Huffpost Registered V…      41    69    20
-    ## 2 arm-teachers 2/27/18 2/28/18 Rasmussen       Adults             43    71    24
-    ## 3 arm-teachers 2/27/18 2/28/18 NPR/Ipsos       Adults             41    68    18
-    ## 4 arm-teachers 3/3/18  3/5/18  Quinnipiac      Registered V…      40    77    10
-    ## 5 arm-teachers 2/26/18 2/28/18 SurveyMonkey    Registered V…      43    80    11
 
 ### Exercise: Filtering data
 
@@ -628,21 +420,6 @@ For example, to transform the Support percentage (0-100) to a proportion
 mutate(gunpolls, Support_Prop = Support / 100)
 ```
 
-    ## # A tibble: 57 × 5
-    ##    Question     Support   rep   dem Support_Prop
-    ##    <chr>          <dbl> <dbl> <dbl>        <dbl>
-    ##  1 age-21            72    61    86         0.72
-    ##  2 age-21            82    72    92         0.82
-    ##  3 age-21            67    59    76         0.67
-    ##  4 age-21            84    77    92         0.84
-    ##  5 age-21            78    63    93         0.78
-    ##  6 age-21            72    65    80         0.72
-    ##  7 age-21            76    72    86         0.76
-    ##  8 arm-teachers      41    69    20         0.41
-    ##  9 arm-teachers      44    68    20         0.44
-    ## 10 arm-teachers      43    71    24         0.43
-    ## # ℹ 47 more rows
-
 The syntax of mutate is similar to that of `filter()` and `select()`:
 The first argument is the data frame to mutate, and then any number of
 additional arguments can be given to perform mutations. The mutations
@@ -671,19 +448,4 @@ the column to the existing data set).
 ``` r
 gunpolls <- mutate(gunpolls, ____)
 gunpolls
-```
-
-``` r
-# Hint: you need to do use the abs() function on the result 
-#       of subtracting dem from rep. 
-```
-
-``` r
-# Hint: you need to do use the abs() function on the result 
-#       of subtracting dem from rep: abs(rep - dem)
-```
-
-``` r
-# Hint: you need to do use the abs() function on the result 
-#       of subtracting dem from rep: party_diff = abs(rep - dem)
 ```

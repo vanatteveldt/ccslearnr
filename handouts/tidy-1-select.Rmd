@@ -7,11 +7,10 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r opts, echo = FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.path = "img/")
-#library(printr)
+```{r opts, echo = FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.keep = "none", results = FALSE)
+library(printr)
 ```
-
 
 ## Introduction to Tidyverse 
 
@@ -388,15 +387,3 @@ gunpolls
 
 
 
-```{r mutatex-hint-1}
-# Hint: you need to do use the abs() function on the result 
-#       of subtracting dem from rep. 
-```
-```{r mutatex-hint-2}
-# Hint: you need to do use the abs() function on the result 
-#       of subtracting dem from rep: abs(rep - dem)
-```
-```{r mutatex-hint-3}
-# Hint: you need to do use the abs() function on the result 
-#       of subtracting dem from rep: party_diff = abs(rep - dem)
-```
