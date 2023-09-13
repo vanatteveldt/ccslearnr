@@ -2,9 +2,11 @@
 Convert learnr-style Rmd files into 'plain' Rmd files
 by stripping exercise solutions and other learnr-specific contents
 """
+import argparse
 import subprocess
 import re
 from pathlib import Path
+import sys
 import frontmatter
 
 
@@ -51,13 +53,28 @@ def convert(inf, outf):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("tutorials", nargs="*", help="Names of the tutorials to render")
+    args = parser.parse_args()
     root = Path.cwd().parent
     infolder = root / "inst" / "tutorials"
     outfolder = root / "handouts"
-    for file in infolder.glob("*/*.Rmd"):
-        out = outfolder / file.name
-        print(f"{file} -> {out}")
-        convert(file, out)
+
+    if not args.tutorials:
+        print("Please select one or more tutorial to render:")
+        for file in infolder.glob("*/*.Rmd"):
+            print(f"- {file.with_suffix('').name:40} ({file})")
+        sys.exit()
+
+    infiles = [infolder / name / f"{name}.Rmd" for name in args.tutorials]
+    for infile in infiles:
+        if not infile.exists():
+            raise Exception("File {infile} does not exist!")
+
+    for infile in infiles:
+        out = outfolder / infile.name
+        print(f"{infile} -> {out}")
+        convert(infile, out)
         subprocess.check_call(
             [
                 "Rscript",

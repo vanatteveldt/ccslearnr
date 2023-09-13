@@ -105,13 +105,6 @@ library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 polls <- read_csv(url) |>
   select(Question, Population, Pollster, Support)
-```
-
-``` r
-library(tidyverse)
-url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
-polls <- read_csv(url) |>
-  select(Question, Population, Pollster, Support)
 polls
 ```
 

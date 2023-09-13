@@ -196,7 +196,7 @@ age
 party
 ```
 
-```{r leftright-setup, exercise.setup='tidy'}
+```{r leftright-setup, exercise.setup='tidy', echo=FALSE}
 age <- tibble(candidate = c("Trump", "Biden", "Hawkins"), 
               age = c(77, 80, 70))
 party <- tibble(candidate = c("Trump", "Biden", "Jorgensen"),

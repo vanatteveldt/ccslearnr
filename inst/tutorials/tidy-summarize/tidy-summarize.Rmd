@@ -79,7 +79,7 @@ Let's look at how we can we summarize data in R:
 
 First, let's fire up tidyverse and load the gun polls data used in the earlier example:
 
-```{r pollsdata}
+```{r pollsdata, echo=FALSE}
 library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 polls <- read_csv(url) |>
@@ -87,7 +87,7 @@ polls <- read_csv(url) |>
 ```
 
 
-```{r showpolls, eval=F}
+```{r showpolls, eval=FALSE}
 library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 polls <- read_csv(url) |>

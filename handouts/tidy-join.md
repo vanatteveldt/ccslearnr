@@ -237,13 +237,6 @@ age
 party
 ```
 
-``` r
-age <- tibble(candidate = c("Trump", "Biden", "Hawkins"), 
-              age = c(77, 80, 70))
-party <- tibble(candidate = c("Trump", "Biden", "Jorgensen"),
-                party = c("Republican", "Democrat", "Libertarian"))
-```
-
 As you can see, for Trump and Biden we have both age and party
 affiliation. For the (green) candidate Hawkins, however, we are missing
 party affiliation data, while for Jorgensen we are missing her age.
