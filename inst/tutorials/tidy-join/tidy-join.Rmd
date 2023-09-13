@@ -76,7 +76,7 @@ but to make it easier a lightly preprocessed version is available from the repos
 There are two relevant files:
 
 - [US_Demographics.csv](https://github.com/vanatteveldt/ccslearnr/blob/master/data/US_Demographics.csv): Demographics per county, such as population, income, and percentage of the population without a college degree
-- [us_demographics.csv](https://github.com/vanatteveldt/ccslearnr/blob/master/data/us_demographics.csv): Demographics per county, such as population, income, and percentage of the population without a college degree
+- [US_Elections_2020.csv](https://github.com/vanatteveldt/ccslearnr/blob/master/data/US_Elections_2020.csv): Election results per county per candidate
 
 For many research questions, we need to be able to combine the data from these files. 
 For example, we might want to know how Trump's performance relates to the proportion of unemployed, non-white, or college-educated people. 
@@ -237,6 +237,6 @@ Similarly, `semi_join(d1, d2)` selects those rows from d1 that also exist in d2.
 
 Can you use anti_join to answer the same question as above, i.e. which `results` rows are missing demographics data?
 
-```{r missing2, exercise=TRUE, exercise.setup='loaddata'}
+```{r missing2, eval=FALSE, exercise=TRUE, exercise.setup='loaddata'}
 anti_join(___)
 ```

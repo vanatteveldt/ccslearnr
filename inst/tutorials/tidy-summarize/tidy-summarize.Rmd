@@ -181,7 +181,7 @@ This can be very useful to compute the relation between single values and e.g. t
 
 **Exercise:** Can you create a new column `difference`, that shows to what extend an individual poll is higher or lower than the group average? E.g. for the first row, the result would be (approximately) `72 - 75.9 = -3.9`.
 
-```{r mutate2, exercise=TRUE, exercise.setup='pollsdata'}
+```{r mutate2, exercise=TRUE, exercise.setup='pollsdata', eval=FALSE}
 polls |> group_by(Question) |> mutate(Mean_Support=mean(Support), difference=____)
 ```
 ```{r mutate2-solution}
@@ -271,7 +271,7 @@ Note that you can remove this grouping either by either adding `.groups=drop', o
 
 Starting from the code above, and taking into account that after the summarize function the data is grouped by question, can you calculate the deviation from the average support per population within each question? So, the adults are `-0.95` point away from the average support for age-21: the average support for age-21 is `75.4`, and `74.5 - 75.4 = -0.95`.
 
-```{r group-multiple-ex, exercise=TRUE, exercise.setup='pollsdata'}
+```{r group-multiple-ex, exercise=TRUE, exercise.setup='pollsdata', eval=FALSE}
 polls |> 
   group_by(Question, Population) |> 
   summarize(Support=mean(Support)) |> 
