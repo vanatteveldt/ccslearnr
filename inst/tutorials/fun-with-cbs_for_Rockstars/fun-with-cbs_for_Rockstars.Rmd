@@ -1,0 +1,406 @@
+---
+title: "Fun with R for Rockstars: A look at the Dutch voter"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🎸 Rockin' Tip!";
+}
+
+</style>
+
+## CBS and Voting data: The Dutch Dance 🕺
+
+Alright, my dear statistical rockstars!
+🎸 Strap in, because we're about to embark on a wild ride through the world of Dutch statistics, voting data, and the magical land of R.
+And, as always, we'll sprinkle in a bit of humor, a dash of sarcasm, and a whole lot of learning. Let's rock and roll!
+
+Now, I know you could totally download these datasets from their original sources, but hey, I've got your back! I've cleaned them up and made them ready for our jam session.
+
+**Fun Fact**: Did you know that R can read csv files directly from the internet? It's like streaming your favorite rock song online!
+
+### Demographics data: The Opening Act 🎤
+
+Hit the `► Run Code` button below and watch the magic unfold. What you'll see is a data frame.
+Think of data frames as the setlists for our rock concert.
+Each row is a song (or in this case, a Dutch municipality or gemeente), and each column is the details about that song (like demographic info).
+
+In our case, each groove is a Dutch municipality (*gemeente*), and the instruments are demographic details. Let's jam and have a look at [CBS regional figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1691399765879):
+
+```{r datademo, exercise=T}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+demographics
+```
+
+```{r, include=FALSE}
+# Somehow shinyapps.io does not always pick up all the dependencies
+library(ggcorrplot)
+library(xkcd)
+library(sjPlot)
+```
+
+Now, take a wild guess: what do these columns mean?
+Click 'continue' for the grand reveal!
+
+::: Info ::::::
+Fear not, young padawan!
+These code boxes are like a guitar with training wheels.
+You can't break them.
+If you mess up, just hit the `↻ Start Over` button and you're back in tune.
+:::
+
+### Column Confessions: The Big Reveal 🎭
+
+| Variable        | What's it Rockin' About?                                                     |
+| --------------- | ---------------------------------------------------------------------------- |
+| gm              | Unique code for each municipality (like a band's ID)                         |
+| gemeente        | The name of our rockin' municipality                                         |
+| v01_pop         | Total number of fans (population)                                            |
+| v57_density     | How packed the concert is (Population Density)                               |
+| v43_nl          | Percentage of fans who've been with us since the beginning (no migration)    |
+| v122_disposable | Average merch money (disposable income) each fan group (household) has       |
+| v132_income     | Average ticket price (income) per fan group (household)                      |
+| v142_wealth     | Median household wealth. The golden middle!                                  |
+| v153_uitkering  | Percentage of peeps getting social benefits (excluding state pension).       |
+| c_65plus        | Percentage of our classic rock fans (older than 65)                          |
+
+### Voting data: The Chart-toppers
+
+Now, let's check out the voting data, which is like seeing which songs topped the charts in the 2023 provincial elections.
+
+R is like a roadie that can set up and tear down a stage in no time.
+It can clean up and restructure data super efficiently.
+The code below is like our setlist for Groningen. 
+But hey, what if you want to change the order?
+Try removing the `desc(..)` function from arrange (change `arrange(desc(votes))` into `arrange(votes)`).
+
+**Exercise**: Can you tweak the code to show the results for Amsterdam, ordered by party (from ABBA to ZZ Top)?
+
+```{r datavotes, exercise=TRUE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Groningen") |>
+  arrange(desc(votes))
+```
+
+```{r datavotes-solution}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Amsterdam") |>
+  arrange(party)
+```
+
+```{r datavotes-code-check}
+grade_code()
+```
+
+```{r datavotes-hint-1}
+# To rock the Amsterdam setlist, use gemeente == "Amsterdam" in the filter() command
+```
+
+```{r datavotes-hint-2}
+# Rock on with gemeente == "Amsterdam" in the filter() command
+# Change the tune in the arrange command by replacing 'votes' with 'party', and drop the 'desc(.)' function
+```
+
+```{r datavotes-hint-3}
+# Keep the groove with gemeente == "Amsterdam" in the filter() command
+# Change the tune in the arrange command by replacing 'votes' with 'party', and drop the 'desc(.)' function
+results |> 
+  filter(gemeente == "Amsterdam") |> 
+  arrange(party)
+```
+
+::: Info ::::::
+The code box above is like a guitar solo challenge. You've got to hit the right notes (or code) to get the crowd cheering. If you're feeling lost, check out the `💡 Hints` for some guidance. And remember, even Hendrix had to start somewhere!
+:::
+
+## Rockin' Visuals with `R`
+
+Alright, rockstars!
+🎸 Let's amp up the volume and dive into the world of visualizations.
+`R` has this rad tool called `ggplot`, which is like the electric guitar of data visualization.
+It might take a bit to master, but once you do, you'll be shredding data like Jimi Hendrix shredded his guitar.
+
+For this encore, we're using the same data as our opening act:
+
+```{r data, include=FALSE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+```{r dataprep}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+### Scatter Plots: The Classic Rock of Data Viz
+
+Let's kick things off with a classic:
+the scatter plot.
+It's like the "Stairway to Heaven" of data visualization (an old classic that still rocks!).
+We're going to see if there's a relationship between where people live and how old they are. 
+Do our classic rock fans (older folks) prefer the hustle and bustle of the city or the serene sounds of the countryside?
+
+```{r scatter, exercise=T, exercise.setup='data'}
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = c_65plus)
+) +
+  geom_point()
+```
+
+Looks like our older fans prefer the chill vibes of less crowded places.
+
+So what's happenin' above?
+The `ggplot` function above is like setting up the stage for our rock concert.
+We tell it what data to use, and how to map it (inside `aes()`, `v57_density` sets the x, `c_65plus` controls the y placement) . 
+Then, we add in our instruments (like geom_point for scatter points).
+
+Fancy a solo? 
+Try swapping out variables in the mapping, or add some flair with `color = v43_nl` or `size = v01_pop` (inside `aes()`).
+
+### Glam Rock Scatter Plot
+
+Our first plot was like an acoustic version.
+Now, let's go full glam rock with a jazzed-up scatter plot.
+It might look like a complex guitar solo at first, but once you break it down, it's just a series of chords.
+
+::: Info ::::::
+Note: the code box below contains multiple *comments*. Imagine you're at a rock concert, and the lead singer occasionally shouts out to the crowd, giving context to the next song. In the world of R, those shoutouts are comments. Every line starting with a # is like the lead singer giving you some inside info. It's ignored by the band (or in this case, R), but it helps the audience (that's you!) understand what's going on. So, always appreciate those shoutouts; they're there to help you groove to the rhythm of the code!
+:::
+
+```{r scatterpretty, exercise=T, exercise.setup='data'}
+# Basic ggplot
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = v132_income, size = v01_pop, color = 100 - v43_nl)
+) +
+  geom_point(alpha = .7) +
+  # All optional elements to jazz it up
+  ggtitle("Differences between rural and urban municipalities") +
+  xlab("Population density") +
+  ylab("% of people older than 65") +
+  scale_color_gradient(low = "lightblue", high = "darkblue") +
+  scale_size(
+    breaks = c(5000, 50000, 500000),
+    labels = c("5.000", "50.000", "500.000")
+  ) +
+  guides(
+    size = guide_legend(
+      title = "Population", title.position = "top",
+      override.aes = list(color = "darkblue")
+    ),
+    color = guide_colorbar(
+      title = "% with Migration History",
+      title.position = "top",
+      direction = "horizontal"
+    )
+  ) +
+  theme_classic() +
+  theme(legend.key = element_blank())
+```
+
+Here's the how the show above went down: 
+
+1. **Setting the Stage**: You first constructed a basic plot consisting of data, aesthetics, and geoms. This is like setting up the stage and deciding which instruments will play.
+2. **The Roadies' Touch**: ggplot is like a team of seasoned roadies. It's quite good at guessing what the gig needs and picks good scales, colors and legends.
+3. **The Finishing Touches**: However, you're the rock genius that decides the many optional elements to the plot: from color bars and scales to the theme of the concert.
+
+Feel free to play around with the stage setup.
+What happens if you change the lighting (themes) or move the instruments (guides) around?
+And can you change the color of the stage lights (color scale)?
+
+Now, here's a fun fact: In the code above, almost all lines are optional. It's like choosing whether to add a guitar solo or a drum break to your song. What happens if you remove, say, the theme or guide information? It's like stripping back to an unplugged version of the song. And can you change the colors used in the color scale? That's like adding a new instrument to the mix. Experiment and see what tune you end up with!
+
+::: Info ::::::
+Want to change the vibe of your concert?
+In ggplot, you can switch up the themes for a fresh look (just replace `theme_classic()`).
+You can even add new themes from the ggthemes package.
+Try `ggthemes::theme_economist()` for a sophisticated jazz club feel or `ggthemes::theme_tufte()` for an indie coffeehouse vibe.
+:::
+
+### Rockin' Data Mashups and Map-tastic Visuals
+
+Alright, rockstars!
+🎸 Time to take our data on a world tour, or at least a tour of the Netherlands.
+Sometimes, we want to combine the beats from multiple albums (data sources) to create a killer mashup.
+Let's see how we can do that with our election results and demographic data.
+We first `join` them, which works automatically because they both have the `gm` column.
+
+
+Let's see if we can plot the chart performance of the farmer's party BBB against the crowd size (population density):
+
+```{r plot, exercise=T, exercise.setup='data'}
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
+  geom_point(alpha = .5) +
+  xlab("Crowd Size (log scale)") +
+  ylab("Chart Performance for Party") +
+  scale_color_manual(values = c("BBB" = "green", "Anti-immigration" = "blue")) +
+  scale_size(guide = "none") +
+  ggtitle(
+    "BBB's Chart Performance by Municipality",
+    "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)"
+  ) +
+  xkcd::theme_xkcd() +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+
+## Rockin' the Map: The Netherlands Tour
+
+Maps are like concert posters, showing where the action is happening. Let's see how we can visualize our data on a map of the Netherlands.
+
+### Shape Files: The Concert Venues
+
+To rock the map, R needs to know the layout of the concert venues (like municipalities). 
+Let's grab a Dutch `shapefile` from our backstage repository:
+
+```{r loadshapes, include=FALSE, exercise.setup='data'}
+library(sf)
+if (!file.exists("sf_nl.rds")) {
+  library(tidyverse)
+  shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+  write_rds(shapes, "sf_nl.rds")
+} else {
+  shapes <- read_rds("sf_nl.rds")
+}
+```
+
+```{r datagis, exercise=TRUE}
+library(tidyverse)
+library(sf)
+shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+shapes
+```
+
+Now, let's rock the stage with a map of Dutch municipalities.
+We'll light up the provinces with different colors:
+
+```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
+ggplot(data = shapes) +
+  geom_sf(aes(geometry = geom, fill = provincie))
+```
+
+`geom_sf` is a smart one and knows how to rock shape files.
+
+### Rockin' Demographics on the Map
+
+Our map is set, but it's like a stage without the band.
+Let's bring in our demographic data to see where our fans are jamming the hardest.
+
+The code below first `join` shapes and demographics, then shows where the mosh pits (high population density) are:
+
+```{r gisdensity, exercise=TRUE, exercise.setup='loadshapes'}
+inner_join(shapes, demographics) |>
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = v57_density)) +
+  scale_fill_gradient(low = "white", high = "red", guide = "none") +
+  ggtitle("Population density per municipality") +
+  theme_void()
+```
+
+Now, let's see where BBB's biggest fans are:
+
+```{r gisbbb, exercise=TRUE, exercise.setup='loadshapes'}
+bbb <- results |> 
+  filter(party == "BBB")
+inner_join(shapes, bbb) |> 
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = votes)) +
+  ggtitle("Support for BBB per municipality") +
+  scale_fill_gradient(low = "white", high = "green", name = "% Support") +
+  theme_void() +
+  theme(legend.position = "bottom")
+```
+
+So, where are BBB's groupies hanging out?
+
+**Your Turn**: Can you remix this chart for other parties or variables?
+Maybe give it a new color scheme, like changing from rock to jazz.
+Experiment and see what new tunes you can create!
+
+
+## Rockin' Stats with R
+
+Alright, rockstars!
+🎸 After our world tour of data visualization, it's time to dive into the backstage world of statistics.
+Let's see how our tracks (variables) are performing on the charts (correlations and regressions).
+
+### Correlation: The Duets of Data
+
+First, let's see which of our tracks harmonize well together. The cor command is like our soundcheck, letting us see which variables are in tune with each other:
+
+```{r cor, exercise=TRUE, exercise.setup='data'}
+vars <- select(demographics, v01_pop:c_65plus)
+cor(vars, use = "pairwise")
+```
+
+But why just listen when you can also see the performance? Let's visualize these harmonies with the `ggcorrplot` package:
+
+```{r corplot, exercise=TRUE, exercise.setup='data'}
+library(ggcorrplot)
+vars <- select(demographics, v01_pop:c_65plus)
+correlations <- cor(vars, use = "pairwise")
+ggcorrplot(correlations, method = "circle")
+```
+
+
+Look at that dance floor! Can you see which variables are waltzing together and which ones are doing the tango? The closer and more intense their dance, the stronger their relationship.
+
+### Regression: The Chart-topping Predictions
+
+Now, let's see if we can predict BBB's chart performance based on their fan demographics.
+We'll use the lm function, which is like our music producer, helping us see which tracks will be hits:
+
+```{r lm, exercise=TRUE, exercise.setup='data'}
+library(sjPlot)
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+m <- lm(data, formula = votes ~ v57_density + c_65plus)
+tab_model(m)
+```
+
+So, it seems like BBB's chart performance is influenced by the crowd size (population density). The bigger the crowd, the less they're jamming to BBB.
+
+**Exercise**: Let's remix the code above to predict VVD's chart performance based on `c_65plus`, `v43_nl`, and `v132_income`.
+Think of it as a new album release. 
+How's it sounding? 
+Any surprise hits?
+
+(Note: Remember to rename the `bbb` playlist to `vvd` to keep the tracks in order.)
+
+## That's it!
+
+Congrats, that was an awesome first music session. Rock on! 🤘 

@@ -1,0 +1,477 @@
+---
+title: "Dive into R: Unravel the Secrets of the Dutch Voter!"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🛈 Insider Tip!";
+}
+
+</style>
+
+## Discover Dutch Voting Insights with `R` 🎉
+
+Have you ever thought about decoding the magic of elections, understanding voters, and diving deep into demographic mysteries?
+Well, whether or not, you're in for a treat!
+We're taking a thrilling journey into the heart of Dutch voting using `R`.
+Prepare to be amazed, and come ride the `R` wave with us!
+
+Ever heard of CBS (the Dutch stats heroes)?
+How about the intricate election results that determine Dutch policies?
+Well, today we're about to merge them and unveil the magic behind the numbers!
+And guess what?
+We've saved you some time and downloaded and cleaned up the data for you.
+It's all here, ready and shining for you!
+
+::: Info ::::::
+`R` isn't just about numbers; it can fetch data directly from the internet.
+Yes, even from that one spreadsheet you got from your pal on another continent who uses the `csv` spreadsheet format. 😉
+:::
+
+### Let's Get Demographic! 📊
+
+Hit the `► Run Code` button below and witness a marvel of the digital age -- the *data frame*!
+The beating heart of `R`.
+Each row?
+Think of it as a story, representing a Dutch municipality (or *gemeente*).
+The columns?
+They're the juicy details of that story.
+
+Ever browsed [CBS regional figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1691399765879)?
+That's where this data hails from!
+
+```{r datademo, exercise=T}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+demographics
+```
+
+```{r, include=FALSE}
+# Somehow shinyapps.io does not always pick up all the dependencies
+library(ggcorrplot)
+library(xkcd)
+library(sjPlot)
+```
+
+Feeling the suspense?
+Let's decipher what each column stands for.
+Hit 'continue', and let's demystify together! 
+
+::: Info ::::::
+Fear not, young coder!
+These example code boxes are your playground.
+Mistakes?
+They're stepping stones.
+Hit the `Run code` button and begin anew.
+But if you ever feel like you've tangled the code, just hit `↻ Start Over`, and it'll be like nothing ever happened.
+Go wild!
+:::
+
+### The Demographic Decoder 🕵️
+
+| Variable        | Explanation                                                                  |
+| --------------- | ---------------------------------------------------------------------------- |
+| gm              | Unique code for each municipality                                            |
+| gemeente        | The name of the municipality (for when you're telling stories at parties)    |
+| v01_pop         | Total population (how many people are partying?)                             |
+| v57_density     | How packed is the party? Population Density!                                 |
+| v43_nl          | Percentage of folks who've always partied here (no migration history)        |
+| v122_disposable | Average disposable income (how much can they spend on party snacks?)         |
+| v132_income     | Average household's take-home pay                                            |
+| v142_wealth     | How loaded is the average household? Median wealth!                          |
+| v153_uitkering  | Percentage of folks on social benefits (excluding that golden age pension)   |
+| c_65plus        | Those who've partied for over 65 years -- Percentage of seniors!               |
+
+### Decode Dutch Votes! 🗳️
+
+Just like we explored demographics, let's unravel the voting mysteries of 2023's provincial elections.
+Get ready to harness the might of `R`'s data manipulation powers!
+
+
+```{r datavotes, exercise=TRUE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Groningen") |>
+  arrange(desc(votes))
+```
+
+**Challenge Time**:
+Above you see voting results for Groningen.
+What happens if you remove the `desc(..)` function from arrange, i.e., change `arrange(desc(votes))` into `arrange(votes)`?
+Can you now unveil the secrets of Amsterdam's votes, ordered alphabetically by party?
+Dive in!
+
+```{r datavotes-solution}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Amsterdam") |>
+  arrange(party)
+```
+
+```{r datavotes-code-check}
+grade_code()
+```
+
+```{r datavotes-hint-1}
+# Pro Tip: To unveil Amsterdam's secrets, change the filter to `gemeente == "Amsterdam"`
+```
+
+```{r datavotes-hint-2}
+# Two-step guide: 
+# 1. Change the filter to `gemeente == "Amsterdam"`
+# 2. Let's go alphabetical! Replace 'votes' in the arrange command with 'party'. No need for 'desc(.)' this time!
+```
+
+```{r datavotes-hint-3}
+# Almost there! 
+# 1. Replace with `gemeente == "Amsterdam"`
+# 2. And for an alphabetical order, use `arrange(party)`. Here's a starter!
+results |> 
+  filter(gemeente == "Amsterdam") |> 
+  arrange(party)
+```
+
+::: Info ::::::
+Remember:
+The code box is like a puzzle with one solution waiting to be discovered by you!
+Once you think you've cracked it, proudly hit the `☑️Submit Answer` button.
+Stuck?
+Those `💡 Hints` are your allies.
+And, if the computer tries to give you advice after a wrong answer, remember, it's doing its best (even if it might seem a little cryptic at times!).
+Let's conquer this!
+:::
+
+## 🚀 **Unleash the Power of Visual Insights with `R`!**
+
+
+Get ready to dive deep into `R`'s most engaging visualizations.
+Hold onto your seat because we're about to explore the world of data like never before!
+
+```{r data, include=FALSE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+```{r dataprep}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+### **_R's Ultimate Visualization Toolkit: ggplot_** 🎨
+
+Hey there, future data scientist!
+Do you know one of `R`'s best-kept secrets?
+It's `ggplot`.
+This isn't just another visualization tool.
+With `ggplot`, you don't just "look" at data -- you EXPERIENCE it!
+Whether you're an artsy person looking to craft beautiful plots or a logical thinker wanting clear and insightful visuals, `ggplot` has got you covered.
+
+And guess what?
+We're going to use the same rich data we discussed earlier.
+Ready?
+Let's roll!
+
+### 🔍 Your First Hands-on Experience with Scatter Plots 🔍
+
+Scatter plots might seem simple, but they're incredibly powerful.
+Imagine being able to see hidden patterns, relationships, and trends in just one glance!
+
+Have you ever wondered how the age distribution differs between cities and rural areas?
+Does age correlate with population density?
+Let’s find out!
+
+```{r scatter, exercise=T, exercise.setup='data'}
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = c_65plus)
+) +
+  geom_point()
+```
+
+Woah, did you see that?
+It seems older people tend to live in less crowded areas.
+How cool is that?
+Notice the elegance of `ggplot`.
+We gave it some data, told it how to map the data (with the code inside `aes()`), and BOOM! –- a stunning scatter plot!
+
+💡 **Want to experiment?**
+Why not switch variables like `v43_nl` or `v132_income`?
+Or maybe add more flair with `color = v43_nl` or `size = v01_pop`.
+The sky's the limit!
+
+### 🎨 **Time to Glam Up Your Plot** 🎨
+
+While our first plot was revealing, it's time to amp up its appearance!
+Get ready to witness the power of `ggplot`'s customization.
+Check out the enhanced version below:
+
+```{r scatterpretty, exercise=T, exercise.setup='data'}
+# Basic ggplot
+#    - data (demographics)
+#    - a mapping of density (y) against income (x), population size (dot size), and migration history (color),
+#    - and a geom (in this case geom_point to create a scatter plot)
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = v132_income, size = v01_pop, color = 100 - v43_nl)
+) +
+  geom_point(alpha = .7) +
+  # All optional elements to change appearance
+  # Add nice titles for the plot and axes
+  ggtitle("Differences between rural and urban municipalities") +
+  xlab("Population density") +
+  ylab("% of people older than 65") +
+  # Change the scale for migration history to go from light to dark blue:
+  scale_color_gradient(low = "lightblue", high = "darkblue") +
+  # Use the scale command to tweak the legend;
+  scale_size(
+    breaks = c(5000, 50000, 500000),
+    labels = c("5.000", "50.000", "500.000")
+  ) +
+  # Use the guide command to specify titles and direction for the legend
+  guides(
+    size = guide_legend(
+      title = "Population", title.position = "top",
+      override.aes = list(color = "darkblue")
+    ),
+    color = guide_colorbar(
+      title = "% with Migration History",
+      title.position = "top",
+      direction = "horizontal"
+    )
+  ) +
+  # Use the 'classic' theme
+  theme_classic() +
+  # Tweak the theme to drop the background for legend keys
+  theme(legend.key = element_blank())
+```
+
+This might seem overwhelming, but here's the secret -- most of these lines are purely aesthetic.
+The core essence of `ggplot` remains the same!
+
+🎓 **GGPLOT MASTER TIP**:
+The true essence of `ggplot` lies in its layering system.
+Start with the basics and then enhance by adding more layers.
+Each additional command is like adding a new coat of paint or a unique brushstroke.
+
+::: Info ::::::
+**For the Explorers Out There**:
+Try removing some lines.
+Maybe ditch the theme (`theme_classic()`) in favour of `theme_linedraw` or `theme_void`?
+Or even ones from the `ggthemes` packages, that mimics cool styles that are already out there.
+Try using `ggthemes::theme_economist` or `ggthemes::theme_tufte`.
+Or play with the color scales?
+Go wild and create YOUR perfect plot!
+:::
+
+
+### 🔍 Mashing Up Data Like a Pro DJ 🎶
+
+We've all been there -- looking at tables upon tables of data, wondering how they connect.
+But what if I told you that, in a snap, you can bring them all together?
+That's the magic of `R`!
+Let's start with a real-world scenario:
+the excitement of election results combined with demographic data!
+And guess what? 
+The magic word here is `join` and all you need to use it the common key between the data sources (in this case `gm` is referring to the municipality ID in both tables).
+Let's get to it!
+
+Let's see how the farmer's party, BBB, did in different places based on how crowded they are:
+
+```{r plot, exercise=T, exercise.setup='data'}
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
+  geom_point(alpha = .5) +
+  xlab("Population density (log scale)") +
+  ylab("Relative support for party") +
+  scale_color_manual(values = c("BBB" = "green", "Anti-immigration" = "blue")) +
+  scale_size(guide = "none") +
+  ggtitle(
+    "Support for BBB and anti-immigration parties per municipality",
+    "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)"
+  ) +
+  xkcd::theme_xkcd() +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+
+## 🌍 Mapping Your Way to Stardom!
+
+Ever gazed at a map and thought, “I wish I could make one”?
+With `R`, not only can you create a map, you can make it tell stories!
+
+### 🎨 Crafting the Canvas: Shape Files
+
+Hold on to your hats!
+To draw a map, we need to know the shape of regions.
+It's like coloring but even cooler.
+Let's fetch the blueprint for our Dutch map!
+
+```{r loadshapes, include=FALSE, exercise.setup='data'}
+library(sf)
+if (!file.exists("sf_nl.rds")) {
+  library(tidyverse)
+  shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+  write_rds(shapes, "sf_nl.rds")
+} else {
+  shapes <- read_rds("sf_nl.rds")
+}
+```
+
+```{r datagis, exercise=TRUE}
+library(tidyverse)
+library(sf)
+shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+shapes
+```
+
+💡 **Shapefiles Explained**: 
+Think of shapefiles as the 'outline' you'd use in a coloring book.
+They define the borders of regions, like countries or municipalities.
+
+### 🖌 Paint That Map!
+
+To plot the map, use `geom_sf`, it automatically knows how to deal with shapefiles!
+
+```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
+ggplot(data = shapes) +
+  geom_sf(aes(geometry = geom, fill = provincie))
+```
+
+### Combining shapes and demographic information
+
+Sure, maps are cool, but maps that tell stories?
+Legendary! Let’s add some sociologically relevant demographic info to our map!
+For population density:
+
+```{r gisdensity, exercise=TRUE, exercise.setup='loadshapes'}
+inner_join(shapes, demographics) |>
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = v57_density)) +
+  scale_fill_gradient(low = "white", high = "red", guide = "none") +
+  ggtitle("Population density per municipality") +
+  theme_void()
+```
+
+For the support for the BBB party (i.e., who likes the farmer's party, BBB?):
+
+```{r gisbbb, exercise=TRUE, exercise.setup='loadshapes'}
+bbb <- results |> 
+  filter(party == "BBB")
+inner_join(shapes, bbb) |> 
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = votes)) +
+  ggtitle("Support for BBB per municipality") +
+  scale_fill_gradient(low = "white", high = "green", name = "% Support") +
+  theme_void() +
+  theme(legend.position = "bottom")
+```
+
+💭 **Brain Tickler**:
+What stories do these maps whisper about the BBB party?
+Try plotting for other parties and flex those R muscles!
+And hey, why not jazz things up with different colors?
+
+
+## Simple statisticsts: Unmask the Numbers with `R`
+
+Hey, data detective!
+Do you ever look at numbers and think, "What secrets do you hold?"
+With `R`, not only can you ask the numbers, but they'll sing you their deepest truths in the tune of statistics!
+
+### 🎡 Dance of the Variables: Correlation
+
+Ever wonder how two things are related? Like, does eating more chocolate really make you happier? (🍫 + 😄 = ?). That's correlation for you! Let's explore how our demographic data variables groove together:
+
+🔗 **The Correlation Quick-Check**:
+
+```{r cor, exercise=TRUE, exercise.setup='data'}
+# Grabbing our key variables!
+vars <- select(demographics, v01_pop:c_65plus)
+
+# What's the vibe between them?
+cor(vars, use = "pairwise")
+```
+
+But hey, why just see numbers when you can visualize the dance?
+Enter the `ggcorrplot` package:
+
+```{r corplot, exercise=TRUE, exercise.setup='data'}
+# The visual magic wand!
+library(ggcorrplot)
+
+# Dive deeper into the dance of variables.
+vars <- select(demographics, v01_pop:c_65plus)
+correlations <- cor(vars, use = "pairwise")
+ggcorrplot(correlations, method = "circle")
+```
+
+💡 **Pro Tip**: Correlation coefficients range from -1 to +1.
+The closer they are to these extremes, the stronger the dance bond between variables!
+
+
+### 🎢 Predicting the Unpredictable: Regression
+
+Regression is employed to understand relationships between variables, particularly how changes in independent variables correspond with variations in dependent ones.
+In other words: 
+you've seen the dance; now let's predict the future moves!
+Can demographics help us predict how the BBB party will fare?
+Let's find out!
+
+```{r lm, exercise=TRUE, exercise.setup='data'}
+library(sjPlot)
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+m <- lm(data, formula = votes ~ v57_density + c_65plus)
+tab_model(m)
+```
+
+```{r lm-solution}
+library(sjPlot)
+vvd <- filter(results, party == "VVD")
+data <- inner_join(vvd, demographics)
+m <- lm(data, formula = votes ~ c_65plus + v43_nl + v132_income)
+tab_model(m)
+```
+
+```{r lm-code-check}
+grade_code()
+```
+
+Guess what? The denser a municipality, the fewer the votes for BBB. But age? Seems like it doesn't play a part for BBB.
+
+🌟 **Your Turn! Challenge Time**:
+Let's shake things up. Predict the VVD's vote share using `c_65plus`, `v43_nl`, and `v132_income`.
+What stories do the numbers tell you?
+Are they what you expected? 
+(Note: Renaming the `bbb` dataset to `vvd` is essential, or the code checker will see it as a mistake.)
+
+🔮 **Final Thought**: With R, you're not just analyzing numbers; you're weaving tales, predicting futures, and unveiling secrets. So, arm yourself with curiosity, and let R be your guide to data enlightenment! 🌌📊🌟

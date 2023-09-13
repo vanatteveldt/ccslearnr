@@ -1,16 +1,24 @@
 ---
 title: "Fun with R: A look at the Dutch voter"
-output:
-  github_document:
-    toc: yes
-editor_options:
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
   chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
 ---
 
-```{r opts, echo = FALSE, message=FALSE, warning=FALSE}
-knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.keep = "none", results = FALSE)
-library(printr)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
 ```
+
 <style>
 .Info {
     background-color: rgb(204, 229, 255);
@@ -28,12 +36,19 @@ library(printr)
 
 ## CBS and Voting data
 
-
 For this tutorial, we will use demographic data from CBS (the Dutch statistics bureau) and voting results from the election board. 
 Both of these can be downloaded from the respective sources, but to make it easy we use cleaned up versions from this repository.
 
-Note: As you can see below, `R` can read `csv` files (a common format that can also be imported or exported from, e.g., Excel or SPSS)
-directly from the internet!
+The code in this tutorial will walk you through an analysis of this data, but there is little explanation of what is happening.
+Instead, we want you to ask questions to the AI helper that is embedded on every page.
+Look through the code, run and explore it and whenever something is unclear, just ask a question!
+
+Try it out below by asking what an R function is:
+
+```{r, echo=FALSE}
+knitr::include_app("https://vanatteveldt.shinyapps.io/ai_assistant_app/", height = "450px")
+```
+
 
 ### Demographics data
 
@@ -45,10 +60,17 @@ and each column represents a quantity of information about that row, e.g., a mea
 
 In this case, each row represents a Dutch municipality (*gemeente*), with the columns being a selection of demographic information collected from [CBS regional figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1691399765879):
 
-```{r datademo}
+```{r datademo, exercise=T}
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
-head(demographics)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+demographics
+```
+
+```{r, include=FALSE}
+# Somehow shinyapps.io does not always pick up all the dependencies
+library(ggcorrplot)
+library(xkcd)
+library(sjPlot)
 ```
 
 Can you guess what the columns mean? Click 'continue' to get an explanation of each column. 
@@ -79,13 +101,9 @@ Moreover, if you feel that you have messed up the code, you can press the `↻ S
 Similar to above, we can load voting data per municipality. 
 The code below will load data for each party in each municipality in the 2023 provincial elections.
 
-`R` also has powerful commands to clean up and restructure data. 
-For example, the code below shows the results for a single municipality (Groningen), ordered by vote share.
-What happens if you remove the `desc(..)` function from arrange, i.e., change `arrange(desc(votes))` into `arrange(votes)`?
-
 **Exercise**: Can you change the code to show the results for the municipality of Amsterdam, ordered by party (starting from A)?
 
-```{r datavotes}
+```{r datavotes, exercise=TRUE}
 library(tidyverse)
 results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
 results |>
@@ -93,8 +111,34 @@ results |>
   arrange(desc(votes))
 ```
 
+```{r datavotes-solution}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Amsterdam") |>
+  arrange(party)
+```
 
+```{r datavotes-code-check}
+grade_code()
+```
 
+```{r datavotes-hint-1}
+# Use gemeente == "Amsterdam" within the filter() command
+```
+
+```{r datavotes-hint-2}
+# Use gemeente == "Amsterdam" within the filter() command
+# Replace the 'votes' in the arrange command by 'party', and remove the 'desc(.)' function
+```
+
+```{r datavotes-hint-3}
+# Use gemeente == "Amsterdam" within the filter() command
+# Replace the 'votes' in the arrange command by 'party', and remove the 'desc(.)' function
+results |> 
+  filter(gemeente == "Amsterdam") |> 
+  arrange(party)
+```
 
 ::: Info ::::::
 The code box above is an exercise with a single correct solution. 
@@ -108,9 +152,15 @@ Also, if you submit an incorrect answer, `R` will do it's best to pinpoint where
 ## Simple visualizations
 
 Besides the ability to read and clean up data, `R` has a very powerful visualization suite called `ggplot`. 
-Although this can be hard to master, there are many useful resources to learn more and it can be very rewarding (and fun!) to make nice visualizations. 
+Although this can be hard to master, there are many useful resources to learn more (and you can always ask your AI assistant) and it can be very rewarding (and fun!) to make nice visualizations. 
 
 For this section, we will use the same data as above:
+
+```{r data, include=FALSE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
 
 ```{r dataprep}
 library(tidyverse)
@@ -118,11 +168,13 @@ results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/ma
 demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
 ```
 
+```{r, echo=FALSE}
+knitr::include_app("https://vanatteveldt.shinyapps.io/ai_assistant_app/", height = "450px")
+```
+
 ### A first scatter plots
 
 Let's make a first minimal scatter plot.
-A scatter plot can be very useful to see the relation between variables, for example between population density and age:
-do older people live mostly in cities or in more rural regions?
 
 ```{r scatter, exercise=T, exercise.setup='data'}
 ggplot(
@@ -133,52 +185,39 @@ ggplot(
 ```
 
 So, it turns out that older people mostly live in less dense municipalities. 
-Have a quick look at the code above. The ggplot function takes two arguments, the data (`demographics`) 
-and an *aesthetic mapping* (`aes(..)`). This mapping links columns in the the data frame (e.g. `v57_density`)
-to graphical elements of the plot (e.g. the x position of the scatter points).
-Finally, you add geometrical elements to the plot, in this case a `geom_point` or scatter point. 
+Have a quick look at the code above.
+Do you understand what it does and how to read the scatter plot?
+If not, just ask your assistant!
 
-What happens when you replace variables in the mapping with other variables, e.g. `v43_nl` or `v132_income`?
+*Your turn*: What happens when you replace variables in the mapping with other variables, e.g. `v43_nl` or `v132_income`?
 You can also try adding another aesthetic, for example `color = v43_nl` or `size = v01_pop`.
 
 ### A prettier plot
 
 The plot above was informative, but not very pretty. 
 The example below shows a much richer plot command.
-It may look scary at first, but if you look at the commands they make more sense than you would think.
+It may look scary at first, but if you look at the commands individually they make more sense than you would first think.
 It also shows quite well how ggplot works: 
 You first construct a basic plot consisting of data, aesthetics, and geoms. 
 This generally produces a decent plot, as ggplot is quite good at guessing what good scales etc. are based on your data.
 However, you can add many optional elements to the plot to change the appearance, from changing the color bars to repositioning the legend.
-Take a look at the code below:
+Take a look at the code below (and ask your assistant to explain every line you don't get):
 
-::: Info ::::::
-Note: the code box below contains multiple *comments*. 
-Every line starting with a `#` is called a comment, and is simply ignored by `R` so can be used to explain your code.
-:::
-```{r scatterpretty, exercise.setup='data'}
-# Basic ggplot 
-#    - data (demographics)
-#    - a mapping of density (y) against income (x), population size (dot size), and migration history (color),
-#    - and a geom (in this case geom_point to create a scatter plot)
+```{r scatterpretty, exercise=T, exercise.setup='data'}
+
 ggplot(
   data = demographics,
   mapping = aes(x = v57_density, y = v132_income, size = v01_pop, color = 100 - v43_nl)
 ) +
   geom_point(alpha = .7) +
-  # All optional elements to change appearance
-  # Add nice titles for the plot and axes
   ggtitle("Differences between rural and urban municipalities") +
   xlab("Population density") +
   ylab("% of people older than 65") +
-  # Change the scale for migration history to go from light to dark blue:
   scale_color_gradient(low = "lightblue", high = "darkblue") +
-  # Use the scale command to tweak the legend;
   scale_size(
     breaks = c(5000, 50000, 500000),
     labels = c("5.000", "50.000", "500.000")
   ) +
-  # Use the guide command to specify titles and direction for the legend
   guides(
     size = guide_legend(
       title = "Population", title.position = "top",
@@ -190,13 +229,12 @@ ggplot(
       direction = "horizontal"
     )
   ) +
-  # Use the 'classic' theme
   theme_classic() +
-  # Tweak the theme to drop the background for legend keys
   theme(legend.key = element_blank())
 ```
 
-In the code above, almost all lines are optional. What happens if you remove e.g. the theme or guide information?
+In the code above, almost all lines are optional.
+What happens if you remove e.g. the theme or guide information?
 And can you change the colors used in the color scale?
 
 ::: Info ::::::
@@ -214,7 +252,7 @@ Fortunately, this is quite easy because they have a common key variable (`gm`) o
 
 So, let's see if we can plot the support for the farmer's party BBB against the population density:
 
-```{r plot, exercise.setup='data'}
+```{r plot, exercise=T, exercise.setup='data'}
 bbb <- filter(results, party == "BBB")
 data <- inner_join(bbb, demographics)
 ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
@@ -240,22 +278,36 @@ Finally, to look at regional or national differences, it can be very insightful 
 To do this, `R` first needs to know the *shape* of the various regions (such as the municipalities used above).
 We can download a cleaned up Dutch 'shapefile' from the tutorial repository:
 
+```{r loadshapes, include=FALSE, exercise.setup='data'}
+library(sf)
+if (!file.exists("sf_nl.rds")) {
+  library(tidyverse)
+  shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+  write_rds(shapes, "sf_nl.rds")
+} else {
+  shapes <- read_rds("sf_nl.rds")
+}
+```
 
 
-```{r datagis}
+```{r datagis, exercise=TRUE}
 library(tidyverse)
 library(sf)
 shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
 shapes
 ```
 
-Now, we can plot this map using a regular ggplot command, using the `geom_sf` geometrical object, 
-which can directly use the `geom` column from the shapefile. 
-We can also specify the fill color of regions, for example using the province column:
+Now, we can plot this map with `geom_sg`.
 
-```{r plotshape, exercise.setup='loadshapes'}
+```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
 ggplot(data = shapes) +
   geom_sf(aes(geometry = geom, fill = provincie))
+```
+
+Is the code above clear to you?
+
+```{r, echo=FALSE}
+knitr::include_app("https://vanatteveldt.shinyapps.io/ai_assistant_app/", height = "450px")
 ```
 
 ### Combining shapes and demographic information
@@ -263,9 +315,10 @@ ggplot(data = shapes) +
 In the example above, we used only the spatial information to plot a map of Dutch municipalities.
 Of course, it becomes much more interesting (and relevant!) if we can plot sociologically relevant information.
 
-For this end, we need to `join` the spatial and demographic information, and then we can use other columns from the combined data set to color the regions. For example, the code below plots the population density per municipality:
+For this end, we need to `join` the spatial and demographic information, and then we can use other columns from the combined data set to color the regions.
+For example, the code below plots the population density per municipality:
 
-```{r gisdensity, exercise.setup='loadshapes'}
+```{r gisdensity, exercise=TRUE, exercise.setup='loadshapes'}
 inner_join(shapes, demographics) |>
   ggplot() +
   geom_sf(aes(geometry = geom, fill = v57_density)) +
@@ -276,7 +329,7 @@ inner_join(shapes, demographics) |>
 
 We could compare this with the vote share of e.g. the (farmer's) party BBB:
 
-```{r gisbbb, exercise.setup='loadshapes'}
+```{r gisbbb, exercise=TRUE, exercise.setup='loadshapes'}
 bbb <- results |> 
   filter(party == "BBB")
 inner_join(shapes, bbb) |> 
@@ -287,7 +340,6 @@ inner_join(shapes, bbb) |>
   theme_void() +
   theme(legend.position = "bottom")
 ```
-
 
 What does this tell us about the target constituency of the BBB party? 
 Can you plot the same maps for other parties or variables? Can you change the color scheme?
@@ -302,20 +354,23 @@ In this sub section, we will look at some simple statistical results.
 First, let's see how the demographics are correlated. 
 The command `cor` gives the bivariate correlations of all variables, quite useful for quick exploration:
 
-```{r cor, exercise.setup='data'}
+```{r cor, exercise=TRUE, exercise.setup='data'}
 vars <- select(demographics, v01_pop:c_65plus)
 cor(vars, use = "pairwise")
 ```
 
+```{r, echo=FALSE}
+knitr::include_app("https://vanatteveldt.shinyapps.io/ai_assistant_app/", height = "450px")
+```
+
 We can also plot this using the `ggcorrplot` package:
 
-```{r corplot, exercise.setup='data'}
+```{r corplot, exercise=TRUE, exercise.setup='data'}
 library(ggcorrplot)
 vars <- select(demographics, v01_pop:c_65plus)
 correlations <- cor(vars, use = "pairwise")
 ggcorrplot(correlations, method = "circle")
 ```
-
 
 ### Regression
 
@@ -324,8 +379,15 @@ For this, we combine the demographic and vote data as above,
 and use the `lm` function to compute the linear regression model.
 Finally, we use the `tab_model` function from the `sjPlot` package to create a nice looking regression table:
 
+```{r lm, exercise=TRUE, exercise.setup='data'}
+library(sjPlot)
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+m <- lm(data, formula = votes ~ v57_density + c_65plus)
+tab_model(m)
+```
 
-```{r lm, exercise.setup='data'}
+```{r lm-solution}
 library(sjPlot)
 vvd <- filter(results, party == "VVD")
 data <- inner_join(vvd, demographics)
@@ -333,6 +395,9 @@ m <- lm(data, formula = votes ~ c_65plus + v43_nl + v132_income)
 tab_model(m)
 ```
 
+```{r lm-code-check}
+grade_code()
+```
 
 So, BBB's vote share can be predicted from population density (the denser the municipality, the fewer votes),
 but not by the percentage of people over 65.
