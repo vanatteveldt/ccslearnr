@@ -1,0 +1,418 @@
+---
+title: "Painting with R: Crafting the Dutch Voter Portrait"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🎨 Artistic Insight";
+}
+
+</style>
+
+## Crafting the Canvas with CBS and Voting Data
+
+Imagine you're an artist, and you're about to paint a detailed portrait of the Dutch voter.
+To do this, you need the right colors and brushes.
+In our R world, these are data and functions. 
+
+For our masterpiece, we'll be using vibrant colors from CBS (the Dutch statistics bureau) and the election board's palette.
+While you can mix these colors yourself by downloading them, we've prepared a special set for you to make your artistic journey smoother.
+
+Remember, just like an artist uses different brushes and techniques to bring a painting to life, in `R`, we use different functions and commands to visualize and analyze data.
+One of the most common formats we'll be using is the `csv` file, which is like a sketchbook where data is neatly organized, ready to be painted upon.
+
+### Laying Down the Base with Demographics Data
+
+When you run the code below, think of it as preparing your canvas.
+You'll see a *data frame* - this is like a sketch on your canvas.
+In this sketch, each row is a unique Dutch municipality (*gemeente*), and the columns are different shades of demographic information, just like colors on a palette.
+Let's have a look at the colors (the [CBS regional figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1691399765879)):
+
+```{r datademo, exercise=T}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+demographics
+```
+
+```{r, include=FALSE}
+# Somehow shinyapps.io does not always pick up all the dependencies
+library(ggcorrplot)
+library(xkcd)
+library(sjPlot)
+```
+
+Take a moment to admire your canvas.
+Can you guess what each shade or column represents?
+Click 'continue' to unveil the colors of our palette.
+
+::: Info ::::::
+Remember, this is your canvas, and there's no fear of making a mistake.
+Every time you feel like starting over, just hit the 'Run code' button, and you'll have a fresh canvas.
+If you ever feel you've mixed the wrong colors, the `↻ Start Over` button will bring back the original shades.
+:::
+
+### Unveiling the Colors of Our Palette
+
+| Color (Variable) | Shade (Explanation)                                                         |
+| ---------------- | --------------------------------------------------------------------------- |
+| gm               | Unique code for each municipality                                           |
+| gemeente         | Unique name of each municipality                                            |
+| v01_pop          | Total population, like the base color of our painting                       |
+| v57_density      | The intensity or population density                                         |
+| v43_nl           | Percentage of population without a migration history, our native shade      |
+| v122_disposable  | Average disposable income per household, the richness of our color palette  |
+| v132_income      | Average standardized income per household, the tone of our color            |
+| v142_wealth      | Median household wealth, the depth of our shade                             |
+| v153_uitkering   | Percentage of population receiving social benefits, the texture of our paint|
+| c_65plus         | Percentage of population older than 65, the vintage shade                   |
+
+### Painting the Voting Landscape
+
+Now, let's add more details to our painting with voting data.
+This will be like adding intricate patterns and designs to our canvas. 
+
+`R` is like a versatile brush that can help us refine our artwork.
+For instance, the code below paints the voting landscape of a single municipality (Groningen). But what if you wanted to change the perspective?
+Try removing the `desc(..)` function from arrange and see how the landscape changes  (change `arrange(desc(votes))` into `arrange(votes)`).
+
+**Artistic Challenge**: Can you modify the code to depict the vibrant voting scene of Amsterdam, ordered by the party names (starting from A)?
+
+```{r datavotes, exercise=TRUE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Groningen") |>
+  arrange(desc(votes))
+```
+
+```{r datavotes-solution}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Amsterdam") |>
+  arrange(party)
+```
+
+```{r datavotes-code-check}
+grade_code()
+```
+
+```{r datavotes-hint-1}
+# To focus on Amsterdam, use gemeente == "Amsterdam" within the filter() brush stroke.
+```
+
+```{r datavotes-hint-2}
+# To focus on Amsterdam, use gemeente == "Amsterdam" within the filter() brush stroke.
+# Change your perspective by replacing 'votes' with 'party' in the arrange brush stroke, and remove the 'desc(.)' technique.
+```
+
+```{r datavotes-hint-3}
+# To focus on Amsterdam, use gemeente == "Amsterdam" within the filter() brush stroke.
+# Change your perspective by replacing 'votes' with 'party' in the arrange brush stroke, and remove the 'desc(.)' technique.
+results |> 
+  filter(gemeente == "Amsterdam") |> 
+  arrange(party)
+```
+
+::: Info ::::::
+The code box above is like an art challenge with a specific theme. 
+You need to adjust your brush strokes and click the `☑️Submit Artwork` button to showcase your masterpiece.
+Don't fret over a few misplaced strokes; art is about expression and learning.
+You can always refine your techniques and try again.
+If you ever feel lost, click on the `💡 Artistic Tips` for some inspiration.
+Remember, while `R` can guide you, it's your creativity that brings the canvas to life.
+:::
+
+## Painting with R: Crafting Visual Masterpieces
+
+Just as an artist uses brushes and colors to create beautiful paintings, in the world of `R`, we have a powerful toolkit called `ggplot` to craft visual masterpieces.
+While mastering the art of `ggplot` might seem like learning to paint a detailed fresco, with the right guidance and practice, you'll soon be creating visual wonders!
+
+For our next artwork, we'll continue using the colors and brushes from our previous canvas:
+
+```{r data, include=FALSE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+```{r dataprep}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+### Crafting Your First Scatter Artwork
+
+Imagine a scatter plot as a canvas filled with stars, each shining brightly, revealing a story.
+Let's craft our first scatter artwork to explore the relationship between population density and age.
+Do the stars of older age shine brighter in the bustling cities or in the tranquil countryside?
+
+```{r scatter, exercise=T, exercise.setup='data'}
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = c_65plus)
+) +
+  geom_point()
+```
+
+Gaze upon your creation!
+It seems the stars of older age shine more luminously in less dense municipalities.
+Dive into the code above and notice how `ggplot` is like your canvas, where you define your colors (`data = demographics`), brush strokes (`mapping = aes(..)`), and how to place these strokes (`v57_density` dictates the placement on the x, `c_65plus` on the y axis).
+The `geom_point` is like a special kind of brush that that makes dots (there are others to make lines or symbols and many more).
+
+Feel adventurous?
+Try changing the colors or the size of the stars by replacing variables in the mapping.
+Let your creativity flow!
+
+### Crafting a Masterpiece
+
+While our initial artwork was a delightful sketch, let's now craft a detailed masterpiece.
+The following code might seem like a complex dance of brush strokes, but with a keen eye, you'll see the rhythm and flow.
+It also shows quite well how ggplot works: 
+You first construct a basic plot consisting of data, aesthetics, and geoms. 
+This generally looks quite nice as R is experienced in painting data (it knows what scales, sizes and colors work okay).
+However, you can add many optional elements to the plot to change it into your personal style: from changing the color bars to repositioning the legend.
+
+::: Info ::::::
+Remember, lines starting with a `#` are like whispered secrets from the artist, guiding you through the creation process. They're comments that `R` will gently ignore, allowing you to understand the essence of each brush stroke.
+:::
+
+```{r scatterpretty, exercise=T, exercise.setup='data'}
+# Setting up the canvas with ggplot
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = v132_income, size = v01_pop, color = 100 - v43_nl)
+) +
+  geom_point(alpha = .7) +
+  # Adding titles and labels to our artwork
+  ggtitle("Contrasts between Urban and Rural Landscapes") +
+  xlab("Population Density") +
+  ylab("Wealth of the Land") +
+  # Choosing our color palette
+  scale_color_gradient(low = "skyblue", high = "midnightblue") +
+  # Refining the legend to guide our viewers
+  scale_size(
+    breaks = c(5000, 50000, 500000),
+    labels = c("5.000", "50.000", "500.000")
+  ) +
+  guides(
+    size = guide_legend(
+      title = "Population", title.position = "top",
+      override.aes = list(color = "midnightblue")
+    ),
+    color = guide_colorbar(
+      title = "% with Rich Cultural History",
+      title.position = "top",
+      direction = "horizontal"
+    )
+  ) +
+  # Choosing a classic theme for our masterpiece
+  theme_classic() +
+  theme(legend.key = element_blank())
+```
+
+Each line in the code above is like a brush stroke, adding depth and detail to our artwork.
+Feel free to play around, remove some lines, or change the colors.
+What happens when you experiment with different themes or guide information?
+
+::: Info ::::::
+In the world of `ggplot`, the appearance of our artwork is shaped by *themes*. These themes define the mood, style, and essence of our visual story.
+While we've used the `theme_classic`, there are many other themes waiting to be explored.
+For a modern touch, try `theme_linedraw` or for a minimalist approach, `theme_void`. If you're feeling adventurous, dive into the `ggthemes` package and experiment with themes like `ggthemes::theme_economist` or `ggthemes::theme_tufte`.
+:::
+
+
+
+### Merging Canvases: Combining Data Sources
+
+In the realm of art, sometimes we need to combine different sketches to create a detailed masterpiece.
+Similarly, in `R`, we often merge data from various sources to craft intricate visualizations.
+Let's embark on this artistic journey and see how we can blend our sketches to depict the Dutch voter landscape.
+
+Imagine you have two sketches - one showcasing election results (`results`) and another portraying demographic details.
+To create a detailed artwork, we need to merge these sketches based on a common element, the `gm` (like a unique signature on each sketch).
+
+Let's craft a visualization that depicts the support for the farmer's party BBB against the backdrop of population density:
+
+```{r plot, exercise=T, exercise.setup='data'}
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
+  geom_point(alpha = .5) +
+  xlab("Population Density (Artistic Log Scale)") +
+  ylab("Support for the Party") +
+  scale_color_manual(values = c("BBB" = "green", "Anti-immigration" = "blue")) +
+  scale_size(guide = "none") +
+  ggtitle(
+    "Support Landscape for BBB and Anti-immigration Parties",
+    "(Dutch 2023 Artistic Elections; note: size of point relative to logged municipality population)"
+  ) +
+  xkcd::theme_xkcd() +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+
+## Crafting Maps: Painting Regional Landscapes
+
+To truly appreciate regional differences, let's paint a map.
+This is like using a stencil to guide our brush strokes, ensuring we capture every detail.
+
+### Crafting the Stencil: Shape Files
+
+To paint our map, `R` needs a stencil or a *shape* of the regions (like the municipalities we've been discussing).
+Let's fetch a detailed stencil of Dutch regions:
+
+```{r loadshapes, include=FALSE, exercise.setup='data'}
+library(sf)
+if (!file.exists("sf_nl.rds")) {
+  library(tidyverse)
+  shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+  write_rds(shapes, "sf_nl.rds")
+} else {
+  shapes <- read_rds("sf_nl.rds")
+}
+```
+
+
+```{r datagis, exercise=TRUE}
+library(tidyverse)
+library(sf)
+shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+shapes
+```
+
+With our stencil ready, let's start painting!
+Using the `geom_sf` brush, we can paint the regions using the `geom` column from our stencil.
+Let's add some color using the province column:
+
+```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
+ggplot(data = shapes) +
+  geom_sf(aes(geometry = geom, fill = provincie))
+```
+
+### Merging Stencil and Colors: Combining Shapes and Demographics
+
+Our stencil is ready, but to make our map truly come alive, we need to add colors from our demographic palette.
+By merging our stencil with demographic details, we can paint regions with sociologically relevant shades.
+
+For instance, let's paint the population density across municipalities (for this we first `join` data once more):
+
+```{r gisdensity, exercise=TRUE, exercise.setup='loadshapes'}
+inner_join(shapes, demographics) |>
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = v57_density)) +
+  scale_fill_gradient(low = "white", high = "red", guide = "none") +
+  ggtitle("Population Density Artwork per Municipality") +
+  theme_void()
+```
+
+Now, let's compare this with the support landscape for the farmer's party BBB:
+
+```{r gisbbb, exercise=TRUE, exercise.setup='loadshapes'}
+bbb <- results |> 
+  filter(party == "BBB")
+inner_join(shapes, bbb) |> 
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = votes)) +
+  ggtitle("Support Landscape for BBB") +
+  scale_fill_gradient(low = "white", high = "green", name = "Support Shades") +
+  theme_void() +
+  theme(legend.position = "bottom")
+```
+
+Gaze upon your creation!
+What tales does this artwork tell about the BBB party's audience? 
+Feel inspired?
+Try painting similar maps for other parties or shades.
+Maybe experiment with a different color palette to set a different mood for your artwork.
+
+## Painting with R: Crafting Statistical Masterpieces
+
+In the world of art, sometimes we need more than just colors and brushes.
+We need tools to measure, analyze, and understand the patterns in our artwork.
+Similarly, in `R`, we have a powerful set of statistical tools to help us decipher the patterns in our data.
+Let's dive into this analytical journey and craft some statistical masterpieces.
+
+### Measuring Patterns: Correlation
+
+Imagine correlation as the rhythm or harmony between two colors in a painting.
+When two colors blend seamlessly, they are positively correlated.
+When they contrast sharply, they might be negatively correlated.
+Let's explore how the demographics harmonize with each other:
+
+```{r cor, exercise=TRUE, exercise.setup='data'}
+vars <- select(demographics, v01_pop:c_65plus)
+cor(vars, use = "pairwise")
+```
+
+To visualize this harmony, we can use the `ggcorrplot` package, which paints a beautiful correlation matrix:
+
+```{r corplot, exercise=TRUE, exercise.setup='data'}
+library(ggcorrplot)
+vars <- select(demographics, v01_pop:c_65plus)
+correlations <- cor(vars, use = "pairwise")
+ggcorrplot(correlations, method = "circle")
+```
+
+
+### Crafting Predictive Art: Regression
+
+Imagine regression as predicting the next brush stroke based on the patterns of previous strokes.
+Let's see if we can predict the support for the BBB party based on demographic details.
+We'll merge our sketches, use the `lm` function to craft our predictive model, and then display our findings in a detailed table (using `tab_model` from `sjPlot`):
+
+```{r lm, exercise=TRUE, exercise.setup='data'}
+library(sjPlot)
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+m <- lm(data, formula = votes ~ v57_density + c_65plus)
+tab_model(m)
+```
+
+It seems that the BBB's support can be predicted by the population density (fewer votes in denser areas), but the age factor doesn't seem to influence it much.
+
+**Exercise**: Let's change our focus and try to predict the VVD's support.
+Modify the code above to predict the VVD's vote share using `c_65plus`, `v43_nl`, and `v132_income`. 
+
+(Note: Be sure to rename the `bbb` data to `vvd` to avoid confusing R's code checking)
+
+```{r lm-solution}
+library(sjPlot)
+vvd <- filter(results, party == "VVD")
+data <- inner_join(vvd, demographics)
+m <- lm(data, formula = votes ~ c_65plus + v43_nl + v132_income)
+tab_model(m)
+```
+
+```{r lm-code-check}
+grade_code()
+```
+
+What patterns emerge from this artwork?
+Do the coefficients tell a story that surprises you?
+Remember, just like interpreting art, understanding statistics requires a keen eye and an open mind.

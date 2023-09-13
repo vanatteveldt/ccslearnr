@@ -1,0 +1,412 @@
+---
+title: "Cooking with Data: A Gourmet Look at the Dutch Voter"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🍽️ Chef's Tip";
+}
+
+</style>
+
+## Ingredients
+
+For our gourmet dish, we will be using:
+
+- Demographic data from CBS (the Dutch statistics bureau)
+- Voting results from the election board
+
+Both of these ingredients can be sourced fresh from their respective sources, but for convenience, we have pre-cleaned versions available.
+
+::: Info ::::::
+Remember, `R` can fetch `csv` files directly from the internet, making it easier to gather fresh ingredients!
+:::
+
+### Preparing the Demographics
+
+After executing the code below, you will have a beautifully prepared *data frame* ready for cooking.
+Data frames are like the favorite cooking pan of `R` as every dish is a bit more tasty when it is prepared in the well-used iron.
+Here, the data has already been carefully placed so each row is a unique flavor (municipalities/*gemeente*) and each column adds a different texture (variable).
+
+Our dish will feature Dutch municipalities (*gemeente*), with various demographic seasonings from [CBS regional figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=1691399765879):
+
+```{r datademo, exercise=T}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+demographics
+```
+
+```{r, include=FALSE}
+# Somehow shinyapps.io does not always pick up all the dependencies
+library(ggcorrplot)
+library(xkcd)
+library(sjPlot)
+```
+
+Curious about the flavors in our dish?
+Try to guess first what each column is.
+Click `continue` for a breakdown of each seasoning.
+
+::: Info ::::::
+Remember, in our kitchen, you can't ruin the dish!
+Every time you execute the code, it's like starting with fresh ingredients.
+If you feel you've added too much salt, just hit the `↻ Start Over` button and begin anew.
+:::
+
+### Seasoning Breakdown
+
+| Ingredient      | Flavor Profile                                                               |
+| --------------- | ---------------------------------------------------------------------------- |
+| gm              | Unique code for each municipality                                            |
+| gemeente        | Unique name of each municipality                                             |
+| v01_pop         | Total population                                                             |
+| v57_density     | Population Density                                                           |
+| v43_nl          | Percentage of population without a migration history                         |
+| v122_disposable | Average disposable income per household                                      |
+| v132_income     | Average standardized income per household                                    |
+| v142_wealth     | Median household wealth                                                      |
+| v153_uitkering  | Percentage of population receiving social benefits (excluding state pension) |
+| c_65plus        | Percentage of population older than 65                                       |
+
+### Preparing the Voting Data
+
+Just like our demographics, we need to prepare the voting data.
+This will add a rich flavor to our dish, representing each party in each municipality from the 2023 provincial elections.
+For example, the code below shows the results for a single municipality (Groningen), ordered by vote share.
+What happens if you remove the `desc(..)` function from arrange (change `arrange(desc(votes))` into `arrange(votes)`)?
+
+**Chef's Challenge**: After preparing the data for Groningen, can you adjust the recipe to showcase the flavors of Amsterdam, ordered by party (from A to Z)?
+
+```{r datavotes, exercise=TRUE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Groningen") |>
+  arrange(desc(votes))
+```
+
+```{r datavotes-solution}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Amsterdam") |>
+  arrange(party)
+```
+
+```{r datavotes-code-check}
+grade_code()
+```
+
+```{r datavotes-hint-1}
+# To bring out the flavors of Amsterdam, use gemeente == "Amsterdam" in the filter() command
+```
+
+```{r datavotes-hint-2}
+# To bring out the flavors of Amsterdam, use gemeente == "Amsterdam" in the filter() command
+# Adjust the seasoning by replacing 'votes' in the arrange command with 'party', and remove the 'desc(.)' function
+```
+
+```{r datavotes-hint-3}
+# To bring out the flavors of Amsterdam, use gemeente == "Amsterdam" in the filter() command
+# Adjust the seasoning by replacing 'votes' in the arrange command with 'party', and remove the 'desc(.)' function
+results |> 
+  filter(gemeente == "Amsterdam") |> 
+  arrange(party)
+```
+
+::: Info ::::::
+Remember, cooking is an art!
+The code box above is like a cooking challenge.
+Adjust the recipe and click the `☑️Submit Answer` button to see if you've mastered the dish.
+Don't worry about mistakes; every chef has their unique style.
+If you're stuck, click on the `💡 Hints` for some culinary guidance.
+:::
+
+## Plating Your Data: Simple Visualizations
+
+In our data kitchen, we have a special tool called `ggplot` that allows us to plate our data in the most visually appealing way!
+Mastering `ggplot` is like mastering the art of plating in gourmet cooking.
+It might seem challenging at first, but with practice, you can create visual masterpieces.
+
+For this part, we'll be using our previously prepared ingredients:
+
+```{r data, include=FALSE}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+```{r dataprep}
+library(tidyverse)
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+```
+
+### Crafting Your First Scatter Plot
+
+Imagine a scatter plot as a plate sprinkled with ingredients.
+Now, each ingredient you place on this plate symbolizes a row of data from our dataset.
+The position where you place each ingredient on the plate is determined by the values of specific variables for that particular row of data.
+Let's create our first scatter plot to see the relationship between population density and age.
+Are our older ingredients mostly found in urban or rural areas?
+
+```{r scatter, exercise=T, exercise.setup='data'}
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = c_65plus)
+) +
+  geom_point()
+```
+
+It seems older restaurant customers are mostly found in less dense parts of the country.
+Dive into the recipe above. 
+The `ggplot` function uses our ingredients (`data = demographics`) and a *presentation style* (`aes(..)`).
+This style links our ingredients to the visual elements of our plate (`v57_density` dictates the placement on the x, `c_65plus` on the y axis).
+
+**Chef's Challenge**: Can you sprinkle other ingredients on our plate, like `v43_nl` or `v132_income`?
+ Try adding more flair with `color = v43_nl` or `size = v01_pop`.
+
+### Elevating Your Presentation
+
+Our initial plate was delightful, but let's elevate it!
+The recipe below might seem intricate, but each step adds a unique touch to our presentation.
+It also shows quite well how ggplot works: 
+You first construct a basic plot consisting of data, aesthetics, and geoms. 
+This generally produces a decent plot, as ggplot is quite good at guessing what how the data can be best presented.
+However, like changing a proven recipe, you can add many optional elements to the plot to change the appearance, from changing the color bars to repositioning the legend.
+Just the way you like to eat (I mean look at) it.
+Dive in and see how `ggplot` works:
+
+::: Info ::::::
+Remember, every line starting with a `#` is a chef's note, guiding you through the recipe.
+`R` does not execute them, but treats everything right of the `#` like it wasn't there.
+:::
+
+```{r scatterpretty, exercise=T, exercise.setup='data'}
+# Basic ggplot
+#    - data (demographics)
+#    - a mapping of density (y) against income (x), population size (dot size), and migration history (color),
+#    - and a geom (in this case geom_point to create a scatter plot)
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = v132_income, size = v01_pop, color = 100 - v43_nl)
+) +
+  geom_point(alpha = .7) +
+  # All optional elements to change appearance
+  # Add nice titles for the plot and axes
+  ggtitle("Differences between rural and urban municipalities") +
+  xlab("Population density") +
+  ylab("% of people older than 65") +
+  # Change the scale for migration history to go from light to dark blue:
+  scale_color_gradient(low = "lightblue", high = "darkblue") +
+  # Use the scale command to tweak the legend;
+  scale_size(
+    breaks = c(5000, 50000, 500000),
+    labels = c("5.000", "50.000", "500.000")
+  ) +
+  # Use the guide command to specify titles and direction for the legend
+  guides(
+    size = guide_legend(
+      title = "Population", title.position = "top",
+      override.aes = list(color = "darkblue")
+    ),
+    color = guide_colorbar(
+      title = "% with Migration History",
+      title.position = "top",
+      direction = "horizontal"
+    )
+  ) +
+  # Use the 'classic' theme
+  theme_classic() +
+  # Tweak the theme to drop the background for legend keys
+  theme(legend.key = element_blank())
+```
+
+In the recipe above, each step adds a unique touch.
+ What happens if you adjust the presentation style or colors?
+
+::: Info ::::::
+In `ggplot`, presentation styles are controlled by *themes*. You can experiment with different themes like `theme_linedraw` or `theme_void`.
+For a gourmet touch, try using `ggthemes::theme_economist` or `ggthemes::theme_tufte`, which are additional styles from the package `ggthemes`.
+:::
+
+### Layering Flavors: Combining Multiple Data Sources
+
+In gourmet cooking, combining ingredients from different kitchens can lead to a symphony of flavors, like in a fusion restaurant.
+Similarly, in data visualization, combining data from multiple sources can provide richer insights.
+
+Imagine you want to understand the preference for a particular ingredient (the farmer's party BBB) across different regions, and how it relates to the base flavor (population density).
+We first `join` them, which works automatically because they both have the `gm` column.
+Here's how you can visualize this:
+
+```{r plot, exercise=T, exercise.setup='data'}
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
+  geom_point(alpha = .5) +
+  xlab("Population density (log scale)") +
+  ylab("Preference for Ingredient (BBB)") +
+  scale_color_manual(values = c("BBB" = "green", "Anti-immigration" = "blue")) +
+  scale_size(guide = "none") +
+  ggtitle(
+    "Preference for BBB and Anti-immigration Ingredients Across Regions",
+    "(Dutch 2023 provincial elections; note: size of point relative to logged region population)"
+  ) +
+  xkcd::theme_xkcd() +
+  theme(legend.position = "top", legend.title = element_blank())
+```
+
+## Plating on Maps: Visualizing Regional Differences
+
+To truly appreciate regional differences in flavor preferences, we need to plate our data on a map.
+
+### Preparing the Map: Shape Files
+
+Before we can plate our data, we need a map or a 'shape' of the regions.
+Think of this as the outline of our plate:
+
+
+```{r loadshapes, include=FALSE, exercise.setup='data'}
+library(sf)
+if (!file.exists("sf_nl.rds")) {
+  library(tidyverse)
+  shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+  write_rds(shapes, "sf_nl.rds")
+} else {
+  shapes <- read_rds("sf_nl.rds")
+}
+```
+
+
+```{r datagis, exercise=TRUE}
+library(tidyverse)
+library(sf)
+shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+shapes
+```
+
+With our plate ready, let's start plating our ingredients:
+
+```{r plotshape, exercise=TRUE, exercise.setup='loadshapes'}
+ggplot(data = shapes) +
+  geom_sf(aes(geometry = geom, fill = provincie))
+```
+
+`geom_sf` knows how to work with the ingredients in `shapes`.
+We also used the `provincie` to give our map that extra tasty color.
+
+### Layering with Demographic Information
+
+Now, let's add some flavor to our map by layering it with demographic information.
+This will help us understand the base flavors of each region.
+
+We first use `join` to combine the data evenly in our pan, then we simmer it nicely to bring out the population density flavour:
+
+```{r gisdensity, exercise=TRUE, exercise.setup='loadshapes'}
+inner_join(shapes, demographics) |>
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = v57_density)) +
+  scale_fill_gradient(low = "white", high = "red", guide = "none") +
+  ggtitle("Base Flavors (Population Density) per Region") +
+  theme_void()
+```
+
+To understand the preference for our special ingredient (BBB), let's visualize its popularity across regions:
+
+```{r gisbbb, exercise=TRUE, exercise.setup='loadshapes'}
+bbb <- results |> 
+  filter(party == "BBB")
+inner_join(shapes, bbb) |> 
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = votes)) +
+  ggtitle("Popularity of Ingredient (BBB) per Region") +
+  scale_fill_gradient(low = "white", high = "green", name = "% Preference") +
+  theme_void() +
+  theme(legend.position = "bottom")
+```
+
+**Chef's Challenge**: What insights can you gather about the preference for the BBB ingredient? Can you plate similar maps for other ingredients or flavors? How about experimenting with different color palettes?
+
+Let's wrap up our culinary data journey by diving into the essence of data analysis: statistics. Think of this as the taste testing phase, where we evaluate the flavors and textures of our dish to ensure it's just right.
+
+## Taste Testing with Simple Statistics
+
+In the world of data, `R` is our taste testing toolkit. It allows us to evaluate the relationships and patterns in our data, ensuring we have a well-balanced dish.
+
+### Evaluating Flavors: Correlation
+
+Correlation is like tasting two ingredients together to see how well they complement each other. Let's see how our demographic flavors correlate:
+
+```{r cor, exercise=TRUE, exercise.setup='data'}
+vars <- select(demographics, v01_pop:c_65plus)
+cor(vars, use = "pairwise")
+```
+
+To visualize these correlations, we can use the `ggcorrplot` package, which is like presenting a flavor wheel of our ingredients:
+
+```{r corplot, exercise=TRUE, exercise.setup='data'}
+library(ggcorrplot)
+vars <- select(demographics, v01_pop:c_65plus)
+correlations <- cor(vars, use = "pairwise")
+ggcorrplot(correlations, method = "circle")
+```
+
+
+### Crafting the Perfect Blend: Regression
+
+Regression is like adjusting the quantities of our ingredients to achieve the perfect balance.
+Let's see if we can predict the preference for our BBB ingredient using the demographic flavors:
+
+```{r lm, exercise=TRUE, exercise.setup='data'}
+library(sjPlot)
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+m <- lm(data, formula = votes ~ v57_density + c_65plus)
+tab_model(m)
+```
+
+From our taste test, we see that the preference for BBB is influenced by population density, but not by the percentage of older flavors (people over 65).
+
+**Chef's Challenge**: Can you adjust the recipe to predict the preference for the VVD ingredient using `c_65plus`, `v43_nl`, and `v132_income`? How do these flavors influence the preference? Are you surprised by the blend?
+
+```{r lm-solution}
+library(sjPlot)
+vvd <- filter(results, party == "VVD")
+data <- inner_join(vvd, demographics)
+m <- lm(data, formula = votes ~ c_65plus + v43_nl + v132_income)
+tab_model(m)
+```
+
+```{r lm-code-check}
+grade_code()
+```
+
+(Note: Remember to rename the `bbb` data to `vvd` to ensure our taste testing toolkit (R) understands your adjustments.)
+
+Bon Appétit! With your statistical insights, you're now ready to serve a well-balanced and flavorful data dish!
+
