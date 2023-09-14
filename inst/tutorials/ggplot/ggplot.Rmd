@@ -154,6 +154,7 @@ ggplot(elections,
 
 To make this graph a bit nicer, let's make some changes:
 - The votes are given as a proportion of 0-1, but most people prefer 0-100%. This can be changed in the `scale` by setting a labelling function. 
+- The party names are in all capitals, which is ugly and distracting. We can use `str_to_title` to change them to Title Case. 
 - This graph uses the default colors for parties, which do not match our normal ideas of which party should have which color.
   We can fix this by using a manual scale for the color: `scale_color_manual`, which allows us to specify exactly which value should get which color. 
 - The data for the minor parties was sometimes missing. For example, the Greens were only included in 2000 and 2020. 
@@ -162,8 +163,7 @@ To make this graph a bit nicer, let's make some changes:
 - Finally, let's make the line for the minor parties dotted, using `mutate` to define major, and then using it as the linetype aesthetic, 
   again setting a manual scale to force the FALSE values to be dashed (and removing the guide/legend).
 
-
-To achieve the last two changes, we need to preprocess the data before the `ggplot` command, using the `complete` and `mutate` functions.
+To achieve these two changes, we need to preprocess the data before the `ggplot` command, using the `complete` and `mutate` functions.
 We do this by placing these in a pipeline before `ggplot`, and then of course omitting the data argument from the ggplot call.
 (see the handout on summarizing data for an explanation of pipelines, if needed). 
 
@@ -172,14 +172,14 @@ library(tidyverse)
 elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
 ```
 ```{r line2, exercise=TRUE}
-library(tidyverse)
 elections |> 
   complete(year, party, fill=list(votes=0)) |>
-  mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN") |>
+  mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN",
+         party = str_to_title(party)) |>
   ggplot(aes(x=year, y=votes, color=party, linetype=major)) + 
   scale_y_continuous(labels = scales::percent) + 
   scale_linetype_manual(values=c("dashed", "solid"), guide='none') + 
-  scale_color_manual(breaks=c("DEMOCRAT", "REPUBLICAN", "GREEN", "LIBERTARIAN", "OTHER"),
+  scale_color_manual(breaks=c("Democrat", "Republican", "Green", "Libertarian", "Other"),
                      values=c("blue", "red", "green4", "yellow4", "grey")) + 
   geom_line()
 ```
