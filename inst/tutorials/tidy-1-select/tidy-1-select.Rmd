@@ -273,6 +273,7 @@ Assign the result to the `gunpolls` object
 
 
 ```{r gunpollsex, exercise=TRUE, eval=FALSE}
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 ___

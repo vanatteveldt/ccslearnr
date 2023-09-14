@@ -15,9 +15,6 @@ learnr_to_md_options:
 knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.path = "img/")
 library(learnr)
 gradethis::gradethis_setup()
-tutorial_options(
-  exercise.reveal_solution = FALSE
-)
 ```
 <style>
 .Info {
@@ -69,6 +66,78 @@ In R, summarization also follows the same steps, with `group_by` used for creati
 
 In the next section, we will look at these commands in detail. 
 
+
+
+## Before we start: Pipelines and the |> symbol
+
+In Tidyverse, often you run many data cleaning or transformation commands in sequence.
+For example, you might want to read in data, select some columns, filter some rows,
+mutate a new calue, and summarize some other values. 
+
+If we would do this with single commands, we would get a very repetitive script.
+For example, 
+
+```{r pipe1}
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+polls <- read_csv(url)
+polls <- filter(polls, Question == "age-21")
+polls <- select(polls, Population, Pollster, Support)
+polls <- mutate(polls, Percent = Support / 100)
+```
+
+The code above runs fine, but as you can see it repeats the name `polls` an awful lot. 
+Because this is such a common pattern, R has introduced a shortcut to express such a sequence, or **pipeline**,
+of operations: The pipeline operator `|>`. 
+
+This operator works by chaining together multiple functions, such that the output of the first function is the input
+(first argument) of the second functoin. To see this in action, the following snippet can be rewritten as a pipeline like this:
+
+```{r pipe2}
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+polls <- read_csv(url) |>
+  filter(Question == "age-21") |>
+  select(Population, Pollster, Support) |>
+  mutate(Percent = Support / 100)
+```
+
+The whole sequence of calls is now a single statement ('sentence'), where the result of `read_csv` is the input of `filter`, the result of which is fed into `select`, etc., until the output of `mutate` is assigned to the polls variable.
+
+This technique is very convenient to group related calls together, 
+and can make code more readable by making it clear that such a group of calls is a logical unit.
+
+The biggest **common mistake** is that you no longer supply the data to the functions in the pipeline (except the first), so instead of using `filter(data, ...) |> select(data, ...)` make sure you use  `filter(data, ...) |> select( ...)`. Note that you can also feed the data into the first function, like `data |> filter(...)`. 
+
+Whether you use pipelines or not yourself is a stylistic choice, but it's important to be able to read them as they are often used in scripts (including this tutorial).
+Note that older code might use the `%>%` symbol, which was around longer and has the same function. 
+
+### Pipelines: exercise
+
+Can you rewrite the calls from `read_csv` to `mutate` into a single pipeline?
+
+
+```{r pipe3, exercise=TRUE}
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+gunpolls <- read_csv(url)
+gunpolls <- select(gunpolls, Question, Support, 
+                   rep=`Republican Support`, dem=`Democratic Support`)
+gunpolls <- mutate(gunpolls, diff = rep - dem)
+head(gunpolls)
+```
+```{r pipe3-solution}
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+gunpolls <- read_csv(url) |>
+ select(Question, Support, 
+        rep=`Republican Support`, dem=`Democratic Support`) |>
+  mutate(diff = rep - dem) 
+head(gunpolls)
+```
+```{r pipe3-code-check}
+grade_code()
+```
 
 
 ## Summarizing data in R
