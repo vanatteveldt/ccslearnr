@@ -1,0 +1,47 @@
+---
+title: 'Visualizing data with ggplot'
+author: "Wouter van Atteveldt"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE, remove_for_md=TRUE}
+knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.path = "img/")
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🛈 Information";
+}
+</style>
+
+## Introduction
+
+Creating visualizations is one of the most useful and powerful ways to analyse and data
+and tell a convincing story with these data. 
+
+In `ggplot`, R Tidyverse has a very powerful and well-designed visualization library.
+It can be used to make almost all kinds of graphs, from simple line and scatter plots to   
+
+
+
+
+
