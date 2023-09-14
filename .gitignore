@@ -51,3 +51,16 @@ rsconnect/
 tmp
 env
 __pycache__
+
+# Temporary files in tutorials
+
+inst/tutorials/*/*.html
+inst/tutorials/*/*_data/
+handouts/*.Rmd
+assignments/*.Rmd
+assignments/*.docx
+
+.vscode
+
+
+
