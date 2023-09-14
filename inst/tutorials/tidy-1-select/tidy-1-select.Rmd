@@ -12,9 +12,6 @@ learnr_to_md_options:
 knitr::opts_chunk$set(message=FALSE, warning=FALSE, fig.path = "img/")
 library(learnr)
 gradethis::gradethis_setup()
-tutorial_options(
-  exercise.reveal_solution = FALSE
-)
 ```
 
 ## Introduction to Tidyverse 
@@ -85,12 +82,14 @@ Let's say our respondents are 24, 32 and 27 years old.
 Can you add a column called 'age' that specifies this age for the respondents?
 
 ```{r tibbleage, exercise=TRUE}
+library(tidyverse)
 respondents <- tibble(resp_id = c(1,2,3), 
                       gender = c("M","M","F"))
 respondents
 ```
 
 ```{r tibbleage-solution}
+library(tidyverse)
 respondents <- tibble(resp_id = c(1,2,3), 
                       gender = c("M","M","F"),
                       age = c(24, 32, 27))
@@ -145,17 +144,20 @@ A csv file of the political polls just after the fall of the Dutch cabinet Rutte
 Can you download that file and assign it to an object called `polls`?
 
 ```{r loadpolls2, exercise=TRUE, eval=FALSE}
+library(tidyverse)
 polls <- ____
 polls
 ```
 
 ```{r loadpolls2-solution}
 # Option 1: storing the url in a temporary object ----
+library(tidyverse)
 url <- "https://i.amcat.nl/peiling.csv"
 polls <- read_csv(url)
 polls
 
 # Option 2: putting the url directly in the function ----
+library(tidyverse)
 polls <- read_csv("https://i.amcat.nl/peiling.csv")
 polls
 ```
@@ -176,6 +178,7 @@ to change the *columns* of a data frame.
 In this section, we will continue with the gun polls data we used above:
 
 ```{r setupgun}
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls
@@ -279,6 +282,7 @@ gunpolls  # prints the result on screen
 
 ```{r gunpollsex-solution}
 # Option 1: use separate commands for rename and select : ----
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls <- rename(gunpolls, rep_support=`Republican Support`, dem_support= `Democratic Support`)
@@ -286,6 +290,7 @@ gunpolls <- select(gunpolls, Question, Pollster, rep_support, dem_support)
 gunpolls
 
 # Option 2: use separate commands for rename and select, starting with select : ----
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls <- select(gunpolls, Question, Pollster, `Republican Support`, `Democratic Support`)
@@ -294,6 +299,7 @@ gunpolls
 
 
 # Option 3: combine the rename and select in a single command: ----
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls <- select(gunpolls, Question, Pollster, rep_support=`Republican Support`, dem_support= `Democratic Support`)
@@ -312,6 +318,7 @@ Another common task is selecting *rows*, which can be done with the `filter` fun
 This section also uses the gun polls data we used above:
 
 ```{r setupgun3}
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls
@@ -354,6 +361,7 @@ To check if a value is missing, you should use the function `is.na(column)`.
 For example, let's look at a version of the gun polls data which has some missing value:
 
 ```{r readgunpollsdirty}
+library(tidyverse)
 gunpolls_dirty <- read_csv("https://cssbook.net/d/guns-polls-dirty.csv")
 gunpolls_dirty
 ```
@@ -378,6 +386,7 @@ Let's go back to the original gunpolls data.
 Can you select the polls about stricter gun laws (`stricter-gun-laws`) where the overall suppport was at least 70%, and assign that selection to a new object called `strict_polls`?
 
 ```{r filterex, exercise=TRUE, eval=F}
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 ___
@@ -385,24 +394,28 @@ strict_polls
 ```
 
 ```{r filterex-solution}
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 strict_polls <- filter(gunpolls, Question == "stricter-gun-laws" & Support >= 70)
 strict_polls
 
 # Of course, you can also turn the two arguments arround: ----
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 strict_polls <- filter(gunpolls, Support >= 70 &  Question == "stricter-gun-laws")
 strict_polls
 
 # And you can also use multiple arguments to filter: ----
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 strict_polls <- filter(gunpolls, Support >= 70,  Question == "stricter-gun-laws")
 strict_polls
 
 # Or the other way around: ----
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 strict_polls <- filter(gunpolls, Question == "stricter-gun-laws", Support >= 70)
@@ -424,6 +437,7 @@ The mutate function makes it easy to create new variables or to modify existing 
 
 ```{r setupgun2}
 # unfortunately, this chunk won't be shown in the exercise, so we'll have to duplicate it...
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 
@@ -431,6 +445,7 @@ gunpolls <- select(gunpolls, Question, Support,
                    rep=`Republican Support`, dem=`Democratic Support`)
 ```
 ```{r}
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls <- select(gunpolls, Question, Support, 
