@@ -132,9 +132,6 @@ ggplot(demographics,
 Note the use of `alpha` to make the points somewhat transparent, making it a bit easier to see when points overlap. 
 This is given as a constant value rather than a mapping, since we want all points to have this. 
 
-## Bar plots
-
-(will be added later)
 
 ## Line graphs
 
@@ -167,11 +164,11 @@ To achieve these two changes, we need to preprocess the data before the `ggplot`
 We do this by placing these in a pipeline before `ggplot`, and then of course omitting the data argument from the ggplot call.
 (see the handout on summarizing data for an explanation of pipelines, if needed). 
 
-```{r line2-setup}
+```{r electiondata}
 library(tidyverse)
 elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
 ```
-```{r line2, exercise=TRUE}
+```{r line2, exercise=TRUE, exercise.setup='electiondata'}
 elections |> 
   complete(year, party, fill=list(votes=0)) |>
   mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN",
@@ -184,6 +181,53 @@ elections |>
   geom_line()
 ```
 
+## Bar plots
+
+Where scatter and line plots generally focus on plotting individual cases, bar plots often present some sort of summary per case.
+For example, let's consider that US Demographics data:
+
+```{r}
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+Suppose we would like to show the number of counties per state. This can be done using a bar plot, for which you only specify
+either the `y` or `x` axis. This by default *counts* the number of cases and creates a bar for each case representing this count:
+
+```{r}
+ggplot(us_demographics, aes(y=state)) + geom_bar()
+```
+
+For continuous variables, you need to divide the range into *bins*. This can be done using `geom_histogram`, which also takes only an `x` or `y` argument.
+For example, the code below shows the number of counties by percentage non-white population, which is divided into 10 bins (deciles):
+
+
+```{r}
+ggplot(us_demographics, aes(x=nonwhite_pct)) + geom_histogram(bins=10, color="black")
+```
+
+
+There are some more interesting options to explore with a bar plot, as showcased by the plot below:
+
+- You can also specify the summary value manually if you have already computed the statistic, for example for the votes in the election data loaded above.
+  For this, use `geom_col` rather than `geom_bar` and specify both `x` and `y` aesthetic
+- To create a grouped bar plot, specify a `fill` aesthetic and add `position_dodge2()` to the geom. 
+  (note: normally `position_dodge()` also works, but with a continuous grouping value like year you need `dodge2`)
+- Often, a vertically arranged bar plot can be more readable than a horizontal one.
+  However, if you prefer a horizontal plot, you can put the x markers at a 45 or 90 degree angle. 
+
+```{r bar2, exercise=TRUE}
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+elections |>
+  complete(year, party, fill=list(votes=0)) |>
+  ggplot(aes(x=party, y=votes, fill=year)) + geom_col(position=position_dodge2()) + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  ylab("")
+```
+
+(note the use of complete to ensure that missing year-party combinations are treated as zero).
 
 ## Combining geoms
 

@@ -1,6 +1,16 @@
 Visualizing data with ggplot
 ================
 
+- [Introduction](#introduction)
+  - [GGplot basics](#ggplot-basics)
+  - [Make it pretty!](#make-it-pretty)
+- [Scatter plots](#scatter-plots)
+- [Line graphs](#line-graphs)
+- [Bar plots](#bar-plots)
+- [Combining geoms](#combining-geoms)
+- [Creating high-quality graphs for
+  reports](#creating-high-quality-graphs-for-reports)
+
 <style>
 .Info {
     background-color: rgb(204, 229, 255);
@@ -28,20 +38,20 @@ plots.
 For an an overview of possibilities and more explanation, you can check
 out the free online resources below:
 
-  - [The R Graph
-    gallery](https://r-graph-gallery.com/ggplot2-package.html) -
-    contains many examples of beautiful plots, all with R code included
-  - [From data to viz](https://www.data-to-viz.com/) - an interactive
-    site that showcases good plots based on your data, giving not just
-    the R code but also best practices, common mistakes, and
-    alternatives for each plot.
-  - [The ggplot cheat
-    sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf)
-    with a nice overview of ggplot functions and options
-  - [Data Visualization](https://socviz.co/) by Kieran Healy - a
-    completely free online book that discusses the principles of data
-    visualization and the best ways to visualize various types of data,
-    also including R code for all examples.
+- [The R Graph
+  gallery](https://r-graph-gallery.com/ggplot2-package.html) - contains
+  many examples of beautiful plots, all with R code included
+- [From data to viz](https://www.data-to-viz.com/) - an interactive site
+  that showcases good plots based on your data, giving not just the R
+  code but also best practices, common mistakes, and alternatives for
+  each plot.
+- [The ggplot cheat
+  sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf)
+  with a nice overview of ggplot functions and options
+- [Data Visualization](https://socviz.co/) by Kieran Healy - a
+  completely free online book that discusses the principles of data
+  visualization and the best ways to visualize various types of data,
+  also including R code for all examples.
 
 ### GGplot basics
 
@@ -71,18 +81,18 @@ This ggplot call is typical for how ggplot works, and showcases the
 *grammar of graphics*. Essentially, every graph contains these three
 basic elements:
 
-  - The **data**, in this case `mtcars`. This is the first argument of
-    the ggplot function.
-  - One or more **geometrical elements** or `geom`s, that form the
-    actual visualization.
-  - An **aesthetic mapping** or `aes` that maps columns in the data to
-    aspects of the geometry.
+- The **data**, in this case `mtcars`. This is the first argument of the
+  ggplot function.
+- One or more **geometrical elements** or `geom`s, that form the actual
+  visualization.
+- An **aesthetic mapping** or `aes` that maps columns in the data to
+  aspects of the geometry.
 
 In other words, the plot above is a plot of points (i.e. a scatter
 plot), whose x and y positions are mapped to the `hp` and `mpg` columns
 of the data frame `mtcars`
 
-### Make it pretty\!
+### Make it pretty!
 
 Besides these three basic elements (data, geoms, and aesthetics), you
 can tweak almost every aspect of a plot. For example, the code below
@@ -91,19 +101,17 @@ cylinders of the car.
 
 Besides this, it adds three extra elements:
 
-  - A `scale`. By default, ggplot looks at the data and determines a
-    reasonable scale. This default is generally quite good, and means
-    that you can quickly make decent graphs. With the `scale_*`
-    commands, you can tweak this scale, for example by changing color
-    values, the range, etc.
-  - A `ggtitle`. You can add various elements like titles, subtitles,
-    axis labels etc. to the plot to make it more informative
-  - A `theme`. Themes determine the look and feel of everything around
-    the data, e.g. the plot background, grid lines, fonts, etc. You can
-    create and tweak themes to change the look and feel of plots, for
-    example to match the house style of a company or journal.
-
-<!-- end list -->
+- A `scale`. By default, ggplot looks at the data and determines a
+  reasonable scale. This default is generally quite good, and means that
+  you can quickly make decent graphs. With the `scale_*` commands, you
+  can tweak this scale, for example by changing color values, the range,
+  etc.
+- A `ggtitle`. You can add various elements like titles, subtitles, axis
+  labels etc. to the plot to make it more informative
+- A `theme`. Themes determine the look and feel of everything around the
+  data, e.g. the plot background, grid lines, fonts, etc. You can create
+  and tweak themes to change the look and feel of plots, for example to
+  match the house style of a company or journal.
 
 ``` r
 ggplot(mtcars, aes(x=hp, y=mpg, color=cyl)) + 
@@ -147,10 +155,6 @@ Note the use of `alpha` to make the points somewhat transparent, making
 it a bit easier to see when points overlap. This is given as a constant
 value rather than a mapping, since we want all points to have this.
 
-## Bar plots
-
-(will be added later)
-
 ## Line graphs
 
 Line graphs mostly useful to showcase change over time. This uses
@@ -183,8 +187,8 @@ sometimes missing. For example, the Greens were only included in 2000
 and 2020. By default, ggplot draws a line between those points, which
 misleadingly suggests that they had a result in the intervening years as
 well. We fix this using the `complete` function, which inserts missing
-combinations of `year` and `party`, setting the `vote` variable to zero.
-- Finally, let’s make the line for the minor parties dotted, using
+combinations of `year` and `party`, setting the `vote` variable to
+zero. - Finally, let’s make the line for the minor parties dotted, using
 `mutate` to define major, and then using it as the linetype aesthetic,
 again setting a manual scale to force the FALSE values to be dashed (and
 removing the guide/legend).
@@ -212,6 +216,65 @@ elections |>
                      values=c("blue", "red", "green4", "yellow4", "grey")) + 
   geom_line()
 ```
+
+## Bar plots
+
+Where scatter and line plots generally focus on plotting individual
+cases, bar plots often present some sort of summary per case. For
+example, let’s consider that US Demographics data:
+
+``` r
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+Suppose we would like to show the number of counties per state. This can
+be done using a bar plot, for which you only specify either the `y` or
+`x` axis. This by default *counts* the number of cases and creates a bar
+for each case representing this count:
+
+``` r
+ggplot(us_demographics, aes(y=state)) + geom_bar()
+```
+
+For continuous variables, you need to divide the range into *bins*. This
+can be done using `geom_histogram`, which also takes only an `x` or `y`
+argument. For example, the code below shows the number of counties by
+percentage non-white population, which is divided into 10 bins
+(deciles):
+
+``` r
+ggplot(us_demographics, aes(x=nonwhite_pct)) + geom_histogram(bins=10, color="black")
+```
+
+There are some more interesting options to explore with a bar plot, as
+showcased by the plot below:
+
+- You can also specify the summary value manually if you have already
+  computed the statistic, for example for the votes in the election data
+  loaded above. For this, use `geom_col` rather than `geom_bar` and
+  specify both `x` and `y` aesthetic
+- To create a grouped bar plot, specify a `fill` aesthetic and add
+  `position_dodge2()` to the geom. (note: normally `position_dodge()`
+  also works, but with a continuous grouping value like year you need
+  `dodge2`)
+- Often, a vertically arranged bar plot can be more readable than a
+  horizontal one. However, if you prefer a horizontal plot, you can put
+  the x markers at a 45 or 90 degree angle.
+
+``` r
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+elections |>
+  complete(year, party, fill=list(votes=0)) |>
+  ggplot(aes(x=party, y=votes, fill=year)) + geom_col(position=position_dodge2()) + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  ylab("")
+```
+
+(note the use of complete to ensure that missing year-party combinations
+are treated as zero).
 
 ## Combining geoms
 
