@@ -65,6 +65,7 @@ demographics
 # Somehow shinyapps.io does not always pick up all the dependencies
 library(ggcorrplot)
 library(xkcd)
+library(ggthemes)
 library(sjPlot)
 ```
 
