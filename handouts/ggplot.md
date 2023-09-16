@@ -53,6 +53,17 @@ out the free online resources below:
   visualization and the best ways to visualize various types of data,
   also including R code for all examples.
 
+<div class="Info">
+
+Most of the plots in this tutorial focus on the mechanics of the
+visualization and don’t spend a lot of attention on adding informative
+labels, making it visually attractive, etc. For plots in reports and
+presentations, however, it is extremely important to pay attention to
+these details. So, be sure to check out the last section on *Creating
+high-quality graphs* as well!
+
+</div>
+
 ### GGplot basics
 
 To illustrate how ggplot works, let’s take a look at a simple built-in
@@ -153,7 +164,15 @@ ggplot(demographics,
 
 Note the use of `alpha` to make the points somewhat transparent, making
 it a bit easier to see when points overlap. This is given as a constant
-value rather than a mapping, since we want all points to have this.
+value rather than a mapping, since we want all points to have this. This
+can be used on all geoms: if you wish to e.g. make all points a certain
+color or size, you add these in the `geom(...)` call directly, i.e. not
+in an `aes(...)` call.
+
+What happens when you add `shape=21` or even `shape='🏠'` to the call?
+For `shape=21`, you can also add a fill aesthetic (or constant value) if
+desired. (gogle ggplot shapes to see an overview of built-in default
+shapes, like the circles for 21)
 
 ## Line graphs
 
@@ -229,6 +248,12 @@ us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccsl
 us_demographics
 ```
 
+``` r
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
 Suppose we would like to show the number of counties per state. This can
 be done using a bar plot, for which you only specify either the `y` or
 `x` axis. This by default *counts* the number of cases and creates a bar
@@ -278,8 +303,151 @@ are treated as zero).
 
 ## Combining geoms
 
-(will be added later)
+The plots below all had a single `geom`, creating a pure bar, line,
+scatter or other plot. You can also combine elements, however, for
+example adding a regression line through a scatter plot.
+
+For example, consider the scatter plot we created earlier:
+
+``` r
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+```
+
+``` r
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point()
+```
+
+We can add a regression (trend) line to this plot by adding a
+`geom_smooth` (using `lm`, i.e. a linear model), which conveniently uses
+the same aesthetics as the scatter plot:
+
+``` r
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() + 
+  geom_smooth(method = lm)
+```
+
+When adding multiple geoms, by default they use the data and aesthetics
+from the `ggplot` call. However, you can override these by specifying
+which data or aesthetics to use for a geom.
+
+For example, we could add the names of selected municipalities, for
+example the outliers. To do this, we would add a `geom_text()` with a
+`label` aesthetic. However, if we would label all 345 points it would
+quickly become a mess. For that reason, we can create a subset of the
+data, and use that as the data for the `geom_text`:
+
+``` r
+subset = filter(demographics, c_65plus > 30 | c_65plus < 15 | v57_density > 4000)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() + 
+  geom_text(data=subset, aes(label=gemeente), nudge_y = -.5)
+```
+
+Some things to note here: - ggplot wants the data as first argument, and
+the mapping as second. For geoms this is unfortunately the other way
+around, so we specify that the first argument is the data by using
+`data=subset` rather than just `geom_text(subset,...)` - `geom_text` now
+has it’s own data, and we also specify a label aesthetic. The x and y
+aesthetic (i.e. the label positions) are not overridden, so they use the
+mapping from the `ggplot` call. - Finally, we use `nudge_y` to move all
+labels a little bit down so they don’t overlap with the points.
 
 ## Creating high-quality graphs for reports
 
-(will be added later)
+So far, we have mostly kept the default options for graphs and did not
+spend too much attention to making them nicer to look at or easier to
+read. This is fine if you’re visualising data as part of your own
+analysis. If you want to include the visualizations in a report or
+article, however, or present them to an audience, it is worth spending a
+bit of time to make them both prettier and more informative.
+Fortunately, `ggplot` gives you almost endless options to tweak any
+aspect of each plot.
+
+There are probably as many ideas on the ‘best’ visualization as there
+are data scientists, and many aspects of what makes a graph beautiful or
+informative are subjective. However, there are e number of things that
+you should generally pay attention to:
+
+- The graph should be understandable without reading any text in the
+  rest of the paper or report. This means that titles and axis labels
+  should immediately make it clear what the graph is about. As a rule of
+  thumb, mention the most important relation or question you are
+  answering in the title, and make sure that the axis labels do not
+  contain strange abbreviations or technical terms.
+- Make sure all elements are clearly readable and elements don’t overlap
+  each other if it can be helped.
+- Make sure the scales and legends are clear and make sense in terms of
+  your data.
+
+As an example, consider the first graph from the scatter plot section:
+
+``` r
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v132_income)) +
+  geom_point(alpha=.6)
+```
+
+This graph is fairly informative: we can see that older people mostly
+live in smaller, more rural, and somewhat richer communities. However,
+if you were to show this graph to an outsider, they would not be able to
+understand most of the this. It lacks a descriptive title, uses obscure
+variable names for axis labels, uses scientific notation for the
+population, and personally I find the default style a bit jarring.
+
+These points can all be addressed by **adding extra elements** to the
+plot. Specifically:
+
+- You can add an overall `ggtitle` and horizontal and vertical axis
+  labels (`xlab` and `ylab`)
+- You can alter the way values are mapped between a column and the
+  aesthetic element by adding the `scale_` functions. These functions
+  are named for the aesthetic and optionally the data type, so for
+  example `scale_size` changes the size aesthetic (for example changing
+  the legend labels and name), while the `scale_color_gradient` creates
+  a gradient scale for the color, where you can specify the colors on
+  both ends of the gradient.
+- Finally, you can select a `theme` and then add more `theme(..)`
+  functions to change that theme, for example to change lines, fonts,
+  etc.
+
+The code below addresses most of these points, and as a bonus adds
+labeling for some of the more interesting points by first creating a
+subset of points to label, and then adding a second geom (`geom_text`)
+using its own data and aesthetics (see the section on combining geoms).
+
+``` r
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+highlight <- filter(demographics, v01_pop > 250000 | 
+                      c_65plus > 30 | 
+                      c_65plus > 25 & v57_density > 3000 |
+                      c_65plus < 15)
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v132_income)) +
+  geom_point(alpha=.6) + 
+  xlim(0, 7000) + 
+  geom_text(data=highlight, aes(label=gemeente), nudge_y = -1, size=3, color="coral") + 
+  ggtitle("Where do older people live?",
+          "Selected characteristics of Dutch municipalities") +
+  xlab("Population density") + 
+  ylab("Percentage of population aged 65+") + 
+  scale_size(breaks=c(5000, 50000, 500000), labels=c("5.000", "50.000", "500.000"), name="Population") + 
+  scale_color_gradient(low="coral", high="darkblue", name="Household\nIncome") +
+  theme_classic() + theme(axis.title = element_text(size=12))
+```
+
+Have a look at the code above and see if you understand how the
+different elements combine to create the plot. Can you change the
+highlighting criteria to label different points?
+
+As an exercise, pick any of the earlier graphs from this handout, and
+see if you can turn it into a beautiful and informative visualization!
