@@ -12,4 +12,6 @@ results |> filter(year == 2020, office == "US PRESIDENT", mode == "TOTAL") |>
   mutate(fips = as.numeric(fips), state=str_to_title(state), county=str_to_title(county), party=str_to_title(party)) |>
   write_csv("data/US_Elections_2020.csv")
 
-
+results |> filter(office == "US PRESIDENT", mode == "TOTAL") |>
+  group_by(year, party) |> summarize(votes=sum(candidatevotes)) |> mutate(votes=votes/sum(votes)) |>
+  write_csv("data/US_Elections_years.csv")
