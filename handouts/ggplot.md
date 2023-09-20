@@ -3,10 +3,15 @@ Visualizing data with ggplot
 
 - [Introduction](#introduction)
   - [GGplot basics](#ggplot-basics)
+  - [Elements of a ggplot](#elements-of-a-ggplot)
   - [Make it pretty!](#make-it-pretty)
 - [Scatter plots](#scatter-plots)
 - [Line graphs](#line-graphs)
+  - [Let’s make it pretty!](#lets-make-it-pretty)
 - [Bar plots](#bar-plots)
+  - [Histograms](#histograms)
+  - [Using geom_col instead of
+    geom_bar](#using-geom_col-instead-of-geom_bar)
 - [Combining geoms](#combining-geoms)
 - [Creating high-quality graphs for
   reports](#creating-high-quality-graphs-for-reports)
@@ -88,7 +93,13 @@ ggplot(mtcars,
   geom_point()
 ```
 
-This ggplot call is typical for how ggplot works, and showcases the
+**Exercise:** First, let’s run the code the way it is now (press the
+‘run code’ button). Now, can you change the plot to show the `wt`
+(weight) on the x axis instead?
+
+### Elements of a ggplot
+
+The ggplot call above is typical for how ggplot works, and showcases the
 *grammar of graphics*. Essentially, every graph contains these three
 basic elements:
 
@@ -162,6 +173,19 @@ ggplot(demographics,
   geom_point(alpha=.6)
 ```
 
+``` r
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v43_nl)) +
+  scale_color_gradient(low="darkblue", high="lightblue") + 
+  geom_point(alpha=.6)
+```
+
+**Exercise**: Can you change the code to make the colors represent the
+percentage of inhabitants without a migration history (`v43_nl`), and
+change the color scale to run from dark blue to light blue?s
+
 Note the use of `alpha` to make the points somewhat transparent, making
 it a bit easier to see when points overlap. This is given as a constant
 value rather than a mapping, since we want all points to have this. This
@@ -169,10 +193,11 @@ can be used on all geoms: if you wish to e.g. make all points a certain
 color or size, you add these in the `geom(...)` call directly, i.e. not
 in an `aes(...)` call.
 
-What happens when you add `shape=21` or even `shape='🏠'` to the call?
-For `shape=21`, you can also add a fill aesthetic (or constant value) if
-desired. (gogle ggplot shapes to see an overview of built-in default
-shapes, like the circles for 21)
+If you want to play around a bit more: What happens when you add
+`shape=21` or even `shape='🏠'` to the call? For `shape=21`, you can
+also add a fill aesthetic (or constant value) if desired - how does that
+affect the plot? (you can google ‘ggplot shapes’ to see an overview of
+built-in default shapes, like the circles for 21)
 
 ## Line graphs
 
@@ -192,6 +217,8 @@ ggplot(elections,
        aes(x=year, y=votes, color=party)) + 
   geom_line()
 ```
+
+### Let’s make it pretty!
 
 To make this graph a bit nicer, let’s make some changes: - The votes are
 given as a proportion of 0-1, but most people prefer 0-100%. This can be
@@ -263,6 +290,8 @@ for each case representing this count:
 ggplot(us_demographics, aes(y=state)) + geom_bar()
 ```
 
+### Histograms
+
 For continuous variables, you need to divide the range into *bins*. This
 can be done using `geom_histogram`, which also takes only an `x` or `y`
 argument. For example, the code below shows the number of counties by
@@ -272,6 +301,8 @@ percentage non-white population, which is divided into 10 bins
 ``` r
 ggplot(us_demographics, aes(x=nonwhite_pct)) + geom_histogram(bins=10, color="black")
 ```
+
+### Using geom_col instead of geom_bar
 
 There are some more interesting options to explore with a bar plot, as
 showcased by the plot below:
@@ -300,6 +331,11 @@ elections |>
 
 (note the use of complete to ensure that missing year-party combinations
 are treated as zero).
+
+**Exercise:** In the code above, `year` is a numeric variable, causing R
+to create a gradient scale for it. Can you change year into a factor
+(using `as.factor(year)`) in the code above? How does that change the
+plot?
 
 ## Combining geoms
 
@@ -344,7 +380,7 @@ quickly become a mess. For that reason, we can create a subset of the
 data, and use that as the data for the `geom_text`:
 
 ``` r
-subset = filter(demographics, c_65plus > 30 | c_65plus < 15 | v57_density > 4000)
+subset = filter(demographics, c_65plus > 30 | v57_density > 4000)
 ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
   geom_point() + 
   geom_text(data=subset, aes(label=gemeente), nudge_y = -.5)
@@ -358,6 +394,10 @@ has it’s own data, and we also specify a label aesthetic. The x and y
 aesthetic (i.e. the label positions) are not overridden, so they use the
 mapping from the `ggplot` call. - Finally, we use `nudge_y` to move all
 labels a little bit down so they don’t overlap with the points.
+
+**Exercise:** Can you add labels for the municipalities where less than
+15% of the population is over 65? (hint: you can add another condition
+to the existing filter call by adding another `|`)
 
 ## Creating high-quality graphs for reports
 

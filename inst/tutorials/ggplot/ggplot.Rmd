@@ -77,9 +77,20 @@ ggplot(mtcars,
        aes(x=hp, y=mpg)) + 
   geom_point()
 ```
+```{r basicplot-solution}
+ggplot(mtcars, 
+       aes(x=wt, y=mpg)) + 
+  geom_point()
+```
+```{r basicplot-code-check}
+grade_code()
+```
 
+**Exercise:** First, let's run the code the way it is now (press the 'run code' button). Now, can you change the plot to show the `wt` (weight) on the x axis instead?
 
-This ggplot call is typical for how ggplot works,
+### Elements of a ggplot
+
+The ggplot call above is typical for how ggplot works,
 and showcases the *grammar of graphics*. Essentially, every graph contains these three basic elements:
 
 - The **data**, in this case `mtcars`. This is the first argument of the ggplot function.
@@ -133,15 +144,29 @@ ggplot(demographics,
   scale_color_gradient(low="coral", high="darkblue") + 
   geom_point(alpha=.6)
 ```
+```{r point-solution, exercise=TRUE}
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v43_nl)) +
+  scale_color_gradient(low="darkblue", high="lightblue") + 
+  geom_point(alpha=.6)
+```
+```{r point-code-check}
+grade_code()
+```
+
+**Exercise**: Can you change the code to make the colors represent the percentage of inhabitants without a migration history (`v43_nl`), 
+and change the color scale to run from dark blue to light blue?s
 
 Note the use of `alpha` to make the points somewhat transparent, making it a bit easier to see when points overlap. 
 This is given as a constant value rather than a mapping, since we want all points to have this.
 This can be used on all geoms: if you wish to e.g. make all points a certain color or size,
 you add these in the `geom(...)` call directly, i.e. not in an `aes(...)` call.
 
-What happens when you add `shape=21` or even `shape='🏠'` to the call? 
-For `shape=21`, you can also add a fill aesthetic (or constant value) if desired. 
-(gogle ggplot shapes to see an overview of built-in default shapes, like the circles for 21)
+If you want to play around a bit more: What happens when you add `shape=21` or even `shape='🏠'` to the call? 
+For `shape=21`, you can also add a fill aesthetic (or constant value) if desired - how does that affect the plot? 
+(you can google 'ggplot shapes' to see an overview of built-in default shapes, like the circles for 21)
 
 
 ## Line graphs
@@ -159,6 +184,8 @@ ggplot(elections,
        aes(x=year, y=votes, color=party)) + 
   geom_line()
 ```
+
+### Let's make it pretty!
 
 To make this graph a bit nicer, let's make some changes:
 - The votes are given as a proportion of 0-1, but most people prefer 0-100%. This can be changed in the `scale` by setting a labelling function. 
@@ -215,6 +242,8 @@ either the `y` or `x` axis. This by default *counts* the number of cases and cre
 ggplot(us_demographics, aes(y=state)) + geom_bar()
 ```
 
+### Histograms
+
 For continuous variables, you need to divide the range into *bins*. This can be done using `geom_histogram`, which also takes only an `x` or `y` argument.
 For example, the code below shows the number of counties by percentage non-white population, which is divided into 10 bins (deciles):
 
@@ -223,6 +252,7 @@ For example, the code below shows the number of counties by percentage non-white
 ggplot(us_demographics, aes(x=nonwhite_pct)) + geom_histogram(bins=10, color="black")
 ```
 
+### Using geom_col instead of geom_bar
 
 There are some more interesting options to explore with a bar plot, as showcased by the plot below:
 
@@ -242,8 +272,36 @@ elections |>
   scale_x_discrete(guide = guide_axis(angle = 45)) + 
   ylab("")
 ```
+```{r col-solution}
+# Option 1: You can add the as.factor(year) directly into the aesthetic : ----
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+elections |>
+  complete(year, party, fill=list(votes=0)) |>
+  ggplot(aes(x=party, y=votes, fill=as.factor(year))) + geom_col(position=position_dodge2()) + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  ylab("")
+
+# Option 2: You can also call mutate first : ----
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+elections |>
+  complete(year, party, fill=list(votes=0)) |>
+  mutate(year=as.factor(year)) |>
+  ggplot(aes(x=party, y=votes, fill=year)) + geom_col(position=position_dodge2()) + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  ylab("")
+```
+```{r col-code-check}
+grade_code()
+```
+
 
 (note the use of complete to ensure that missing year-party combinations are treated as zero).
+
+**Exercise:** In the code above, `year` is a numeric variable, causing R to create a gradient scale for it.
+Can you change year into a factor (using `as.factor(year)`) in the code above? 
+How does that change the plot?
 
 ## Combining geoms
 
@@ -283,11 +341,21 @@ However, if we would label all 345 points it would quickly become a mess.
 For that reason, we can create a subset of the data, and use that as the data for the `geom_text`:
 
 ```{r multiple3, exercise=TRUE, exercise.setup='dutchdemo'}
-subset = filter(demographics, c_65plus > 30 | c_65plus < 15 | v57_density > 4000)
+subset = filter(demographics, c_65plus > 30 | v57_density > 4000)
 ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
   geom_point() + 
   geom_text(data=subset, aes(label=gemeente), nudge_y = -.5)
 ```
+```{r multiple3-solution}
+subset = filter(demographics, c_65plus > 30 | v57_density > 4000 | c_65plus < 15)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() + 
+  geom_text(data=subset, aes(label=gemeente), nudge_y = -.5)
+```
+```{r multiple3-code-check}
+grade_code()
+```
+
 
 Some things to note here:
 - ggplot wants the data as first argument, and the mapping as second. For geoms this is unfortunately the other way around,
@@ -295,6 +363,9 @@ Some things to note here:
 - `geom_text` now has it's own data, and we also specify a label aesthetic. The x and y aesthetic (i.e. the label positions)
   are not overridden, so they use the mapping from the `ggplot` call. 
 - Finally, we use `nudge_y` to move all labels a little bit down so they don't overlap with the points. 
+
+**Exercise:** Can you add labels for the municipalities where less than 15% of the population is over 65?
+(hint: you can add another condition to the existing filter call by adding another `|`)
 
 ## Creating high-quality graphs for reports
 
