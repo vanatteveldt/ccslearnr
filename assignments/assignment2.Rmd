@@ -19,7 +19,7 @@ library(printr)
 
 # Gegevens (tabel plus ±2 alineas tekst)
 
-3. Haal de relevante gegevens op, selecteer alleen de relevante rijen en kolommen, geef de kolommen begrijpelijke namen, en koppel de gegevens tot 1 bestand waarin zowel het stemgedrag als de demographische variabelen per partij zitten.
+3. Haal de relevante gegevens op, selecteer alleen de relevante rijen en kolommen, geef de kolommen begrijpelijke namen, en koppel de gegevens tot 1 bestand waarin per gemeente zowel het stemgedrag voor de gekozen partij als de demographische variabelen zitten.
 
 ```{r}
 library(tidyverse)
