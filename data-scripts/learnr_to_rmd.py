@@ -40,7 +40,7 @@ def convert(inf, outf):
         print(header_text, file=out)
         for line in content.split("\n"):
             if re.match(
-                "```{.*(remove_for_md=T.*|-solution|-code-check|-hint|-hint-\\d+)}",
+                "```{.*(remove_for_md\s*=\s*T.*|-solution|-code-check|-hint|-hint-\\d+)}",
                 line,
             ):
                 skip = True

@@ -331,7 +331,7 @@ Now, we of course want to extract the text of all the press releases from `pr`!
 Can you complete the code below to achieve this?
 
 
-```{r mappr-setup}
+```{r mappr-setup, remove_for_md = TRUE}
 library(rvest)
 url <- str_c("https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten")
 page <- read_html(url)

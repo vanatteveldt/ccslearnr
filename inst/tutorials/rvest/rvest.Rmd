@@ -249,7 +249,7 @@ html |> html_element('div.rightColumn')
 
 We can extract the text with the `html_text2` function (more on this below).
 
-```{r readtoy}
+```{r readtoy, remove_for_md = TRUE}
 library(rvest)
 html <- read_html('https://bit.ly/3lz6ZRe')
 ```

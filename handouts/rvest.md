@@ -322,11 +322,6 @@ We can extract the text with the `html_text2` function (more on this
 below).
 
 ``` r
-library(rvest)
-html <- read_html('https://bit.ly/3lz6ZRe')
-```
-
-``` r
 text <- html |> 
   html_element('div.rightColumn') |>
   html_text2()
