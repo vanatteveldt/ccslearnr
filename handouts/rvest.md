@@ -16,8 +16,10 @@ Visualizing data with ggplot
 - [Selecting HTML elements](#selecting-html-elements)
   - [Selecting descendants (children, children’s children,
     etc.)](#selecting-descendants-children-childrens-children-etc)
+  - [Selecting elements within an
+    element](#selecting-elements-within-an-element)
 - [Extracting data from elements](#extracting-data-from-elements)
-- [Revisiting the wiki scraper](#revisiting-the-wiki-scraper)
+  - [Selecting attributes](#selecting-attributes)
 
 <style>
 .Info {
@@ -110,19 +112,19 @@ ggplot(happy_table_2020, aes(x=`GDP per capita`, y=`Healthy life expectancy`)) +
   geom_point() + geom_smooth(method = 'lm')
 ```
 
-The scraping part is really just the short pipe there! With
-`read_html(url)`, we visit the Wikipedia page. Then
-`html_elements(".wikitable")` searches this website to find all elements
-called ‘wikitable’, and `html_table()` imports this these tables as data
-frames.
+**Exercise:** What happens when you change `[[3]]` into `[[4]]` in the
+code above? Can you create a plot of hapiness score (y) against freedom
+to make life choices (x)?
 
-*As an exercise, you could try the same thing for other Wikipedia pages
-with tables. Just replace the url and change the columns for the x and y
-axis in ggplot*
+If you have a look at the code above, the scraping part is actually just
+the short pipe at the top of the code! With `read_html(url)`, we visit
+the Wikipedia page. Then `html_elements(".wikitable")` searches this
+website to find all elements called ‘wikitable’, and `html_table()`
+imports this these tables as data frames.
 
 If you happen to know a bit about HTML, you might realize that
 `html_elements(".wikitable")` just uses CSS to select the (first)
-element with the .wikitable class. If so, congratulations, you now
+element with the `.wikitable` class. If so, congratulations, you now
 basically know web scraping! If not, don’t worry! You really only need
 to know very little about HTML to use web scraping. We’ll cover this in
 the next section.
@@ -320,12 +322,26 @@ We can extract the text with the `html_text2` function (more on this
 below).
 
 ``` r
+library(rvest)
+html <- read_html('https://bit.ly/3lz6ZRe')
+```
+
+``` r
 text <- html |> 
   html_element('div.rightColumn') |>
   html_text2()
 
 cat(text)  ## (cat just prints the text more nicely)
 ```
+
+**Exercise:** Can you change the code above so it only extracts the text
+of the table in the right hand side column? (that is, it should output
+the numbers and letters, but not the paragraph above it) Hint: you can
+use the **id** of an element, see the example above where the element
+with `id=exampleTable` was selected.
+
+(note that there are many ways to do make this selection in HTML, so
+don’t worry if you get the right result but R thinks it’s wrong!)
 
 ## Selecting HTML elements
 
@@ -421,51 +437,76 @@ the article as well. Instead, what you’d do is select the article
 element first, and then within that article element you’d look for all
 URLs.
 
-Here’s how you’d do it. Let’s take the [Wikipedia page for
-hyperlinks](https://en.wikipedia.org/wiki/Hyperlink). And let’s say we
-want to get only links from the body of the article (so NOT the ones in
-the left column). First, let’s just get all the links. Links are
-typically in `<a>` tags, so we’ll get all of them, and then use the
-`length()` function to see how many we got.
+Here’s how you’d do it. Let’s take the [Wikipedia page for Extinction
+Rebellion](https://en.wikipedia.org/wiki/Extinction_Rebellion). And
+let’s say we want to get only links from the main text of the article
+(so NOT the ones in the left column, the list of languages, the info box
+on the right, etc). At the time of writing (2023), the first link was to
+the UK, the second was a link explaining environmental movements.
+
+The code below just gets all the links. Links are typically in `<a>`
+tags, so we’ll get all of them, and then use the `length()` function to
+see how many we got.
 
 ``` r
-read_html('https://en.wikipedia.org/wiki/Hyperlink') |>
+library(rvest)
+read_html('https://en.wikipedia.org/wiki/Extinction_Rebellion') |>
   html_elements('a') |>
   length()
 ```
 
-Now let’s do this again, but first selecting only the body. If you
-inspect the HTML, you’d find that the body is in an element with the
-attributes `<div id="content" class="mb-body" role="main">`. So we can
-easily get this with the id selector `#content`. There are two ways to
-do this. The most efficient way is to use `#content a` as the CSS
-selector. This basically says: first select `#content`, and then within
-that select all `<a>`.
+If you run the code above directly, you will see it results in 540
+links, starting mostly with boilerplate links to the various wikipedia
+sections.
 
-``` r
-read_html('https://en.wikipedia.org/wiki/Hyperlink') |>
-  html_elements('#content a') |>
-  length()
-```
+**Exercise**: Can you change the code so it only finds the links in the
+**main text** of the article?
 
-Indeed, we got less links this time, because it worked! The nice thing
-about this is that it works for any combination of CSS selectors. This
-was a combination of `id` (#content) and `element` (a), but it could
-also have been `class element`, `class class` etc. Also, you can
+Do achieve this, first inspect the HTML. You will find that the body is
+contained in an element with the
+attributes`<div id="mw-content-text" ...>`.
+
+Try changing the selection above into `#mw-content-text a`. If all is
+well, this should limit the number of hyperlinks, but it does not start
+with the link to the UK, but rather with the organization logo and a
+list of founders from the infobox.
+
+To get only the links within the article body, you can limit results to
+hyperlinks within paragraphs. Paragraphs are `p` tags, so you can use
+`#mw-content-text a` (or even just `p a` as there are no paragraphs
+outside the main text). Does that work?
+
+The code above allows you to select descendants of elements. The nice
+thing about this is that it works for any combination of CSS selectors.
+This was a combination of `id` (#content) and `element` (a), but it
+could also have been `class element`, `class class` etc. Also, you can
 actually string as many together as you like! So if you have an `<a>` in
 a `<span>` in a `<div>`, you could look for `div span a`.
 
-The second approach is to use the pipe! The `html_elements` function
-doesn’t just work on the entire HTML. It also works on selected
-elements. So we could first look for the `#content` element, and then
-run `html_elements('a')` on that element.
+### Selecting elements within an element
+
+The example above showed how you can search for elements contained in
+other elements.
+
+Sometimes, it can also be useful to first select one element (e.g. the
+infobox), and then select further elements within it.
+
+This is quite easy with `rvest`: You assign the first element (the
+infobox) to an object. Then, you can run `html_element` on that object
+rather than on the whole document.
+
+For example, the code below saves the infobox element, and then lists
+all hyperlinks within that element:
 
 ``` r
-read_html('https://en.wikipedia.org/wiki/Hyperlink') |>
-  html_element('#content') |>
-  html_elements('a') |>
-  length()
+library(rvest)
+html <- read_html('https://en.wikipedia.org/wiki/Extinction_Rebellion') 
+infobox <- html |> html_element('.infobox')
+infobox |> html_elements('a')
 ```
+
+**Exercise:** Can you alter the code above to select all images from the
+infobox?
 
 If this is your first run in with CSS and HTML, this might al seem a bit
 overwhelming. The good part though: this should cover most of what you
@@ -494,20 +535,24 @@ but gives you the text as it appears in the html code. For example, look
 at this text from the left column of our toy example:
 
 ``` r
+library(rvest)
 html <- read_html('https://bit.ly/3lz6ZRe')
-html |> html_element('.leftColumn') |> html_text()
+html |> html_element('.leftColumn') |> html_text() |> cat()
 ```
 
 That’s pretty ugly. See all those ‘\n’ and empty spaces? That’s because
 in the HTML source code the developer added some line breaks and empty
 space to make it look better in the code. But in the browser these extra
 breaks and spaces are ignored. `html_text2` let’s you get the text as
-seen in the browser. In general, you should just use html_text2(), but
-note that for huge amounts of data html_text() might be faster.
+seen in the browser.
 
-``` r
-html |> html_element('.leftColumn') |> html_text2()
-```
+**Exercise:** Can you change `html_text()` into `html_text2()` in the
+code above? How does it change the output?
+
+In general, you should just use html_text2(), but note that for huge
+amounts of data html_text() might be faster.
+
+### Selecting attributes
 
 Another nice function is `html_attr` or `html_attrs`, for getting
 attributes of elements. With `html_attrs` we get all attributes. For
@@ -525,9 +570,15 @@ stored as the `href` attribute.
 html |> html_elements('a') |> html_attr('href')
 ```
 
-## Revisiting the wiki scraper
+**Exercise:** The code below selects all images (`img` tags) in the XR
+article. Can you fill in the blank to get the source location (`src`) of
+these images?
 
-(example to come)
+``` r
+library(rvest)
+html <- read_html('https://en.wikipedia.org/wiki/Extinction_Rebellion') 
+html |> html_elements('img') |> ____
+```
 
 [^1]: If you look at the HTML code of our [example
     page](view-source:https://bit.ly/31keW5P), you see that there is
