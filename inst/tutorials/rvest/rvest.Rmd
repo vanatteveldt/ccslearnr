@@ -1,5 +1,5 @@
 ---
-title: 'Visualizing data with ggplot'
+title: 'Scraping data with RVest'
 author: "Kasper Welbers & Wouter van Atteveldt"
 output: 
   learnr::tutorial:
@@ -14,6 +14,7 @@ learnr_to_md_options:
 ```{r setup, include=FALSE, remove_for_md=TRUE}
 knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 library(learnr)
+library(tidyverse)
 gradethis::gradethis_setup()
 tutorial_options(
   exercise.reveal_solution = FALSE

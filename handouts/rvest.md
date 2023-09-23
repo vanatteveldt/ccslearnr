@@ -1,4 +1,4 @@
-Visualizing data with ggplot
+Scraping data with RVest
 ================
 
 - [Introduction: Scraping](#introduction-scraping)
