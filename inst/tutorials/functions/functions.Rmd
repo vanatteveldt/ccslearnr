@@ -15,9 +15,6 @@ learnr_to_md_options:
 knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 library(learnr)
 gradethis::gradethis_setup()
-tutorial_options(
-  exercise.reveal_solution = FALSE
-)
 ```
 <style>
 .Info {

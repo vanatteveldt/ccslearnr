@@ -16,9 +16,6 @@ knitr::opts_chunk$set(message=FALSE, warning=FALSE)
 library(learnr)
 library(tidyverse)
 gradethis::gradethis_setup()
-tutorial_options(
-  exercise.reveal_solution = FALSE
-)
 ```
 <style>
 .Info {
