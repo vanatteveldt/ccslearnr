@@ -115,7 +115,7 @@ after all!
 
 ### Why use functions?
 
-The code above should how you can create a function, but doesn’t really
+The code above shows how you can create a function, but doesn’t really
 tell you **why** (or when) you should do this.
 
 The main benefit of using functions is because it allows you to re-use
@@ -313,7 +313,7 @@ can scrape with the code below:
 
 ``` r
 library(rvest)
-url <- str_c("https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten")
+url <- "https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten"
 page <- read_html(url)
 urls <-  page |> html_elements(".nieuwsoverzicht__item") |> html_attr("href")
 titles <- page |> html_elements(".nieuwsoverzicht__item-title") |> html_text()
@@ -341,6 +341,7 @@ Now, we of course want to extract the text of all the press releases
 from `pr`! Can you complete the code below to achieve this?
 
 ``` r
+library(tidyverse)
 scrape_pr_text <- function(url) {
   full_url <- str_c("https://www.fnv.nl", url)
   text <- ____

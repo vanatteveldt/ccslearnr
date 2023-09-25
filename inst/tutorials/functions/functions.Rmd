@@ -107,7 +107,7 @@ They are your functions, after all!
 
 ### Why use functions?
 
-The code above should how you can create a function,
+The code above shows how you can create a function,
 but doesn't really tell you **why** (or when) you should do this.
 
 The main benefit of using functions is because it allows you to re-use code more efficiently. 
@@ -300,7 +300,7 @@ The main page linked above contains a list of press releases, which we can scrap
 
 ```{r pr, exercise=TRUE}
 library(rvest)
-url <- str_c("https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten")
+url <- "https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten"
 page <- read_html(url)
 urls <-  page |> html_elements(".nieuwsoverzicht__item") |> html_attr("href")
 titles <- page |> html_elements(".nieuwsoverzicht__item-title") |> html_text()
@@ -330,13 +330,14 @@ Can you complete the code below to achieve this?
 
 ```{r mappr-setup, remove_for_md = TRUE}
 library(rvest)
-url <- str_c("https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten")
+url <- "https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten"
 page <- read_html(url)
 urls <-  page |> html_elements(".nieuwsoverzicht__item") |> html_attr("href")
 titles <- page |> html_elements(".nieuwsoverzicht__item-title") |> html_text()
 pr <- tibble(title=titles, url=urls)
 ```
 ```{r mappr, exercise=TRUE, , eval=FALSE}
+library(tidyverse)
 scrape_pr_text <- function(url) {
   full_url <- str_c("https://www.fnv.nl", url)
   text <- ____
@@ -347,6 +348,7 @@ texts <- map(pr$url, scrape_pr_text, .progress=TRUE) |> ____()
 inner_join(pr, texts)
 ```
 ```{r mappr-solution}
+library(tidyverse)
 scrape_pr_text <- function(url) {
   full_url <- str_c("https://www.fnv.nl", url)
   text <- read_html(full_url) |> 
