@@ -202,7 +202,11 @@ report_2023 <- clean_report("report_1981.pdf")
 
 One way to solve this is using the tidyverse `map` functions. To use
 map, you call the `map` function with two arguments: a list of objects,
-and
+and a function to be called on each of those objects.
+
+The following (dummy) code has a function to claims to be analysing some
+sort of report (but in reality just returns a random number), which is
+then called on three different reports in a single `map` call:
 
 ``` r
 library(tidyverse)
@@ -313,6 +317,7 @@ can scrape with the code below:
 
 ``` r
 library(rvest)
+library(tidyverse)
 url <- "https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten"
 page <- read_html(url)
 urls <-  page |> html_elements(".nieuwsoverzicht__item") |> html_attr("href")
@@ -341,7 +346,6 @@ Now, we of course want to extract the text of all the press releases
 from `pr`! Can you complete the code below to achieve this?
 
 ``` r
-library(tidyverse)
 scrape_pr_text <- function(url) {
   full_url <- str_c("https://www.fnv.nl", url)
   text <- ____

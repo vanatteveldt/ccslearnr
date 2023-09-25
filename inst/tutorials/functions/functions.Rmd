@@ -201,7 +201,11 @@ report_2023 <- clean_report("report_1981.pdf")
 
 One way to solve this is using the tidyverse `map` functions.
 To use map, you call the `map` function with two arguments:
-a list of objects, and 
+a list of objects, and a function to be called on each of those objects. 
+
+The following (dummy) code has a function to claims to be analysing some sort of report 
+(but in reality just returns a random number),
+which is then called on three different reports in a single `map` call:
 
 ```{r map, exercise=TRUE}
 library(tidyverse)
@@ -300,6 +304,7 @@ The main page linked above contains a list of press releases, which we can scrap
 
 ```{r pr, exercise=TRUE}
 library(rvest)
+library(tidyverse)
 url <- "https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten"
 page <- read_html(url)
 urls <-  page |> html_elements(".nieuwsoverzicht__item") |> html_attr("href")
@@ -330,14 +335,14 @@ Can you complete the code below to achieve this?
 
 ```{r mappr-setup, remove_for_md = TRUE}
 library(rvest)
+library(tidyverse)
 url <- "https://www.fnv.nl/over-de-fnv/wie-we-zijn/perskamer/persberichten"
 page <- read_html(url)
 urls <-  page |> html_elements(".nieuwsoverzicht__item") |> html_attr("href")
 titles <- page |> html_elements(".nieuwsoverzicht__item-title") |> html_text()
 pr <- tibble(title=titles, url=urls)
 ```
-```{r mappr, exercise=TRUE, , eval=FALSE}
-library(tidyverse)
+```{r mappr, exercise=TRUE, eval=FALSE}
 scrape_pr_text <- function(url) {
   full_url <- str_c("https://www.fnv.nl", url)
   text <- ____
