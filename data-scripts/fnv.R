@@ -23,4 +23,17 @@ scrape_pr_text <- function(url) {
            text = trimws(text))
 }
 texts <- map(result$url, scrape_pr_text, .progress=TRUE) |> list_rbind()
-inner_join(pr, texts) |> write_csv("fnv.csv")
+inner_join(pr, texts) |> write_csv(here::here("data/fnv.csv"))
+
+read_csv("~/Dropbox/onderwijs/soc/fnv.csv") |> write_csv(here::here("data/fnv.csv"))
+
+
+
+w0 = read_csv("https://raw.githubusercontent.com/vupolcom/VU-Election-Study/main/data/intermediate/wave0.csv")
+w0 |> select(gender, age, education,)
+
+
+d_raw <- read_csv("https://raw.githubusercontent.com/vupolcom/VU-Election-Study/main/data/intermediate/wave0.csv")
+source("https://raw.githubusercontent.com/vupolcom/VU-Election-Study/main/src/lib/data.R")
+library(here)
+long = extract_long(d_raw)
