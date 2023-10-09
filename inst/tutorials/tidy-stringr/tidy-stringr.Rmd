@@ -144,6 +144,13 @@ text patterns. Although a full overview of regular expressions is beyond the sco
 To find a regular expression in a text, we use the `str_view` command, which is quite useful for designing/debugging expressions. 
 At its simplest, literal text such as `Bob` will simply match that word in the text.
 
+```{r strviewhide, echo=FALSE}
+# Hide strview output for handout - for interactive this is overwritten in next chunk
+str_view <- function(txt, pattern) {
+  invisible(stringr::str_view(txt, pattern))
+}
+```
+
 ```{r strview, remove_for_md=TRUE}
 library(tidyverse)
 txt = c("Hi, I'm Bob", "my email address  is  Bob@example.com", "A #hashtag for the #millenials")

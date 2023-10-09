@@ -175,8 +175,6 @@ txt = c("Hi, I'm Bob", "my email address  is  Bob@example.com", "A #hashtag for 
 str_view(txt, "Bob") # literal text just matches that text - Bob matches Bob
 ```
 
-\[1\] │ Hi, I’m <Bob> \[2\] │ my email address is <Bob>@example.com
-
 (Note: You might have to install the htmlwidgets package for this to
 work)
 
@@ -188,64 +186,13 @@ word characters (`\\w`), digits (`\\d`), or whitespace (`\\s`):
 
 ``` r
 str_view(txt, "m.") # . matches any character 
-```
-
-\[1\] │ Hi, I’<m >Bob \[2\] │ <my> e<ma>il address is
-<Bob@exa><mp>le.com \[3\] │ A \#hashtag for the \#<mi>llenials
-
-``` r
 str_view(txt, "\\.") # \\. matches an actual period (.)  
-```
-
-\[2\] │ my email address is <Bob@example>\<.\>com
-
-``` r
 str_view(txt, "\\w") # \w matches any 'word' character, meaning letters, numbers, and underscores
-```
-
-\[1\] │ <H><i>, <I>’<m> <B><o><b> \[2\] │ <m><y> <e><m><a><i><l>
-<a><d><d><r><e><s><s> <i><s> <B><o><b>@<e><x><a><m>
-<p>
-
-<l><e>.<c><o><m> \[3\] │ <A> \#<h><a><s><h><t><a><g> <f><o><r> <t><h><e>
-\#<m><i><l><l><e><n><i><a><l><s>
-
-``` r
 str_view(txt, "\\W") # \W matches anything except word characters
-```
-
-\[1\] │ Hi\<,\>\< \>I\<’\>m\< \>Bob \[2\] │ my\< \>email\< \>address\<
-\>\< \>is\< \>\< \>Bob\<@\>example\<.\>com \[3\] │ A\< \>\<#\>hashtag\<
-\>for\< \>the\< \>\<#\>millenials
-
-``` r
 str_view(txt, "[a-z]") # [..] are character ranges, in this case, all lower caps letters 
-```
-
-\[1\] │ H<i>, I’<m> B<o><b> \[2\] │ <m><y> <e><m><a><i><l>
-<a><d><d><r><e><s><s> <i><s> B<o><b>@<e><x><a><m>
-<p>
-
-<l><e>.<c><o><m> \[3\] │ A \#<h><a><s><h><t><a><g> <f><o><r> <t><h><e>
-\#<m><i><l><l><e><n><i><a><l><s>
-
-``` r
 str_view(txt, "[^abc]") # [^..] is a negated character range, in this case, all except the letters a, b, and c 
-```
-
-\[1\] │ <H><i>\<,\>\< \><I>\<’\><m>\< \><B><o>b \[2\] │ <m><y>\<
-\><e><m>a<i><l>\< \>a<d><d><r><e><s><s>\< \>\< \><i><s>\< \>\<
-\><B><o>b\<@\><e><x>a<m>
-<p>
-
-<l><e>\<.\>c<o><m> \[3\] │ <A>\< \>\<#\><h>a<s><h><t>a<g>\<
-\><f><o><r>\< \><t><h><e>\< \>\<#\><m><i><l><l><e><n><i>a<l><s>
-
-``` r
 str_view(txt, "\\ba") # \b matches word boundaries,this matches an a at the beginning of a word
 ```
-
-\[2\] │ my email <a>ddress is <Bob@example.com>
 
 See e.g. [this
 table](https://cssbook.net/content/chapter09.html#tbl-regex) for a more
@@ -283,58 +230,15 @@ You can also specify multiples of a character:
 
 ``` r
 str_view(txt, "ad*")   # * means an a followed by zero or more (d's, in this case)
-```
-
-\[2\] │ my em<a>il <add>ress is <Bob@ex><a>mple.com \[3\] │ A
-\#h<a>sht<a>g for the \#milleni<a>ls
-
-``` r
                        # and as many as possible (greedy)
 str_view(txt, "ad*?")  # *? means zero or more (d's, in this case), but as few as needed (non-greedy)
-```
-
-\[2\] │ my em<a>il <a>ddress is <Bob@ex><a>mple.com \[3\] │ A
-\#h<a>sht<a>g for the \#milleni<a>ls
-
-``` r
 str_view(txt, "ad+")   # + means one or more d's
-```
-
-\[2\] │ my email <add>ress is <Bob@example.com>
-
-``` r
 str_view(txt, "ad+?")  # + means one or more d's, but as few as needed
-```
-
-\[2\] │ my email <ad>dress is <Bob@example.com>
-
-``` r
 str_view(txt, "ad?")   # ? means zero or one, i.e. an 'optional' match
-```
-
-\[2\] │ my em<a>il <ad>dress is <Bob@ex><a>mple.com \[3\] │ A
-\#h<a>sht<a>g for the \#milleni<a>ls
-
-``` r
 str_view(txt, "add?")  # a single d, optionally followed by another d
-```
-
-\[2\] │ my email <add>ress is <Bob@example.com>
-
-``` r
 str_view(txt, "B.*m")  # a B, followed by zero or more of any character 
-```
-
-\[2\] │ my email address is <Bob@example.com>
-
-``` r
                        # (and as many as possible), followed by an m
 str_view(txt, "B.*?m") # a B, followed by zero or more of any character 
-```
-
-\[2\] │ my email address is <Bob@exam>ple.com
-
-``` r
                        # (but as few as needed), followed by an m
 ```
 
@@ -349,21 +253,9 @@ for emails or introductions:
 
 ``` r
 str_view(txt, "\\w+@\\w+\\.\\w+")  # matches (some) email addresses
-```
-
-\[2\] │ my email address is <Bob@example.com>
-
-``` r
 str_view(txt, "I'm \\w+\\b")       # matches "I'm XXX" phrases
-```
-
-\[1\] │ Hi, \<I’m Bob\>
-
-``` r
 str_view(txt,  "#\\w+")            # matches #hashtags
 ```
-
-\[3\] │ A \<#hashtag\> for the \<#millenials\>
 
 Note, the email address pattern is far from complete, and will match
 addresses with subdomains, numbers, and many other possibilities. It
@@ -374,8 +266,6 @@ below should do pretty well for all but the most arcane addresses:
 regex_email = regex("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
 str_view(txt, regex_email)
 ```
-
-\[2\] │ my email address is <Bob@example.com>
 
 For more information, see the [section on regular expressions in
 Computational Analysis of

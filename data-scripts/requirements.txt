@@ -1,2 +1,3 @@
- pandas
- xmltodict
+pandas
+xmltodict
+python-frontmatter
