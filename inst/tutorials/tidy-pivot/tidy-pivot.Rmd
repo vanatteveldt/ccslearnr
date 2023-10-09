@@ -176,7 +176,7 @@ For this, R expects these two values to be in separate columns.
 The syntax of `pivot_wider` is `pivot_wider(data, names_from=names_column, values_from=values_column)`.
 Can you pivot the income data to wide format so the correlation calculation below works?
 
-```{r widex-setup, exercise.setup='topdec'}
+```{r widex-setup, exercise.setup='topdec', remove_for_md=TRUE}
 income <- income_raw |> pivot_longer(U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
 ```
 ```{r widex, exercise=TRUE, eval=FALSE}

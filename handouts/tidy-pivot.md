@@ -198,10 +198,6 @@ Can you pivot the income data to wide format so the correlation
 calculation below works?
 
 ``` r
-income <- income_raw |> pivot_longer(U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
-```
-
-``` r
 income_wide <- pivot_wider(___)
 cor.test(income_wide$U.S., income_wide$France)
 ```
