@@ -1,4 +1,4 @@
-StringR: Working with Textual Data in R
+Pivot data from long to wide and back
 ================
 
 - [Introduction](#introduction)
