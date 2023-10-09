@@ -29,6 +29,7 @@ li pre {border: 0px; padding: 0; margin:0}
   font-weight: bold;
   content: "🛈 Information";
 }
+.compacttable table {width:0%}
 </style>
 
 
@@ -38,18 +39,51 @@ This tutorial discusses how to *reshape* data, particularly from long to wide fo
 
 You can check out [Section 6.5 of Computational Analysis of Communication](https://cssbook.net/content/chapter06.html#sec-pivot) and/or [Chapter 12 of the R4DS book](http://r4ds.had.co.nz/tidy-data.html) for mote information
 
-# Introduction: Long and Wide data
+### Long and Wide data
 
 In a data matrix, normally the rows consist of observations (cases, respondents) and the columns of variables containing information about these cases. 
-As explained in the chapter referenced above, in the `tidyverse` philosophy data is said to be tidy if each observation (case) is exactly one row, and each measurement (variable) is exactly one column. 
-Data is said to be 'untidy' if for example the columns represents measurement years in a longitudinal data set, where each year is really its own observation.
-Thus, using the names of the tidyverse functions, there is a need to `pivot_longer` information from multiple columns into a single column, or inversely to `pivot_wider` it from one column accross multiple columns. 
+However, sometimes the columns really represent multiple observations, e.g. different years of data on the same country or different waves from the same respondents.
+Inversely, sometimes a single observation is spread over multiple rows, with e.g. the number of lower and higher education citizens treated as different rows.
 
-Note that what is called 'tidy' here is what is also often called a *long* data format, with most information in separate rows, while a *wide* data format contains most information in separate columns. Another way to view the functions is that `pivot_longer` transforms data from wide to long (also called variables to cases), and `pivot_wider` converts data from long to wide (cases to variables).
+In general, data is said to be in `long` format if there are many rows and few columns, for example with student--grade data like below, where there is a row for each student-course combination:
 
-For reference, `long` data is sometimes also referred to as `stacked` data, because the data is represented as rows that are stacked on top of each other.
+<div class="compacttable">
 
-# Before we start: Getting and cleaning the data
+| Student | Course | Grade |
+|:-|:-|:-|
+| Nana | BDCT | 8.5|
+| Nana | ISOC | 7.0|
+| Joan | BDCT | 7.5|
+| Joan | ISOC | 6.0 |
+
+
+The same data could be represented by creating a column for each course, which would turn it into a `wide` table
+with one row per student:
+
+| Student | BDCT | ISOC | 
+|:-|:-|:-|
+| Nana | 8.5 | 7.0 |
+| Joan | 7.5 | 6.0 |
+
+</div>
+
+Which of these data is more useful depends on the task at hand.
+For many tidyverse functions, such as creating a graph with a color per course, or computing
+any form of average grade per course, long format is generally the best option.
+In fact, the Tidyverse book refers to long data as *tidy* data. 
+
+However, if we want to specifically compare different grades for a student,
+or use the courses as separate variables in a statistical model,
+it can be easier to have them in wide format. 
+
+Fortunately, as we will see in the code below, R makes it quite easy to **pivot** between these format:
+`pivot_wider` makes long data wider, and `pivot_longer` does the reverse. 
+
+## Columns to rows: pivot_longer
+
+In this section, you will learn how to pivot wide data into longer data. 
+
+### Data
 
 For this tutorial we will use the data from Piketty's Capital in the 21st Century. 
 In particular, we will work with the data on income inquality, with the goal of making a graph showing the evolution 
@@ -57,231 +91,242 @@ of income inequality in different countries.
 
 For this, we load the income inequality data set and remove missing values.
 
-
 ```{r}
 library(tidyverse)
-base = "https://raw.githubusercontent.com/ccs-amsterdam/r-course-material/master/data"
-income_raw = read_csv(paste(base, "income_topdecile.csv", sep = "/")) %>% na.omit
+url <- "https://raw.githubusercontent.com/ccs-amsterdam/r-course-material/master/data/income_topdecile.csv"
+income_raw <- read_csv(url) |> na.omit()
 income_raw
 ```
+```{r topdec, remove_for_md=TRUE}
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/ccs-amsterdam/r-course-material/master/data/income_topdecile.csv"
+income_raw <- read_csv(url) |> na.omit()
+```
+As you can see, the data stores the share of income going to  the top decile of earners per decade per country. This data is 'wide', in the sense that the columns contain multiple observations, 
+while it is normally better (or tidier) to have the observations in different rows. 
+As we will see, that will make it easier to combine, adjust, or visualize the data.
 
+### `Pivot_longer`: from columns to rows
 
-Note that Piketty's data is published as excel files with complex (multi-row) headers,
-so we uploaded a cleaned version of the data to our github repository. 
-Even though this data is slightly cleaner, you will see that there is plenty to be done to get this data in shape!
-
-# Wide to long: stacking columns
-
-As you can see (after getting rid of missing values), the data stores the share of income going to  the top decile/percentile of earners per decade per country. This data is 'wide', in the sense that the columns contain observations, while it is normally better (or tidier) to have the observations in different rows. As we will see, that will make it easier to combine or adjust the data later on.
 
 In tidyverse, the function used for transforming data from columns (wide) to rows (long) is `pivot_longer`: the idea is that you stack the information from multiple columns into a single, longer column. 
 
-The syntax for calling `pivot_longer` is as follows: `pivot_longer(data, columns, names_to="key_column", values_to="value_column")`. The first argument is the data (unless you use pipe notation, as shown below). The second argument, columns, is a list of columns which need to be gathered in a single column. You can list the columns one by one, or specify them as a sequence `first:last`. 
-The `names_to=` argument specifies the name of a new column that will hold the names of the observations, i.e. the old column names. In our case, that would be `country` since the columns refer to countries. 
+The syntax for calling `pivot_longer` is as follows: `pivot_longer(data, columns, names_to="key_column", values_to="value_column")`. The first argument is the data (unless you use pipe notation, as shown below). 
+The second argument, columns, is a list of columns which need to be gathered in a single column. You can list the columns one by one, or specify them as a sequence `first:last`. 
+The `names_to=` argument specifies the name of a new column that will hold the names of the observations, i.e. the old column names. 
+In our case, that would be `country` since the columns refer to countries. 
 The `values_to=` argument specifies the name of the new column that will hold the values, in our case the top-decile of incomes. 
+Note that you can omit both the `names_to` and `values_to` argument, in which case the columns will get the default names `name` and `value`.
 
 Note that (similar to mutate and other tidyverse functions), the column names don't need to be quoted as long as they don't contain spaces or other characters that are invalid in R names. 
 
-```{r}
-# as always, you can use either %>% notation or specify the data as first argument. so, the below two commands are equivalent
-
+```{r pivotlonger, exercise=TRUE, exercise.setup='topdec'}
 # using pipe (%>%) notation
-income = income_raw %>% pivot_longer(U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
+income <- income_raw |> pivot_longer(U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
 
 # without using pipe notation
-income = pivot_longer(income_raw, U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
+income <- pivot_longer(income_raw, U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
 
 income
 ```
 
 As you can see, every row now specifies the income inequality in a single country in a single year (or actually, decade). 
 
-Note that in tidyverse style, you can also use negative select to indicate which column NOT to pivot to longer. The following `pivot_longer` gives the same results as above.
+Note that in tidyverse style, you can also use negative select to indicate which column NOT to pivot to longer. 
+In that case, you would use `-Year` instead of `U.S.:Europe`
 
-```{r}
-income = pivot_longer(income_raw, -Year, names_to = 'country', values_to = 'income_topdecile')
+### Exercise: plotting the data
+
+As an exercise, can you pivot the data while:
+
++ using the `-Year` notation
++ calling the values column simply 'topdecile' 
++ and plot it with a line graph, showing the `income_topdecile` on the y-axis, the year on the x-axis, and making a color per country?
+
+```{r exlong, exercise=TRUE, exercise.setup='topdec', eval=FALSE}
+income_raw |> 
+  pivot_longer(____) |> 
+  ggplot(____)
+```
+```{r exlong-solution}
+income_raw |> 
+  pivot_longer(-Year, names_to='country', values_to='topdecile') |> 
+  ggplot(aes(x=Year, y=topdecile, color=country)) + geom_line()
+```
+```{r exlong-code-check}
+grade_code()
 ```
 
-# A more complicated case: wealth inequality
+## Rows to columns: pivot_wider
+
+Perhaps unsurprisingly, you can use `pivot_wider` to turn long data into wide data. 
+Let's start from the wide-format country data created above:
+
+```{r, echo=FALSE}
+income <- pivot_longer(income_raw, U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
+```
+```{r}
+income
+```
+
+### From rows to columns
+
+Now, suppose we would like to compute the correlation between income inequality in France and the U.S.
+For this, R expects these two values to be in separate columns.
+The syntax of `pivot_wider` is `pivot_wider(data, names_from=names_column, values_from=values_column)`.
+Can you pivot the income data to wide format so the correlation calculation below works?
+
+```{r widex-setup, exercise.setup='topdec'}
+income <- income_raw |> pivot_longer(U.S.:Europe, names_to = 'country', values_to = 'income_topdecile')
+```
+```{r widex, exercise=TRUE, eval=FALSE}
+income_wide <- pivot_wider(___)
+cor.test(income_wide$U.S., income_wide$France)
+```
+```{r widex-solution}
+income_wide <- pivot_wider(income, names_from=country, values_from=income_topdecile)
+cor.test(income_wide$U.S., income_wide$France)
+```
+```{r widex-code-check}
+grade_code()
+```
+
+
+## A more complicated case: wealth inequality
 
 Let's now look at the wealth inequality data from Piketty. 
 Of course, there is nothing inherently more complex about wealth inequality than income inequality (from the data side, at least),
 but in this particular case the columns contain the country as well as the measurement level (top-decile, percentile, or promille):
 
 ```{r}
-wealth_raw = read_csv(paste(base, "wealth_inequality.csv", sep = "/"))
+wealth_raw <- read_csv("https://raw.githubusercontent.com/ccs-amsterdam/r-course-material/master/data/wealth_inequality.csv")
 wealth_raw
-colnames(wealth_raw)
 ```
 
-As you can see from the column specification or the output, it somehow parsed the UK promille column as logical (TRUE/FALSE) data rather than
-as double (numeric) data. On inspection this is caused by there not being any values whatsoever. 
-In this case it probably isn't harmfull (R treats FALSE as 0 and TRUE as 1), but it's good practice to keep you data types in check. So, we should now either convert the column to numeric, or simply drop it:
+As you can see, this dat is quite 'messy': 
+Not only are the countries contained in the columns, but the measurement level is as well.
+To make sense of this data, we want to create a data frame with each row being one year and country,
+and having columns for the various measured quantities:
 
-```{r}
-# you can use either option below:
-wealth_raw = mutate(wealth_raw, `United Kingdom: top promille`=as.numeric(`United Kingdom: top promille`))
-wealth_raw = select(wealth_raw, -`United Kingdom: top promille`)
+<div class="compacttable">
+
+| Year | Country | top_decile | top_percentile | top_promille |
+|:-|:-|:-|:-|:-|
+| 1810 | France |  0.799 | 0.456 | 0.171 |
+| 1820 | France |  0.818| 0.467 | 0.190 |
+
+</div>
+
+### The plan
+
+So, how do we get from columns containing both country anbd measurement level,
+to rows for the countries and columns for the measurement level?
+
+One way do do this would be the following:
+
+1. First, use `pivot_longer` so all the measurements are in a single column.
+2. Second, use `separate` to split `France: top decile` into `France` and `top decile`.
+3. Finally, use `pivot_wider` to pivot the measurement levels back to columns.
+
+Don't worry if this solution did not seem immediately obvious to you:
+converting 'data challenges' into workflows like this is probably the hardest part of 
+data-driven research, and it will get more logical with more practice. 
+
+### Step 1. Pivot longer (wide to long)
+
+The first step is the same as above: gather all columns except for the year column into a single column.
+You can keep the default names for the columns (as we will be changing them later anyway)
+
+
+```{r getw, remove_for_md=TRUE}
+library(tidyverse)
+wealth_raw <- read_csv("https://raw.githubusercontent.com/ccs-amsterdam/r-course-material/master/data/wealth_inequality.csv")
 ```
 
 
-## Pivot longer (wide to long)
-
-We will tidy this data in three steps. First, we `pivot_longer` the columns into a single column with all measurements.
-Then, we separate the country from the measurement level.
-Finally, we `pivot_wider` the measurement levels to columns again (since they are measurements on the same observation).
-
-The first step is the same as above: we gather all columns except for the year column into a single column:
-
-```{r}
-wealth = pivot_longer(wealth_raw, -Year, names_to="key", values_to="value")
+```{r wealth1, exercise=TRUE, exercise.setup='getw', eval=FALSE}
+wealth <- pivot_longer(____)
 wealth
 ```
+```{r wealth1-solution}
+wealth <- pivot_longer(wealth_raw, -Year)
+wealth
+```
+```{r wealth1-code-check}
+grade_code()
+```
 
-## Separating columns (splitting one column into two)
+### Step 2. Separating columns (splitting one column into two)
 
 The next step is to split the 'key' column into two columns, for country and for measurement. 
-This can be done using the `separate` command, for which you specify the column to split, the new column names, and what `sep`arator to split on:
+As explained in the [working with strings](https://github.com/vanatteveldt/ccslearnr/blob/master/handouts/tidy-stringr.md) tutorial,
+this can be done using the `separate` command, for which you specify the column to split, the new column names, and what `sep`arator to split on:
 
-```{r}
-wealth = separate(wealth, key, into = c("country","measurement"), sep=":")
-wealth
+```{r echo=F}
+wealth = pivot_longer(wealth_raw, -Year)
+```
+```{r wealth2}
+separate(wealth, name, into = c("country","measurement"), sep=":")
 ```
 
-The `measurement` column is quoted in the output because it stars with a space.
-We could resolve this by specifying `sep=": "` (i.e. adding the space to the separator).
-We can also solve this by changing the column after the split with `mutate`. The code below removes the space
-using the `trimws` (trim white space) function:
+As you can see, the `measurement` starts with a space, which is annoying. Moreover, it contains a space in the middle, which will be problematic if we turn it into a column later.
 
-```{r}
-wealth %>% mutate(measurement = trimws(measurement))
+**Exercise**: Can you change the separator to get rid of the leading space, and use `str_replace_all` to turn the remaining space into an underscore?
+
+```{r getwealth, remove_for_md=TRUE, exercise.setup="getw"}
+wealth = pivot_longer(wealth_raw, -Year)
 ```
 
-We can also use `sub` to search and replace (substitute) within a column, in this case changing " top " into "capital_top_":
-
-```{r}
-wealth = wealth %>% mutate(measurement = sub(" top ", "capital_top_", measurement))
-wealth
+```{r wealth3, exercise=TRUE, exercise.setup='getwealth', eval=FALSE}
+wealth2 <- wealth |> 
+  separate(____) |>
+  mutate(____)
+wealth2
+```
+```{r wealth3-solution}
+wealth2 <- wealth |> 
+  separate(name, into = c("country","measurement"), sep=": ") |>
+  mutate(measurement=str_replace_all(measurement, " ", "_"))
+wealth2
+```
+```{r wealth3-code-check}
+grade_code()
 ```
 
-## Pivot wider (long to wide)
+
+### Step 3. Pivot wider (long to wide)
 
 The wealth data above is now 'too long' to be tidy: the measurement for each country is spread over multiple rows,
 listing the three different measurement levels (decile, percentile, promille).
-In effect, we want to undo one level of gathering, by `spread`ing the column over multiple columns.
 
-Ths syntax for the spread call is similar to that for pivot_longer: `pivot_wider(data, names_from=key_column, values_from=value_column)`.
-Before we had the arguments names_to and values_to, to specify the column names of the new stacked (i.e. long format) columns. 
-This time, we have the names_from and values_from arguments to reverse the process.
-For each unique value in the names_from column a new column will be created, with the corresponding value in the values_from column in the cell.
+**Exercise**: Can you pivot the measurements back to columns and plot the result as a line graph,
+showing top_percentile per year for each country?
 
-```{r}
-wealth = pivot_wider(wealth, names_from=measurement, values_from=value)
-wealth
+(Note that we first call na.omit to omit any completely empty rows in the end result. )
+
+```{r wealth4-setup, exercise.setup='getwealth'}
+wealth2 <- wealth |> 
+  separate(name, into = c("country","measurement"), sep=": ") |>
+  mutate(measurement=str_replace_all(measurement, " ", "_"))
+```
+```{r wealth4, exercise=TRUE, eval=FALSE}
+pivot_wider(wealth2, ____) |>
+  ggplot(____) + geom_line()
+```
+```{r wealth4-solution}
+pivot_wider(wealth2, names_from=measurement) |>
+  ggplot(aes(x=Year, y=top_percentile, color=country)) + geom_line()
+```
+```{r wealth4-code-check}
+grade_code()
 ```
 
-So now each row contains three measurements (columns, variables) relating to each observation (country x year). 
 
-# Recoding data
 
-We want to combine the two 'tidy' data sets that we created above (joining is discussed more in the 'Combining (merging) data' tutorial).
-In principle, this should now be really easy as they both use the same join key (Year and country).
-However, the country names are not identical in both.
 
-You can look at the frequency of values in each column and see the problem:
+### Conclusion
 
-```{r}
-table(wealth$country)
-table(income$country)
-```
+Congrats! Coming up with such complicated data cleaning workflows is quite challenging,
+but you now have all the tools needed for even the most complex data cleaning and data wrangling operations.
 
-Just for fun, below is some code that gives an overview of which set contains which country:
 
-```{r}
-data.frame(country = union(wealth$country, income$country)) %>%
-  mutate(wealth=country %in% wealth$country, income=country %in% income$country)
-```
-
-So, we see that some names occur in one set but not the other (Paris, Germany), but 
-there are also countries that are only named differently (UK and US)
-We could resolve this with a set of `ifelse` statements as done in [a previous tutorial](r-tidy-3_7-visualization.md).
-However, we can also use the tidyverse `recode` command which was made for this purpose. 
-You call recode by first specifying the column name, and then any `"old"="new"` pairs to recode.
-
-Because we really dislike spaces and periods in identifiers, we recode both to either UK or US:
-
-```{r}
-wealth = mutate(wealth, country = recode(country, "United Kingdom"="UK", "United States"="US"))
-income = mutate(income, country = recode(country, "U.K."="UK", "U.S."="US"))
-table(wealth$country)
-table(income$country)
-```
-
-Finally, we remove Germany and Paris with the `filter` function.
-
-```{r}
-wealth = filter(wealth, !country %in% 'Paris')
-income = filter(income, !country %in% 'Germany')
-```
-
-# Combining and plotting data
-
-Now, we are finally ready to combine our data sets. 
-One of the advantages of 'tidying' the data is that it becomes easier to combine them, since the 'join keys' are now the same in both data sets: Year and country. So, we can immediately do an inner join:
-
-```{r}
-inequality = inner_join(income, wealth)
-inequality
-```
-
-Since this data is also `tidy`, we can immediately plot it, for example to make a plot of income inequality per country.
-For more information on plotting, please see the [tutorial on visualization](r-tidy-3_7-visualization.md):
-
-```{r}
-ggplot(inequality) + geom_line(aes(x=Year, y=income_topdecile, colour=country))
-```
-
-As you can see, inequality in general dipped after the recession and especially second world war, but is now climing to 'belle epoque' levels again, especially in the US (which actually used to have less inequality).
-
-```{r}
-ggplot(inequality) + geom_line(aes(x=Year, y=capital_top_decile, colour=country))
-```
-
-This broadly shows the same pattern: a big drop in inequality with the destruction of the depression and War, followed by steadily rising inequality in the last decades. 
-
-## Tidyness as a matter of perception
-
-As a last exercise, suppose we would like to plot wealth and capital inequality in the same figure as separate lines. 
-You can do this with two separate geom_line commands, and e.g. use a dashed line for income inequality:
-
-```{r}
-ggplot(inequality) + geom_line(aes(x=Year, y=capital_top_decile, colour=country)) + 
-  geom_line(aes(x=Year, y=income_topdecile, colour=country), linetype="dashed")
-```
-
-This works, but it would be nice if we could specify the measurement as colour (or type) and have ggplot automatically make the legend. 
-To do this, the different measurements need to be in rows rather than in columns.
-In other words, data that is tidy from one perspective can be 'too wide' for another.
-
-Let's gather the data into a single column, and plot the result for the US:
-
-```{r}
-inequality2 = pivot_longer(inequality, income_topdecile:capital_top_promille, names_to="measurement", values_to="value")
-
-inequality2 %>% 
-  filter(country=="US") %>% 
-  ggplot() + geom_line(aes(x=Year, y=value, linetype=measurement))
-```
-
-We can also plot only top-decile capital and income in a paneled plot.
-Note the use of extra options to set legend location and title, vertical label, and main title text and location (horizontal justification):
-
-```{r reshape_inequality, fig.keep='high', fig.path = "img/"}
-inequality2 %>% 
-  filter(measurement %in% c("income_topdecile", "capital_top_decile") & country != "Europe") %>% 
-  ggplot() + geom_line(aes(x=Year, y=value, linetype=measurement)) + facet_wrap(~ country, nrow = 2) +
-  scale_linetype_discrete(name="Variable:", labels=c("Capital", "Income")) +
-  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) +
-  ylab("Inequality") + 
-  ggtitle("Capital and income inequality over time")
-```
