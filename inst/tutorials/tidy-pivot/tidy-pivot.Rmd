@@ -1,5 +1,5 @@
 ---
-title: "StringR: Working with Textual Data in R"
+title: "Pivot data from long to wide and back"
 output: 
   learnr::tutorial:
     progressive: true
