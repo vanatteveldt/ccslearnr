@@ -1,5 +1,5 @@
 ---
-title: "Recoding data in R"
+title: "StringR: Working with Textual Data in R"
 output: 
   learnr::tutorial:
     progressive: true

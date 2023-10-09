@@ -1,4 +1,4 @@
-Recoding data in R
+StringR: Working with Textual Data in R
 ================
 
 - [Introduction](#introduction)
