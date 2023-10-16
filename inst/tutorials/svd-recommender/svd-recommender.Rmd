@@ -223,7 +223,7 @@ Inversely, what other movies are like by the same people as the movies user 1 li
 
 Based one the result, can you recommend a movie to watch for user 'u1'?  Does the result make sense?
 
-```{r recmovie, exercise=TRUE, exercise.setup='movielens'}
+```{r recmovie, exercise=TRUE, exercise.setup='movielens', eval=FALSE}
 m = tidy_svd(ratings, ____) |>
   ____
 ```

@@ -55,12 +55,35 @@ def convert(inf, outf):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("tutorials", nargs="*", help="Names of the tutorials to render")
+    parser.add_argument("--readme", help="Update the readme file", action="store_true")
     args = parser.parse_args()
     root = Path.cwd().parent
     infolder = root / "inst" / "tutorials"
     outfolder = root / "handouts"
 
-    if not args.tutorials:
+    if args.readme:
+        readme = (root / "README.md").open().read()
+
+        pre = readme.find("<!-- Tutorial table -->")
+        post = readme.find("<!-- /Tutorial table -->")
+        if pre == -1 or post == -1:
+            raise Exception("Cannot parse README")
+
+        table = """
+| Name  | Tutorial | Handout |
+|-|-|
+"""
+
+        for file in infolder.glob("*/*.Rmd"):
+            name = file.with_suffix("").name
+            table += f"{name} | [link](https://vanatteveldt.shinyapps.io/{name}) | [link](handouts/{name}.md)\n"
+
+        readme = readme[: (pre + 23)] + "\n\n" + table + "\n\n" + readme[post:]
+
+        (root / "README.md").open("w").write(readme)
+        print("* New README.md written")
+
+    if not (args.tutorials or args.readme):
         print("Please select one or more tutorial to render:")
         for file in infolder.glob("*/*.Rmd"):
             print(f"- {file.with_suffix('').name:40} ({file})")
