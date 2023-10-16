@@ -8,7 +8,7 @@ Available tutorials:
 
 
 | Name  | Tutorial | Handout |
-|-|-|
+|-|-|-|
 tidy-join | [link](https://vanatteveldt.shinyapps.io/tidy-join) | [link](handouts/tidy-join.md)
 fun-with-cbs_for_Rockstars | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_for_Rockstars) | [link](handouts/fun-with-cbs_for_Rockstars.md)
 fun-with-cbs | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs) | [link](handouts/fun-with-cbs.md)
