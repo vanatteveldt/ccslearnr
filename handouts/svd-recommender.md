@@ -1,0 +1,357 @@
+Collaborative Filtering with SVD
+================
+
+- [Collaborative Filtering with SVD](#collaborative-filtering-with-svd)
+  - [What is Collaborative Filtering?](#what-is-collaborative-filtering)
+- [Simple movie recommendations](#simple-movie-recommendations)
+  - [Applying SVD](#applying-svd)
+  - [Retrieving the recommendations](#retrieving-the-recommendations)
+  - [Interpreting the SVD results](#interpreting-the-svd-results)
+  - [Exercise: Reconstructing the
+    prediction](#exercise-reconstructing-the-prediction)
+- [A bigger example](#a-bigger-example)
+  - [The movielens data](#the-movielens-data)
+  - [Predicting movie recommendations using collaborative filtering with
+    SVD](#predicting-movie-recommendations-using-collaborative-filtering-with-svd)
+  - [Interpreting the dimensions](#interpreting-the-dimensions)
+- [Fine-tuning: How many dimensions?](#fine-tuning-how-many-dimensions)
+- [Validation](#validation)
+  - [Training and Validation data](#training-and-validation-data)
+  - [Training and validation](#training-and-validation)
+- [Conclusion](#conclusion)
+
+<style>
+.match {color: red}
+li pre {border: 0px; padding: 0; margin:0}
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🛈 Information";
+}
+</style>
+
+## Collaborative Filtering with SVD
+
+This tutorial will show how you can use Singular Value Decomposition
+(SVD) to perform Collaborative Filtering and create recommendations. As
+an example, we will use movie ratings, but the techniques can be applied
+to other recommendations as well.
+
+### What is Collaborative Filtering?
+
+The core question in a recommender system is: Which item (i.e. movie,
+news article, possible friend) should we recommend to a user.
+
+*Collaborative Filtering* is a way to answer that question based on
+previous behaviour of this and other users. Suppose we have data as
+follows:
+
+<figure>
+<img
+src="https://miro.medium.com/v2/resize:fit:766/1*Z1z_1Ox7TA7SAgXGM4EmEg.png"
+alt="Collaborative Filtering" />
+<figcaption aria-hidden="true">Collaborative Filtering</figcaption>
+</figure>
+
+So we know the historical data of the first three users, and we know
+that our new user ‘Lizzy’ likes Arrival and Blade Runner. One way to
+base a recommendation on this would be to see that Lizzy most resembles
+the second user, since they also liked both Arrival and Blade Runner.
+Since that user was a big fan of Interstellar, that could be a good
+recommendation for Lizzy. The face that user 3 also liked both Blade
+Runnen and Interstellar is extra evidence for this.
+
+The evidence for Imitation Game is less, since only the first user liked
+it, and even though the also gave 4 starts to Arrival, they did not see
+Blade Runner, so the first user is less similar to Lizzy than the second
+user. Lion King is even less likely, since only the third user rated it
+and they were not very enthusiastic about it.
+
+In this tutorial, we will use Singular Value Decomposition (SVD) to
+analyse a ratings data set and come up with such recommendations
+automatically. If you are unfamiliar with SVD, you might want to have a
+look at [our SVD
+tutorial](https://vanatteveldt.shinyapps.io/svd-simple/) first.
+
+## Simple movie recommendations
+
+Let’s load a fairly trivial data set of movie ratings:
+
+``` r
+library(tidyverse)
+reviews = read_csv("https://raw.githubusercontent.com/ccs-amsterdam/r-course-material/master/data/reviews.csv") 
+```
+
+To see it in a more familiar shape, let’s pivot it to wide:
+
+``` r
+reviews |> pivot_wider(names_from=series, values_from=rating)
+```
+
+So, we can see that Olivia really likes F1 and Home Game, but dislikes
+House of Cards and The Bridge. We don’t know how she thinks about
+Ronaldo vs Messi or Borgen.
+
+### Applying SVD
+
+To recommend a new series to Olivia, we can apply SVD to the (long form)
+data set shown above.
+
+(Note that we use the helper function described in the [SVD
+tutorial](https://vanatteveldt.shinyapps.io/svd-simple/)\], but with a
+bit of extra work you could also use the built-in `svd` function. )
+
+``` r
+source('https://gist.github.com/vanatteveldt/865202bdea23de2e6457d59d25f0ab37/raw')
+m <- tidy_svd(reviews, rows_from = "user", columns_from="series", values_from="rating", ndimensions=3)
+```
+
+### Retrieving the recommendations
+
+To see the recommendations, we can use the `predictions` value of the
+resulting list `m`:
+
+``` r
+m$predictions |> pivot_wider(names_from=series, values_from=prediction)
+```
+
+So, based on all her and other ratings, we would recommend Wallander or
+Ronaldo to Olivia, but certainly not Borgen.
+
+### Interpreting the SVD results
+
+Intuitively, this makes some sense as Borgen is closer to Bridge, while
+at least Ronaldo is more similar to Formula 1 or Home Game.
+
+However, it is interesting to see how SVD came to this prediction. Let’s
+first look at the ‘V’ matrix, pivoted to wider and sorted by the first
+dimension (V1):
+
+``` r
+m$v_values |> pivot_wider(names_from=dimension, values_from=v_value) |> arrange(V1)
+```
+
+So, the first dimension seems to differentiate between sports series
+(which all load negatively) and Scandinavian series (which all load
+positively). Can you change the code above to inspect the third
+dimension instead?
+
+Can you show the user values in a wide format as well? Note, no need to
+arrange here, since we are most interested in the first user.
+
+``` r
+m$u_values
+```
+
+So, Olivia is not a big fan of the first dimension – in other words, she
+prefers sport series to Scandinavian series. Moreover, she is a big fan
+of the third dimension, so she prefers crime series like The Killing or
+Wallander to the more political series Borgen or House of Cards.
+
+### Exercise: Reconstructing the prediction
+
+From the explanation above, you can see the pattern emerging that we
+would rather recommend Wallander or Ronaldo to Olivia than Borgen.
+Mathematically, what we would do for each movie is to multiply Olivia’s
+genre preference with the genre of that movie, and add up the results
+for all genres.
+
+**Exercise** Reconstruct the predictions for Olivia by:
+
+1.  Filtering the `m$u_values` to only list Olivia’s preferences
+2.  Joining this together with `m$v_values` and `m$weights`
+3.  Computing the prediction per series using `group_by` and
+    `summarize`, where the prediction is the
+    `u_value * v_value * weight`
+4.  Arranging the results by prediction
+
+``` r
+source('https://gist.github.com/vanatteveldt/865202bdea23de2e6457d59d25f0ab37/raw')
+m <- tidy_svd(reviews, rows_from = "user", columns_from="series", values_from="rating", ndimensions=3)
+```
+
+*(Note that there are many ways to solve this, so if you get the right
+results but the code is different from the ‘official’ solution, don’t
+worry about it!)*
+
+Does this formula/script makes sense in light of the intuitive
+explanation above?
+
+## A bigger example
+
+The example above used a toy data set to illustrate how SVD can be used
+to make recommendations. In the remainder of this tutorial, you will
+work on a more realistic data set.
+
+### The movielens data
+
+First, let’s download a (lightly cleaned up version of the) movielens
+ratings data:
+
+``` r
+library(tidyverse)
+ratings = read_csv("https://i.amcat.nl/movies.csv")
+head(ratings)
+```
+
+This contains the ‘star-rating’ (out of 5) of users of various movies.
+Apparently, user `u1` really liked the adventures of both Robin Hood and
+Alice in Wonderland. What other movies do we think they would like?
+
+### Predicting movie recommendations using collaborative filtering with SVD
+
+The goal of this tutorial is to give a recommendation to a user, for
+example user 1. Based on what they have rated already, what should we
+recommend to watch next.
+
+We will answer this question using collaborative filtering: looking at
+users that like similar movies to user 1, what other movies do they
+watch? Inversely, what other movies are like by the same people as the
+movies user 1 liked?
+
+**Exercise** Using the code demonstrated above, can you:
+
+1.  Run SVD with 30 dimensions
+2.  Join the predictions with the original ratings. Make sure to keep
+    all predictions, even if a movie was not rated yet.
+3.  Filter on user ‘u1’
+4.  Order by predicted rating
+
+Based one the result, can you recommend a movie to watch for user ‘u1’?
+Does the result make sense?
+
+``` r
+m = tidy_svd(ratings, ____) |>
+  ____
+```
+
+*(Note that there are many ways to solve this, so if you get the right
+results but the code is different from the ‘official’ solution, don’t
+worry about it!)*
+
+### Interpreting the dimensions
+
+**Exercise** Can you list the movies that load strongly on the first
+dimension? And the ones that score worst on this dimension? Can you
+interpret this dimension – does it make sense that someone that likes
+the top movie in the dimension will like the other top movies, and
+dislike the bottom movies? How would you name this dimension? And what
+about the second dimension?
+
+``` r
+m = tidy_svd(ratings, rows_from = "user", columns_from="movie", values_from = "rating", ndimensions = 30)
+# ... add your code here ...
+```
+
+## Fine-tuning: How many dimensions?
+
+Many algorithms have some parameters that can be fine tuned to get
+better performance. Sometimes, these are called ‘hyperparameters’ since
+they are the high-level parameters that drive the algorithm (in this
+case: SVD) that estimate the concrete parameters (in this case:
+dimensions and weights)
+
+For SVD, the only parameter is the number of dimensions. Theory says we
+should plot the weight of the dimensions (singular values), and pick the
+‘elbow point’ where the weight starts to plateau.
+
+**Exercise**: Can you run svd with 100 dimensions, and plot the singular
+values `m$d`? First create a tibble containing the value for each
+dimension, and then plot the singular values as a line plot.
+
+*(Note that there are many ways to solve this, so if you get the right
+results but the code is different from the ‘official’ solution, don’t
+worry about it!)*
+
+Looking at the plot above, where does the ‘elbow’ seem to be? In other
+words, where does the plot transition from a steep decline to a more
+level plateau? This area is generally where you will find the best
+number of dimensions.
+
+## Validation
+
+It would be good to get some idea of how well our algorithm performs. We
+can easily check whether the predicted ratings match the actual ratings
+for movies that a movie rated.
+
+**Exercise**: The code below joins the predictions with the original
+ratings. Can you compute the correlation using `cor.test`?
+
+``` r
+m = tidy_svd(ratings, rows_from = "user", columns_from="movie", values_from = "rating", ndimensions = 30)
+combined <- left_join(m$predictions, ratings) 
+```
+
+### Training and Validation data
+
+Ideally, we would like to know how well we expect am algorithm to
+perform on new data.
+
+An issue with the correlation above is that it (also) correlates
+‘predicted’ ratings with the ratings that were originally used to create
+the model that predicted them. This means that as a performance
+indicator, it is likely too optimistic – in a way, it is trying to
+predict the past rather than predicting the future.
+
+The ‘best practice’ solution in AI is to split your data into *training
+data* (used to build the model) and *validation data* (used to validate
+it).
+
+The code below uses the `slice_sample` command to sample 10% of the data
+for validation, and uses `anti_join` to assign the remaining 90% to a
+`training` data set.
+
+``` r
+validation = slice_sample(ratings, prop=.1)
+training = anti_join(ratings, validation)
+```
+
+``` r
+validation = slice_sample(ratings, prop=.1)
+training = anti_join(ratings, validation)
+```
+
+### Training and validation
+
+**Exercise** Using the split above, can you:
+
+1.  Compute SVD on the **training** data, using 25 dimensions
+2.  Join the predictions with the **validation** data
+3.  Compute the correlation between the actual ratings and the
+    predictions
+
+``` r
+# Insert your code here
+```
+
+*(Note that there are many ways to solve this, so if you get the right
+results but the code is different from the ‘official’ solution, don’t
+worry about it!)*
+
+Is this score lower or higher than the earlier correlation? Does that
+make sense?
+
+## Conclusion
+
+This tutorial showed how SVD can be used as a collaborative filtering
+algorithm for making movie recommendations.
+
+Hopefully, by looking at the inside workings of a (relatively simple)
+algorithm, you have gained a better understanding of how such
+(recommender) algorithms work.
+
+Even if this tutorial might have felt fairly technical, it is important
+to realize that such algorithms are used by companies such as Netflix,
+Google and Meta to recommend what series, items, or posts we should be
+watching. And even if their actual algorithms are (probably) a lot more
+complicated than the one we looked at here, in essence the question they
+ask is always the same: based on patterns in the current data, can we
+predict (impute/estimate) some value that we haven’t seen yet? And
+ultimately the engineers at these companies face the same trade-offs in
+terms of accuracy, validity, and bias.
