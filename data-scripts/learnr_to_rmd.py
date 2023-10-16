@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
         table = """
 | Name  | Tutorial | Handout |
-|-|-|
+|-|-|-|
 """
 
         for file in infolder.glob("*/*.Rmd"):
