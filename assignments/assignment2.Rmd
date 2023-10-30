@@ -1,0 +1,60 @@
+---
+title: "BDCT Group Assignment 1"
+output: word_document
+date: "2023-09"
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning=FALSE)
+library(printr)
+```
+
+# Inleiding (±250 woorden)
+
+1. Kies een partij waarvan je de achterban beter wil begrijpen, bijvoorbeeld de BBB. 
+
+2. Kies twee demographische variabelen uit de CBS gegevens waarvan je voorspelt dat ze samenhangen met stemgedrag op die partij. Formuleer voor elke variabele een onderbouwde hypothese over dat verband . Je kan hiervoor kijken naar meer politicologische literatuur (bijvoorbeeld over partijsystemen en populisme), maar ook naar bijvoorbeeld sociaal economische klasse, ongelijkheid en vertrouwen in de overheid. Haal minimaal 2 relevante wetenschappelijke bronnen aan. 
+
+# Gegevens (tabel plus ±2 alineas tekst)
+
+3. Haal de relevante gegevens op, selecteer alleen de relevante rijen en kolommen, geef de kolommen begrijpelijke namen, en koppel de gegevens tot 1 bestand waarin per gemeente zowel het stemgedrag voor de gekozen partij als de demographische variabelen zitten.
+
+```{r}
+library(tidyverse)
+results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+
+# voeg hier je code in om je data bestanden op te schonen en te combineren
+
+head(data)
+```
+
+4. Laat de bovenste rijen van dit bestand zien en leg met een leesvoorbeeld de betekenis van de kolommen uit. Bijvoorbeeld: Kolom 'bevolkingsdichtheid' geeft het aantal inwoners per vierkante kilometers weer. We zien in de gegevens hierboven dat Groningen met 1.257 inwoners per vierkante kilometer dichter bevolkt is dan Stadskanaal, met 270 inwoners per vierkante kilometer. 
+
+# Exploratieve analyse (figuren plus ±2 alineas tekst)
+
+5. Maak minimaal twee figuren waarin het verband tussen de demografische gegevens en de stemuitslag te zien is. Je mag zelf kiezen welke figuren je gebruikt, bijvoorbeeld spreidingsdiagrammen en/of ingekleurde landkaarten. Zorg ervoor dat de figuren netjes zijn, dat wil zeggen dat er heldere labels en titels zijn en een duidelijk verhaal vertellen.
+
+6. Leg onder elk figuur uit wat er in het figuur te zien is en wat dat betekent. Ga daarbij in op het verband, maar benoem vooral ook gemeentes die juist niet in het verhaal passen. (ongeveer een alinea per figuur)
+
+```{r}
+# Voeg hier je code in om de figuren te maken
+```
+
+# Toetsende analyse (uitslag plus ±1 alinea tekst)
+
+7. Toets het verband tussen de demografische kenmerken en de stemuitslag. Je mag hiervoor correlaties gebruiken, maar je mag eventueel ook een meervoudige regressie uitvoeren. Welke conclusie trek je uit deze toets?
+
+```{r}
+# Voeg hier je code in om de toets uit te voeren
+```
+
+# Conclusie en discussie (±250 woorden)
+
+8. Wat kunnen we concluderen uit de exploratieve en toetsende analyse over het verband tussen bevolkingskenmerken en stemuitslag. Verwijs hierbij terug naar de literatuur uit de inleiding. 
+
+9. Welke vragen zijn nog niet beantwoord, of welke nieuwe vragen zijn juist opgeworpen? Hoe zou een vervolgonderzoek hier eventueel antwoord op kunnen geven?
+
+

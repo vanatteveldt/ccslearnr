@@ -1,0 +1,89 @@
+---
+title: "Assignment 1 template"
+output: html_document
+date: "2023-09-01"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning=FALSE)
+library(printr)
+```
+
+# Introduction
+
+The goal of this assignment is to use the skills from the tutorial to run some simple analyses.
+Substantively, we want to see which parties do better in larger municipalities. 
+
+## Data
+
+The code below creates a dataset containing voting results and municipality size.
+Don't worry if you don't fully understand this code, the `join` commands will be explained
+in a later tutorial. 
+
+```{r data}
+library(tidyverse)
+results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+data <- inner_join(results, demographics) |>
+  select(gemeente, population=v01_pop, party, votes)
+head(data)
+```
+
+## Filtering
+
+To start, choose a political party, e.g. `GROENLINKS` (greens). 
+**Filter** the results data frame to only contain that party, 
+and store it as a new data frame called `subset`. 
+Next, **arrange** the results to sort by votes (descending), and show the first rows of data:
+
+Remove the comment character (`#`) from the lines below and fill in the blanks:
+
+```{r filter}
+# subset = filter(data, ____)
+# subset = arrange(subset, ____)
+# head(subset)
+```
+
+Interpretation: What municipalities is that party most succesful in? Does that make sense?
+(For example, you would expect the greens to do well in cities, especially cities with many students)
+
+*(Replace this sentence by your interpretation)*
+
+## Scatter plot
+
+Now, let's see to what extend the party is more succesful in larger or smaller municipalities.
+
+First, let's first create a scatter plot to see to what extent their voting seems related.
+In the code below, remove the `#` sign and fill in the blanks so the population is on the x-axis, and the votes are on the y-axis:
+
+```{r scatter}
+# ggplot(subset, aes(x=___, y=___)) + geom_point()x
+```
+
+Interpretation: How do you interpret the scatter plot? Does there seem to be a relation between population size and votes?
+
+Bonus: If you want, you can add `+ scale_x_log10()` to the plot to set the population on a logarithmic scale. Does that make it easier to interpret?
+
+Bonus2: If you want, you can add `+ ggtitle("my title") + ylab("% of votes") + xlab("Population") + theme_classic()` to the plot to add labels and change the theme.
+
+## Correlation
+
+After the explorative analysis above, let's do a simple statisitcal analysis to see if there is a significant correlation between vote share and population size.
+
+Hint: the function `cor.test` is not part of the tidyverse, and expects you to select the columns from the data frame. 
+You can do this using e.g. `subset$votes` to select the column called votes:
+
+```{r correlation}
+# cor.test(subset$____, subset$____)
+```
+
+## Bonus: Map
+
+As a bonus exercise, can you adapt the code from the 'Fun with R' tutorial to create a map of vote shares?
+
+## Submitting this assignment
+
+To submit the assignment, **knit** it to a word document, download it, and submit it on canvas. 
+Alternatively, you can print the html report as a pdf and submit that. 

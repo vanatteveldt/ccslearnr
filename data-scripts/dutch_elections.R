@@ -55,7 +55,8 @@ write_csv(results_gm, here("data/dutch_elections_2023ps.csv"))
 
 # CBS data per gemeente
 
-gm = results_gm |> select(gm, gemeente) |> unique()
+gm <- read_csv(here("data/dutch_elections_2023ps.csv")) |>select(gm, gemeente) |> unique()
+# gm = results_gm |> select(gm, gemeente) |> unique()
 
 library(cbsodataR)
 #kern_cbs_2023 = cbs_get_data("70072ned", RegioS=has_substring("GM"), Perioden="2023JJ00")
@@ -72,7 +73,10 @@ demographics =
          v122_disposable="ParticuliereHuishoudensExclStudenten_122",
          v132_income="ParticuliereHuishoudensExclStudenten_132",
          v142_wealth="ParticuliereHuishoudensExclStudenten_142",
-         v153_uitkering="TotDeAOWLeeftijd_153"
+         v153_uitkering="TotDeAOWLeeftijd_153",
+         v212_afstand_ziekenhuis="AfstandTotZiekenhuis_212",
+         v216_afstand_basisschool="AfstandTotSchoolBasisonderwijs_216",
+         v225_dichtheid_restaurants="AantalRestaurantsBinnen3Km_225"
          ) |>
   mutate(c_65plus=v20_65_80 + v21_80plus, v20_65_80=NULL, v21_80plus=NULL,
          v153_uitkering=v153_uitkering/v01_pop*100,
@@ -97,6 +101,25 @@ demographics =
 
 write_csv(demographics, here("data/dutch_demographics.csv"))
 
+
+veiligheid_raw = cbs_get_data("85146NED", RegioS=has_substring("GM"), Perioden="2021JJ00")
+
+veiligheid <- veiligheid_raw |>
+  select(gm=RegioS,
+         voorzieningen_fysiek = FysiekeVoorzieningenSchaalscore_6,
+         sociale_cohesie = SocialeCohesieSchaalscore_15,
+         cijfer_leefbaarheid = RapportcijferLeefbaarheidWoonbuurt_18,
+         overlast_sociaal = EenOfMeerVormenVanSocialeOverlast_34,
+         cijfer_veiligheid = RapportcijferVeiligheidInBuurt_60,
+        voelt_discriminatie = GediscrimineerdGevoeld_66,
+        slachtoffers_criminaliteit = Slachtoffers_68,
+        slachtoffers_geweld = Slachtoffers_72,
+    ) |>
+  mutate(gm=trimws(gm)) |>
+  inner_join(gm) |>
+  select(gm, gemeente, everything())
+
+write_csv(veiligheid, here("data/dutch_demographics_veiligheid.csv"))
 
 ## GIS data per gemeente
 
