@@ -1,0 +1,474 @@
+---
+title: 'The Art of Data: Painting Your Story with ggplot'
+author: "Wouter van Atteveldt"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE, remove_for_md=TRUE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🛈 Information";
+}
+</style>
+
+## The Artistic Intro 🎨
+
+Hey young artists, welcome to the art studio of data visualization! You know how artists use colors, shapes, and lines to create stunning masterpieces? Well, today we're going to become data artists, using visual elements to tell captivating stories with data. 🌈
+
+Think of `ggplot` in R's Tidyverse as your palette of vibrant colors and diverse brushes. With this incredible toolbox, you can create almost any kind of "artwork"—from simple doodles like line and scatter plots, to intricate murals like colorful annotated bubble plots.
+
+### 📚 Get Inspired!
+To get those creative juices flowing, check out these amazing resources:
+
+- [The R Graph gallery](https://r-graph-gallery.com/ggplot2-package.html) - It's like an art exhibition, but for data plots! All pieces come with their own R code.
+- [From data to viz](https://www.data-to-viz.com/) - Think of it as an art school that teaches you to match the best plot to your "data art."
+- [The ggplot cheat sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf) - Your quick guide to mastering different brush strokes and color blends.
+- [Data Visualization](https://socviz.co/) by Kieran Healy - An online art text book that delves into the principles of data as art.
+
+::: Info ::::::
+This tutorial is like a sketchbook where we focus on the basic techniques, rather than finishing touches like labels and visual flair. When you're ready to showcase your art, make sure you visit the section on *Crafting High-Quality Graphs* for those extra details!
+:::
+
+### GGplot: Your Artistic Toolkit 🎨
+
+First, let's "unroll our canvas" by looking at a simple built-in dataset about cars, called `mtcars`:
+
+```{r}
+# Loading our paint (libraries) and canvas (data)
+library(tidyverse)
+data(mtcars)
+mtcars
+```
+
+```{r mtcars}
+library(tidyverse)
+data(mtcars)
+```
+
+Now, what if we want to understand how engine power (`hp`) relates to fuel economy (`mpg`)? Let's start "painting"!
+
+```{r basicplot, exercise=TRUE, exercise.setup='mtcars'}
+# Painting a scatter plot to understand the relationship between hp and mpg
+ggplot(mtcars, 
+       aes(x = hp, y = mpg)) + 
+  geom_point()
+```
+
+```{r basicplot-solution}
+ggplot(mtcars, 
+       aes(x = wt, y = mpg)) + 
+  geom_point()
+```
+
+```{r basicplot-code-check}
+grade_code()
+```
+
+**Exercise:** First, run the existing "sketch" by pressing the 'Run Code' button. Then try swapping out `hp` with `wt` (weight) for the x-axis! 🎨
+
+### Elements of a ggplot: Your Paint, Canvas, and Brushes 🖌️
+
+The ggplot code you saw is like a basic sketch that shows off the essential elements of this form of "data art." Every artwork (or plot) you create with ggplot will have three main components:
+
+1. **The Canvas (Data)**: This is your background where the magic happens, in this case, `mtcars`. This is the first argument when you call `ggplot()`.
+  
+2. **The Paint (Geometrical Elements or 'geoms')**: These are what make up the visual part of your artwork. Think of it as choosing between watercolors, oil paints, or pastels. In our example, `geom_point()` adds points to make a scatter plot.
+
+3. **The Brushes (Aesthetic Mapping or 'aes')**: These decide how your "paint" will be applied on the "canvas." Imagine choosing a fine brush for details or a big, flat one for broader strokes. In our sketch, the aesthetic mapping `aes(x = hp, y = mpg)` told ggplot to map the engine power to the x-axis and fuel economy to the y-axis.
+
+So, in artistic terms, our plot is a scatter "painting," where each point's x and y positions are based on the `hp` and `mpg` attributes from our `mtcars` "canvas."
+
+Are you ready to create more data art? 🎨🌟
+
+### Let's Add Some Glamour: Make it Pretty! ✨
+
+Alright, artists, you've sketched out the basic structure of your artwork, but now let's bring it to life with some bold colors and chic styles! Just like adding layers of texture or a glossy varnish to your paintings, you can enrich your ggplot creations.
+
+Let's dive into the extra "art supplies" that we can use:
+
+1. **Palette (`scale`)**: This lets you customize the color gradient, like choosing between warm and cool shades. However, there are many `scale_*` commands, which let you control how data is mapped to the canvas and how the canvas itself looks.
+
+2. **Title (`ggtitle`)**: A title gives your artwork a name and sets the scene for viewers.
+
+3. **Themes**: Think of this as the frame that enhances your masterpiece. Themes control the atmosphere of your art—from the background color to the font style.
+
+Here's a jazzed-up example:
+
+```{r prettyplot, exercise=TRUE, exercise.setup='mtcars'}
+# Adding multiple layers to our data artwork
+ggplot(mtcars, aes(x = hp, y = mpg, color = cyl)) +
+  geom_point() +
+  scale_color_gradient(low = "darkgreen", high = "darkred") +
+  ggtitle("Car Horsepower and Fuel Economy") +
+  theme_minimal()
+```
+
+**Exercise:** Go wild! Feel free to switch around the x and y, experiment with colors, or even add axis labels like `+ xlab("Horsepower")`.
+
+## Scatter Plots: The Portrait of Data Relationships 🖼️
+
+Scatter plots are the equivalent of classic portraits in art, capturing the essence of the relationship between two numeric variables. We use `geom_point()` as our "brush technique" for this type of art.
+
+A scatter plot requires you to choose an **x** and **y** axis, and you can further decorate your plot by adding colors, size, and even transparency.
+
+Below, we're diving into a community-level dataset to explore various demographics in Dutch municipalities:
+
+```{r point, exercise=TRUE}
+# Exploring the demographics through a colorful scatter plot
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  scale_color_gradient(low = "coral", high = "darkblue") +
+  geom_point(alpha = .6)
+```
+
+```{r point-solution}
+
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v43_nl)) +
+  scale_color_gradient(low = "darkblue", high = "lightblue") +
+  geom_point(alpha = .6)
+```
+
+```{r point-code-check}
+grade_code()
+```
+
+**Exercise**: Try changing the color attribute to represent the percentage of inhabitants without a migration background (`v43_nl`). How about shifting the color palette to a serene blend of dark to light blue?
+
+📌 **Note**: See the use of `alpha`? It's like applying a wash of watercolor over your points to let the layers beneath show through. It's particularly useful when your points are stacked or overlapping.
+
+### The Artist's Choice: Customizing Geoms 🎭
+
+If you're wondering what happens when you play with the `shape` attribute, think of it as swapping your brush for a different one—maybe a fan brush for leaves or a palette knife for texture. For example, using `shape=21` changes the points into a specific kind of circle. You can also fill these shapes using a fill aesthetic or a specific color. You can even use custom shapes like `shape='🏠'`!
+
+🔍 You can Google "ggplot shapes" to find a catalog of different brush tips (shapes) you can use to sprinkle your unique flair on your data masterpiece.
+
+
+## Line Graphs: The Storyboards of Data 📜🖌️
+
+Line graphs are like storyboards in the art of storytelling. Each point is a crucial scene, and the lines between them bring the story to life, connecting the dots to illustrate change over time. 
+
+In ggplot2, our artistic tool for line graphs is `geom_line`. Think of it as a continuous stroke of a paintbrush that links points on your canvas.
+
+🎨 **Key Features of Line Graphs:**
+- **x and y Mappings**: These define the plot area or the 'canvas' where you paint.
+- **Color**: Like adding colors to different characters in your storyboard.
+- **Alpha**: This controls the transparency, like using a lighter or darker stroke.
+- **Linetype**: Choose between solid, dashed, and dotted lines. It's like picking the type of brush stroke you'd use.
+- **Linewidth**: This sets the thickness of your lines, like the difference between using a fine-tip brush or a broad one.
+
+Let's visualize some election data to get a feel for it:
+
+```{r line, exercise=TRUE}
+# Drawing the storyline of U.S. Presidential Elections
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+ggplot(elections, aes(x = year, y = votes, color = party)) + 
+  geom_line()
+```
+
+### Time for Some Final Touches! 🌟
+
+Great! Now let's add some finishing touches to this piece:
+
+1. **Scale Tweaks**: The votes are in a range of 0-1. Let's convert them to percentages for easy understanding—just like choosing between different units of measurement for your canvas.
+  
+2. **Text Formatting**: We'll change the party names to Title Case to make them more visually appealing, just like fine-tuning the captions in a comic strip.
+  
+3. **Color Customization**: Imagine you're custom-mixing your paint to get the perfect shade. We'll manually set party colors to match public perception.
+  
+4. **Handling Missing Scenes**: Just like a storyboard may have missing scenes, our data may have gaps. We'll fill these in to avoid misinterpretation (`geom_line` always connects missing plots, creating the impression that there are values in between, even when that's not true).
+
+5. **Stylize Major and Minor Parties**: We'll set the line types differently for major and minor parties, like drawing the main characters with bold lines and the supporting cast with lighter strokes.
+
+Here's how you do it:
+
+```{r electiondata}
+# Preparing the data, akin to sketching before painting
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+```
+
+```{r line2, exercise=TRUE, exercise.setup='electiondata'}
+# Adding finishing touches to our line graph masterpiece
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN",
+         party = str_to_title(party)) |>
+  ggplot(aes(x = year, y = votes, color = party, linetype = major)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_linetype_manual(values = c("dashed", "solid"), guide = "none") +
+  scale_color_manual(breaks = c("Democrat", "Republican", "Green", "Libertarian", "Other"),
+                     values = c("blue", "red", "green4", "yellow4", "grey")) +
+  geom_line()
+```
+
+🔍 **Note**: We used data transformation techniques like `complete` and `mutate` before using the `|>` to hand the new data to ggplot. Think of it like preparing gathering and preparing your painting tools before you start to create art.
+
+
+## Bar Plots: The Group Portraits of Data 🎨🖼️
+
+Ah, bar plots! Think of them as group portraits in an art gallery. Each bar is like a character in the painting, representing a slice of the larger picture. Unlike scatter or line plots, which focus on individual points or connecting lines, bar plots give you a summary snapshot.
+
+🎨 **Key Features of Bar Plots:**
+
+- **Single Axis Mapping**: In bar plots, you only specify either `x` or `y`, not both. The second axis is filled automatically with count data.
+- **Counts**: By default, bar plots will count the number of occurrences of each item. It's like the artist's impression of each character's prominence in the scene.
+
+Let's say we're interested in a "portrait" that showcases the number of counties in each state using US Demographics data. 
+
+First, let's get our data "palette" ready:
+
+```{r usdemo}
+# Loading the palette of U.S. Demographics
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+```{r}
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+And now, let's get painting:
+
+```{r bar, exercise=TRUE, exercise.setup='usdemo'}
+# Crafting the group portrait of U.S. states by their number of counties
+ggplot(us_demographics, aes(y = state)) +
+  geom_bar()
+```
+
+🖌️ Notice how we used `aes(y = state)`? This means we want each bar's height to represent the number of counties in a state. The ggplot2 package does the counting for us, just like how a painter would decide the size of each character in a portrait based on their significance.
+
+### Histograms: Sorting Your Data into Bins, Like Mixing Paint Colors 🎨🌈
+
+When dealing with continuous data, think of a histogram as sorting your paint colors into different pots. Each pot (or bin) captures a range of shades. You decide how many pots you want, and `geom_histogram` does the work for you!
+
+Here, we will use histograms to look at the number of counties according to their percentage of non-white population. The `bins` parameter is like deciding how many pots (deciles, in this case) you want to divide your colors into:
+
+```{r hist, exercise=TRUE, exercise.setup='usdemo'}
+# Mixing our paint colors (data) into 10 different pots (bins)
+ggplot(us_demographics, aes(x = nonwhite_pct)) +
+  geom_histogram(bins = 10, color = "black")
+```
+
+In this code, `aes(x = nonwhite_pct)` chooses which color spectrum (data variable) we're focusing on, and `bins = 10` tells ggplot to use 10 pots for mixing. The `color = "black"` outline is like the edge of each pot, separating them clearly.
+
+### Bar Plots with Custom Brushes: geom_col 🖌️
+
+What if you've mixed your own colors (calculated your own statistics) and you just need to paint (plot) them? That's where `geom_col` comes in handy, letting you specify both `x` and `y`.
+
+Imagine you've got a bunch of smaller canvases (bars) and want to show the same scene (party) in different years, maybe in different styles. `geom_col` allows us to create a grouped bar plot. Also, it's possible to angle the text labels for a better view—just like how you'd angle your brush for finer strokes.
+
+Let's see this in action:
+
+```{r col, exercise=TRUE}
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+```
+```{r col-solution}
+# Option 1: You can add the as.factor(year) directly into the aesthetic : ----
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = as.factor(year))) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+
+# Option 2: You can also call mutate first : ----
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  mutate(year = as.factor(year)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+```
+```{r col-code-check}
+grade_code()
+```
+(Note: The `complete` function is like a painter double-checking his supplies to make sure no colors are missing before starting. It fills in missing year-party combinations with zero votes.)
+
+ **Exercise 🎨**: In the example above, the `year` is treated as a numeric variable, causing R to blend the colors (create a gradient). But what if you want to treat each year as its own unique color (factor)? You can use `as.factor(year)` to achieve this. Try it out and observe how the painting (plot) changes.
+
+
+
+## Combining Geoms: Adding Layers to Your Masterpiece 🎨🖌️
+
+Think of your plot like a layered canvas. Sure, you can have a beautiful scatter plot or line graph, but what if you want to add a little more depth? Imagine adding layers of paint or texture—like adding a gentle hue for the background or some highlighting to make elements pop. That's precisely what you do when you combine multiple geometric objects or "geoms" in ggplot!
+
+For example, consider the scatter plot we created earlier:
+
+```{r dutchdemo}
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+```
+
+```{r multiple}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point()
+```
+
+
+#### Adding a Trend Line to Your Scatter Plot
+
+To continue our analogy, imagine your scatter plot is like a sky full of stars. What if you want to identify the Milky Way—the overarching trend among these stars?
+
+We do this by adding a trend line using `geom_smooth`, which is like drawing a line to highlight a pattern among the stars:
+
+```{r multiple2, exercise=TRUE, exercise.setup='dutchdemo'}
+# Creating a starry night (scatter plot) and highlighting the Milky Way (trend line)
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+The `geom_smooth(method = lm)` line adds a linear model to our scatter plot, kind of sketching the overarching trend among the stars.
+
+#### Adding Text Labels to Your Plot
+
+What if you want to add constellations or names to some special stars in your sky? That's when `geom_text` comes into play, allowing us to label points.
+
+However, if we label all the stars, the sky will be too crowded! So, let's focus on the standout stars, perhaps the outliers.
+
+Here's how to do it:
+
+```{r multiple3, exercise=TRUE, exercise.setup='dutchdemo'}
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
+```
+```{r multiple3-solution}
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000 | c_65plus < 15)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
+```
+```{r multiple3-code-check}
+grade_code()
+```
+
+A couple of things to note:
+
+- **Data as First Argument**: In `ggplot`, we usually specify the data first and the mapping second. For geoms, it's a bit confusingly flipped. But you can always specify what your first argument is by writing `data = subset`.
+
+- **Own Aesthetic for `geom_text`**: The `geom_text` can have its own data and mapping. Here, it adds a `label` aesthetic to indicate what should be displayed as text. 
+
+- **Nudging**: Just like you might shift a piece slightly in a collage for better alignment, `nudge_y = -.5` moves the labels a bit down to avoid overlapping with the points.
+
+#### **Exercise 🎨**: 
+
+Wouldn't you want to also label the places where youthfulness shines bright, where less than 15% of the population is over 65? To include these, simply add another condition to the `filter` function in the `subset` creation. Remember, you can chain multiple conditions using `|` (or). 
+
+Take up your brushes, young artists, and keep layering your canvas with more data and insights! 🖌️🎨
+
+
+## Crafting High-Quality Graphs: Creating Masterpieces for Showcasing 🖼️🎨
+
+So far, we've been sketching and doodling—making quick and simple visualizations for our own understanding. Think of these as practice pieces or drafts. But what about when you're ready to create a masterpiece for public display, maybe in a report or presentation?
+
+Just like how a fine art piece needs careful finishing touches, your graphs also need that extra polish to shine. 🌟 Let's explore how to add those final brushstrokes and details.
+
+#### Artistic Considerations for Graphs 🤔🎨
+
+Here are some important aspects that can transform your visual sketch into a gallery-worthy piece:
+
+- **Clarity in Presentation**: The graph should speak for itself. Titles and axis labels should be as descriptive as a museum plaque next to a masterpiece. 
+- **Readability**: Ensure that all elements are easily visible and not overlapping, just like ensuring the elements in a painting don't clash.
+- **Sensible Scales and Legends**: Just like the color palette in a painting, make sure your scales and legends are easy to interpret.
+
+#### Brushing Up the Basics 🖌️
+
+Let's consider one of our earlier scatter plots. Imagine it as a landscape painting. While the essence is captured, it needs refining.
+
+Here's the draft:
+
+```{r ugly}
+# Our draft landscape painting (basic scatter plot)
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6)
+```
+
+#### Adding Final Touches: A Step-by-Step Makeover 🎨
+
+To polish this landscape, we'll add various elements:
+
+1. **Title and Labels**: These are like naming your painting and adding a short description. Use `ggtitle` for the title and `xlab` and `ylab` for axis labels.
+2. **Scale Adjustments**: Like adjusting hues and tones in a painting, `scale_` functions help tweak the aesthetics.
+3. **Theme**: The frame around your painting. You can pick a `theme` and further customize it.
+
+Here's how to apply these touches:
+
+```{r pretty, exercise=TRUE}
+# The final, polished landscape painting (enhanced scatter plot)
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+highlight <- filter(demographics, v01_pop > 250000 |
+                      c_65plus > 30 |
+                      c_65plus > 25 & v57_density > 3000 |
+                      c_65plus < 15)
+ggplot(demographics,
+  aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6) +
+  xlim(0, 7000) +
+  geom_text(data = highlight, aes(label = gemeente), nudge_y = -1, size = 3, color = "coral") +
+  ggtitle("Where do older people live?",
+          "Selected characteristics of Dutch municipalities") +
+  xlab("Population density") +
+  ylab("Percentage of population aged 65+") +
+  scale_size(breaks = c(5000, 50000, 500000), labels = c("5.000", "50.000", "500.000"), name = "Population") +
+  scale_color_gradient(low = "coral", high = "darkblue", name = "Household\nIncome") +
+  theme_classic() +
+  theme(axis.title = element_text(size = 12))
+```
+
+🌟 Voila! We've transformed our draft into a well-crafted piece of art.
+
+#### Exercise: Create Your Own Masterpiece 🖌️
+
+Now it's your turn. Take any of the earlier graphs we created—your own drafts—and try to refine them into masterpieces. Add titles, labels, themes, and so on. Can you make it gallery-worthy?
+
+Remember, each brushstroke adds a layer of understanding and appreciation. So go ahead, make your data as captivating as a piece of art! 🎨

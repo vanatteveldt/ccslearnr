@@ -1,0 +1,487 @@
+---
+title: 'Visualizing data with ggplot'
+author: "Wouter van Atteveldt"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE, remove_for_md=TRUE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🛠️ Heads Up! 🛠";
+}
+</style>
+
+
+## 🌟 Introduction 🌟
+
+Hey, future coding superstar! 🌟 So, you're curious about drawing graphs and visualizing data? Awesome! Making graphs is like being a detective 🔍 and an artist 🎨 at the same time. You can uncover the secrets hidden in numbers and show them off in cool, colorful ways. 
+
+We're going to use `ggplot`, which is like a magic wand 🪄 in R for making almost any graph you can imagine. You'll be able to make simple line graphs, scatter plots like connect-the-dots, and even bubble plots that look like a party on your screen! 🎉
+
+📚 Here are some neat places you can learn more:
+
+- [The R Graph gallery](https://r-graph-gallery.com/ggplot2-package.html) - It's like an art gallery but for R graphs (and with code!).
+- [From data to viz](https://www.data-to-viz.com/) - This site helps you pick the perfect graph for your data.
+- [The ggplot cheat sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf) - It's like a mini-guide for ggplot.
+- [Data Visualization](https://socviz.co/) by Kieran Healy - A free online book to become a graph wizard!
+
+::: Info ::::::
+The graphs we'll make first are like sketches; they help us learn the ropes. But if you're going to show them to people in reports or presentations, you'll want to add extra sparkle ✨. Don't worry, we'll cover that later!
+:::
+
+### 🎨 GGplot Basics 🎨
+
+Let's start by playing around with a dataset that's all about cars 🚗. Don't worry if you're not a car fan; it's all for learning how to plot!
+
+First, let's peek at this car data.
+
+```{r}
+# This loads the tidyverse package, which includes ggplot
+library(tidyverse)
+
+# This loads the car data (it's built into R!)
+data(mtcars)
+
+# This shows us the data
+mtcars
+```
+
+```{r mtcars}
+library(tidyverse)
+data(mtcars)
+```
+
+👆 What did we do here?
+
+- `library(tidyverse)`: This is like opening our toolbox. The tidyverse package has a lot of helpful tools, including ggplot!
+- `data(mtcars)`: This gets our car data ready. Think of `mtcars` as a big spreadsheet all about different cars.
+- `mtcars`: This shows us what the data looks like. You'll see columns like `hp` for horsepower and `mpg` for miles per gallon.
+
+Now, let's draw our first graph!
+
+```{r basicplot, exercise=TRUE, exercise.setup='mtcars'}
+# Let's make our first ggplot graph!
+ggplot(mtcars, 
+       aes(x = hp, y = mpg)) + 
+  geom_point()
+```
+```{r basicplot-solution}
+# If you want to plot weight instead of horsepower, you can do this!
+ggplot(mtcars, 
+       aes(x = wt, y = mpg)) + 
+  geom_point()
+```
+```{r basicplot-code-check}
+grade_code()
+```
+
+🏋️‍♀️ **Exercise:** Okay, superhero, your turn! 🦸‍♀️🦸‍♂️ Run the code by pressing the 'Run Code' button. Then, can you switch it up a bit? Try showing `wt` (that's the car's weight) on the x-axis instead of `hp` (horsepower).
+
+### 🎈 Elements of a ggplot 🎈
+
+So, you might be wondering, "What's the magic spell to make that ggplot?" Well, every ggplot needs three main ingredients like a magic potion 🧪:
+
+1️⃣ **The Data**: For us, it's `mtcars`. This is the info you want to show on the graph.
+  
+2️⃣ **Geometrical Elements (Geoms)**: These are the shapes on the graph. In our case, we used `geom_point()` to make a scatter plot with points.
+  
+3️⃣ **Aesthetic Mapping (aes)**: This tells ggplot what data to use for different parts of the graph. We told it to use `hp` for the x-axis and `mpg` for the y-axis.
+
+So, in simple words, our graph is a scatter plot (lots of dots 🟣🔵🟢). The dots' left-to-right position shows the car's horsepower (`hp`), and the up-and-down position shows the miles per gallon (`mpg`). And all of this info comes from the `mtcars` data!
+
+### ✨ Add Some Bling to Your Graph! ✨
+
+So you got the basics, but now let's turn that graph into a masterpiece 🖼️! Did you know you can customize your graph like decorating a cake? 🎂 Yep, you can add colors, titles, and so much more!
+
+Here’s how we can jazz things up:
+
+- `scale_color_gradient`: This lets us change the colors of our dots. The color reflects the number of cylinders (`cyl`) the car has. Cool, right? 🌈. There are also lots of other `scale_*` commands, so you can tweak the range and labels of your axes or change the color values.
+- `ggtitle`: Just like a book needs a title, your graph does too!
+- `theme_minimal`: This gives our graph a clean and tidy look.
+
+Let's see it in action:
+
+```{r prettyplot, exercise=TRUE, exercise.setup='mtcars'}
+# Making a prettier graph with titles and colors
+ggplot(mtcars, aes(x = hp, y = mpg, color = cyl)) +
+  geom_point() +
+  scale_color_gradient(low = "darkgreen", high = "darkred") +
+  ggtitle("Car horsepower and fuel economy") +
+  theme_minimal()
+```
+
+🤹‍♀️ **Play Time**: Your turn! Try flipping the x and y axes, or changing the colors. Want to label the x-axis? Just add `+ xlab("Your Label Here")`.
+
+Ready for more? Let's keep rolling! 🚀
+
+## 🎯 Scatter Plots: The Swiss Army Knife of Graphs 🎯
+
+Scatter plots are super useful; they’re like the Swiss Army knife of graphs! They show how two things relate to each other, like how fast a car is compared to how much gas it uses. 🚗💨
+
+We can get super creative here:
+
+- `size`: Makes the dots bigger or smaller depending on the data. 
+- `color`: We can still color-code our dots.
+- `alpha`: This controls how see-through our dots are. It's great for when dots are hiding behind each other.
+
+Check this out! This scatter plot talks about people and places in the Netherlands:
+
+```{r point, exercise=TRUE}
+# This code gets some data about Dutch demographics
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+
+# And now, the scatter plot!
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  scale_color_gradient(low = "coral", high = "darkblue") +
+  geom_point(alpha = .6)
+```
+```{r point-solution}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v43_nl)) +
+  scale_color_gradient(low = "darkblue", high = "lightblue") +
+  geom_point(alpha = .6)
+```
+```{r point-code-check}
+grade_code()
+```
+
+🎮 **Exercise**: Let's make it more interesting! Can you change the colors to show the percentage of people without migration history (`v43_nl`) and make the colors go from dark blue to light blue? 🌊
+
+🎨 **Extra Artistic Touch**: Use `alpha` to make the points a bit see-through. This way, if they overlap, you can still see each one. You can add this to any shape in ggplot.
+
+👾 **For the Adventurous**: Want to add even more fun? Try using `shape=21` or even `shape='🏠'` in your plot. You can even add a fill color if you use `shape=21`. Go ahead and Google 'ggplot shapes' to see more cool shapes you can use!
+
+Now go ahead, be the artist and scientist you are and create your masterpiece! 🎨🔬
+
+## 📈 Line Graphs: The Time Travelers of Data 🕰️
+
+Line graphs are like storybooks; they take you on a journey through time to show you how things have changed. Instead of using dots like in a scatter plot, a line graph connects those dots with (you guessed it) lines!
+
+To make a line graph, we use `geom_line()`. It's like `geom_point()`, but it draws lines between points instead of showing just the points. And guess what, you can also change their color, how see-through they are (`alpha`), the type of line (`linetype`), and how thick the line is (`linewidth`). 🌈🎨
+
+### 🇺🇸 US Presidential Elections Example 🗳️
+
+Let's explore the US Presidential Elections since 2000! 🗳️🇺🇸
+
+Here’s how to make a simple line graph:
+
+```{r line, exercise=TRUE}
+# Importing the data and libraries
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+
+# Making a line graph
+ggplot(elections,
+       aes(x = year, y = votes, color = party)) + 
+  geom_line()
+```
+
+### ✨ Let's Spruce Things Up! ✨
+
+Our graph is cool, but it could be cooler! So, let's roll up our sleeves and dive into making it fabulous!
+
+1. **Percentages**: Votes are given as decimals (0.5, 0.4, etc.), but we usually understand percentages better (50%, 40%). We can change this using `scale_y_continuous`.
+2. **Caps Alert!**: The party names are SHOUTING in all caps. Let's chill them out to Title Case using `str_to_title`.
+3. **Party Colors**: You probably associate Democrats with blue and Republicans with red, right? We can set specific colors using `scale_color_manual`.
+4. **Missing Data**: Some parties were missing in certain years. Let's add them back with a zero vote, using the `complete` function.
+5. **Dotted Lines**: For smaller parties, let's use dotted lines so they stand out but don't steal the show. We can do this using `scale_linetype_manual`.
+
+Here’s the superstar version of the graph:
+
+```{r electiondata}
+# Importing data and libraries
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+```
+
+```{r line2, exercise=TRUE, exercise.setup='electiondata'}
+# Making our graph amazing!
+elections |>
+  complete(year, party, fill = list(votes = 0)) |> # Filling in missing data
+  mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN", # Identifying major parties
+         party = str_to_title(party)) |> # Making party names prettier
+  ggplot(aes(x = year, y = votes, color = party, linetype = major)) + # Plotting
+  scale_y_continuous(labels = scales::percent) + # Changing to percentage
+  scale_linetype_manual(values = c("dashed", "solid"), guide = "none") + # Customizing line types
+  scale_color_manual(breaks = c("Democrat", "Republican", "Green", "Libertarian", "Other"),
+                     values = c("blue", "red", "green4", "yellow4", "grey")) + # Customizing colors
+  geom_line() # Adding the lines
+```
+
+::: Info ::::::
+We used a "pipe" (that's the `|>` symbol) to chain together a series of operations. This is like assembling a LEGO castle, one piece at a time.
+:::
+
+Now, go ahead and make your own line graph! Will you stick to the script or create your own twists? 🎨📈
+
+## 🍫 Bar Plots: The Skyscrapers of Data 🏢
+
+Bar plots are like little skyscrapers that tell you how much of something you have in each category! While scatter plots and line graphs often show individual data points, bar plots are the superheroes of summary! They show you the big picture—like how many donuts you have in different flavors. 🍩
+
+### 🇺🇸 Exploring U.S. States by County Numbers 🗽
+
+Imagine you're the mayor of a city and you want to know how many cities and towns (called counties) are in each state in the U.S. We can use a bar plot to find out!
+
+First, let's grab the data about U.S. demographics:
+
+```{r usdemo}
+# Importing the data and libraries
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+```{r}
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+Now, we'll make a bar plot that shows the number of counties in each state. In bar plots, you just need to specify one axis (either `x` or `y`). And guess what? The plot will automatically count the number of cases (here, the number of counties) for you. 🎉
+
+```{r bar, exercise=TRUE, exercise.setup='usdemo'}
+# Making a bar plot for the number of counties per state
+ggplot(us_demographics, aes(y = state)) + # Specify 'state' on the y-axis
+  geom_bar() # Make the bar plot
+```
+
+So, what's happening in this code?
+
+- `ggplot(us_demographics, aes(y = state))`: This is telling R, "Hey, let's make a plot with 'state' on the y-axis using the `us_demographics` data."
+- `geom_bar()`: This is the magic wand that turns our instructions into a beautiful bar plot! 🪄✨
+
+See how easy it is?
+
+
+### 🌈 Histograms: The Treasure Bins of Data 🗺️
+
+Histograms are like treasure chests that help you sort your data into different bins or compartments. Imagine you have a chest full of colorful gemstones, and you want to know how many of each size you have. There are probably not two gemstones with exactly the same size, but you could make a bin with small stones, one with mid-size stones and so on. A histogram does just that, and it does so automatically! If you have a continuous variables `ggplot` can divide the range into *bins*.
+
+Let's say you're curious about how diverse different counties in the U.S. are. You can use a histogram to sort them based on their non-white population percentages.
+
+Here's how:
+
+```{r hist, exercise=TRUE, exercise.setup='usdemo'}
+# Making a histogram for percentage of non-white population in each county
+ggplot(us_demographics, aes(x = nonwhite_pct)) + # Specify 'nonwhite_pct' on the x-axis
+  geom_histogram(bins = 10, color = "black") # Use 10 bins and outline them in black
+```
+
+Let's decode the spell we just cast! 🪄
+
+- `ggplot(us_demographics, aes(x = nonwhite_pct))`: This says, "Hey, let's plot the `nonwhite_pct` on the x-axis using the `us_demographics` data!"
+- `geom_histogram(bins = 10, color = "black")`: This is your treasure chest (the histogram) where you're putting your data into 10 compartments or 'bins', and outlining them in black!
+
+Feel like a data wizard yet? 🧙‍♂️
+
+### 🎨 Using `geom_col` for Custom Bar Plots 🖌️
+
+Hold on to your coding hats! Did you know that you can go even fancier with bar plots? Yep! Meet `geom_col`, the sibling of `geom_bar` who loves customization. 🎉
+
+Here, we'll make a bar plot of votes for different parties over multiple years!
+
+```{r col, exercise=TRUE}
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+```
+```{r col-solution}
+# Option 1: You can add the as.factor(year) directly into the aesthetic : ----
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = as.factor(year))) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+
+# Option 2: You can also call mutate first : ----
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  mutate(year = as.factor(year)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+```
+```{r col-code-check}
+grade_code()
+```
+
+What's cooking in this code? 🍳
+
+- `geom_col()`: It allows you to create a bar plot when you've already calculated the statistics yourself.
+- `position = position_dodge2()`: This makes sure the bars for each year don't sit on top of each other but are nicely arranged side by side.
+- `guide = guide_axis(angle = 45)`: Tilt those x-axis labels so they're easier to read!
+
+**Your Mission, Should You Choose to Accept It 🕵️‍♀️**
+
+**Exercise:** In the code above, `year` is treated like a regular number, so R makes a gradient color for it. But years are more like categories, right? Your mission is to change `year` into a factor using `as.factor(year)`. How does it change the plot?
+
+Two options for doing this mission:
+1. Add `as.factor(year)` directly in the aesthetic (`aes()`).
+2. Use `mutate` first to change the `year` to a factor before plotting.
+
+Give it a try, secret agent coder! 🎮🔍
+
+## 🎨 Combining Geoms: Making Your Plot a Masterpiece 🌟
+
+Imagine your data plot is like a pizza 🍕. You can keep it simple with just cheese and sauce—that's your basic plot. But hey, why stop there? You can add more toppings like mushrooms, pepperoni, or even pineapples (if you're into that sort of thing 😆)!
+
+### 📊 Layering Your Data Pizza
+
+Let's go back to our Dutch demographics data:
+
+```{r dutchdemo}
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+```
+
+Remember the scatter plot we made earlier? It looked like this:
+
+```{r multiple}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point()
+```
+
+Now, what if we want to add a trend line to it? 📈
+
+```{r multiple2, exercise=TRUE, exercise.setup='dutchdemo'}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+# Adding a trend line to the scatter plot
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+**What just happened?**
+
+- `geom_smooth(method = lm)`: It adds a trend line using a linear model (`lm`). So now, you can see how density and the population over 65 are related!
+
+### 🏷️ Adding Labels to Special Points
+
+Let's say you want to add labels to specific points, like those that are super unique—outliers! You can do that with `geom_text()`.
+
+```{r multiple3, exercise=TRUE, exercise.setup='dutchdemo'}
+# Adding labels to special points in the scatter plot
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000) # Select only the special points
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
+```
+```{r multiple3-solution}
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000 | c_65plus < 15)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
+```
+```{r multiple3-code-check}
+grade_code()
+```
+
+**Let's decode the magic 🎩:**
+
+- `subset <- filter(demographics, c_65plus > 30 | v57_density > 4000)`: This line filters out the super special points where either the population over 65 is greater than 30% or the density is more than 4000.
+- `geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)`: This adds labels to the points we filtered out. And `nudge_y = -.5` moves the labels a little bit down so they don't overlap with the points.
+
+**Exercise:** Can you add labels for the municipalities where less than 15% of the population is over 65? Your hint: You can add another condition to the filter using another `|` (that's OR in code language!).
+
+Ready to launch your coding rocket? 🚀 3...2...1... Go! 🌠
+
+## 🎨 Becoming an Artistic Data Chef! 🍲
+
+Okay, campers! So far, you've made some pretty awesome graphs. But what if you want to go from making everyday sandwiches to five-star meals with your plots? 🌟 You can add some "seasoning" to make them look extra fancy and super understandable! 🌶️
+
+### 📝 The Recipe for an Awesome Graph!
+
+Here's what you want to keep in mind when you're taking your graph to the next level:
+
+- **Make It Self-Explanatory**: Imagine someone looks at just your graph and nothing else. They should be able to understand what's going on! So, make the titles and labels clear and simple.
+- **Readability**: All the parts should be easy to see and read. No overlapping or super-tiny text, please!
+- **Scales and Legends**: They should make sense and help people understand what the data is saying.
+
+### 🎨 Pimp My Plot!
+
+Remember our scatter plot from earlier? It looked like this:
+
+```{r ugly}
+# Creating a basic scatter plot
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6)
+```
+
+Sure, it's cool, but we can make it **epic**!
+
+```{r pretty, exercise=TRUE}
+# Making our scatter plot epic!
+highlight <- filter(demographics, v01_pop > 250000 |
+                      c_65plus > 30 |
+                      c_65plus > 25 & v57_density > 3000 |
+                      c_65plus < 15) # These are our special points
+ggplot(demographics,
+  aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6) +
+  xlim(0, 7000) +  # Sets the x-axis limits
+  geom_text(data = highlight, aes(label = gemeente), nudge_y = -1, size = 3, color = "coral") +  # Labels for special points
+  ggtitle("Where do older people live?",
+          "Selected characteristics of Dutch municipalities") +  # The title
+  xlab("Population density") +  # x-axis label
+  ylab("Percentage of population aged 65+") +  # y-axis label
+  scale_size(breaks = c(5000, 50000, 500000), labels = c("5.000", "50.000", "500.000"), name = "Population") +  # Changes how the size scale works
+  scale_color_gradient(low = "coral", high = "darkblue", name = "Household\nIncome") +  # Changes the color gradient
+  theme_classic() +  # Changes the overall theme
+  theme(axis.title = element_text(size = 12))  # Changes the size of axis titles
+```
+
+🤓 **Geek Out Time!**
+
+- `ggtitle()`: Adds a big ol' title to the top!
+- `xlab()` and `ylab()`: Makes our x and y axis labels understandable.
+- `scale_size()` and `scale_color_gradient()`: Changes how the size and color of points work.
+- `theme_classic()`: Makes the overall look of the graph neat and tidy!
+- `theme()`: Customizes specific things, like the text size.
+
+### 🌈 Your Artistic Challenge 🎨
+
+Can you change the highlighting criteria to label different points? Give it a try!
+
+Also, pick any of the earlier graphs we made together and turn it into a work of art! Let's go from stick figures to a full-on masterpiece! 🎨🖌️
+
+Ready, set, go! 🚀
+
