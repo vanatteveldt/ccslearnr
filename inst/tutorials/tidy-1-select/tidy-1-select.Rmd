@@ -329,7 +329,7 @@ gunpolls
 
 The `filter` function can be used to select a subset of rows. 
 In the guns data, the `Question` column specifies which question was asked.
-We can select only those rows (polls) that asked whether the minimum purchage age for guns should be raised to 21:
+We can select only those rows (polls) that asked whether the minimum purchase age for guns should be raised to 21:
 
 ```{r filter, exercise=T, exercise.setup='setupgun3'}
 age21 <- filter(gunpolls, Question == 'age-21')
@@ -337,11 +337,11 @@ age21
 ```
 
 This call is typical for a tidyverse function: the first argument is the data to be used (`gunpolls`), 
-and the remaining argument(s) contain information on what should be done to the data. 
+and the remaining argument(s) contain information on what should be done to the data (selecting purchase age should be raised to 21). 
 
 Note the use of `==` for comparison: In R, `=` means assingment and `==` means equals. 
 Other comparisons are e.g. `>` (greather than), `<=` (less than or equal) and `!=` (not equal).
-Yodu can also combine multiple conditions with logical (boolean) operators: `&` (and), `|` or, and `!` (not),
+You can also combine multiple conditions with logical (boolean) operators: `&` (and), `|` or, and `!` (not),
 and you can use parentheses like in mathematics. 
 
 So, we can find all surveys where support for raising the gun age was at least 80%:

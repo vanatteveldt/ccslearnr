@@ -35,7 +35,7 @@ tutorial_options(
 
 ## Introduction
 
-Creating visualizations is one of the most useful and powerful ways to analyse and data
+Creating visualizations is one of the most useful and powerful ways to analyse data
 and tell a convincing story with these data. 
 
 In `ggplot`, R Tidyverse has a very powerful and well-designed visualization library.
