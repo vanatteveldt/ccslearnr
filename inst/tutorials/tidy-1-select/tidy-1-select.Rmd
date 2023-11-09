@@ -133,10 +133,10 @@ gunpolls
 
 (Note that you can safely ignore the (red) message, they simply tell you how each column was parsed)
 
-The shows the first ten rows of the data set, and for each column the data type is also mentioned: `<dbl>` stands for double, which is a *numeric* value; `<chr>` is textual or *character* data. 
+The tibble shows the first ten rows of the data set, and for each column the data type is also mentioned: `<dbl>` stands for double, which is a *numeric* value; `<chr>` is textual or *character* data. 
 
 Note that on your own computer, R will print a message if not all rows or columns could be printed.  If you want to browse through your data, you can also click on the name of the data.frame (gunpolls) in the top-right window "Environment" tab 
-or call `View(d)`. 
+or call `View(gunpolls)`. 
 
 ### Exercise: downloading data
 
@@ -336,7 +336,7 @@ age21 <- filter(gunpolls, Question == 'age-21')
 age21
 ```
 
-This call is typical for a tidyverse function: the first argument is the data to be used (`d`), 
+This call is typical for a tidyverse function: the first argument is the data to be used (`gunpolls`), 
 and the remaining argument(s) contain information on what should be done to the data. 
 
 Note the use of `==` for comparison: In R, `=` means assingment and `==` means equals. 

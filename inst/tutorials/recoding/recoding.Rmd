@@ -233,14 +233,14 @@ In that case, we are looking for a month number (`m`), day number (`d`), and a y
 For a full list of possible codes in this argument (like `m`), see the [parse_date_time documentation](https://lubridate.tidyverse.org/reference/parse_date_time.html). The table below lists some of the most frequently used codes:
 
 | Code | Meaning |
-|-
+| ----- | ------- |
 | y | The year, i.e. 2023 or 23 |
 | m | The month i.e. 4 or April |
 | d | The day of the month, i.e. 11 for April 11 |
 | H | The hour, i.e. 0-24 |
 | M | The minute, i.e. 0:59 |
 | S | The second, i.e. 0:59 |
-|-
+
 
 Can you parse all of the dates below?
 

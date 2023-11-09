@@ -257,7 +257,12 @@ Try using `ggthemes::theme_economist` or `ggthemes::theme_tufte`.
 
 Often, we need to combine data from multiple sources.
 For example, it could be interesting to combine the election results in `results` with the demographic data.
-Fortunately, this is quite easy because they have a common key variable (`gm`) on which to join them. 
+Fortunately, in our example both sets have a common key variable (`gm`) on which to join them. 
+
+
+::: Info ::::::
+Combining data frames is very often needed while doing data analysis. In order to be able to combine data sets in R it is necessary both data sets have at least one variable that overlaps, in other words, a variable with the same name representing the same aspect of the data, e.g. an Id or a name of a municipality. In the latter case it is also needed that all these names are spelled exactly the same, since the computer cannot know that 's-Gravenhage is the same as Den Haag...
+:::
 
 So, let's see if we can plot the support for the farmer's party BBB against the population density:
 
