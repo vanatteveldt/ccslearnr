@@ -1,0 +1,477 @@
+---
+title: 'Cooking Up Data Visualizations with ggplot'
+author: "Wouter van Atteveldt"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE, remove_for_md=TRUE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+library(learnr)
+gradethis::gradethis_setup()
+tutorial_options(
+  exercise.reveal_solution = FALSE
+)
+```
+<style>
+.Info {
+    background-color: rgb(204, 229, 255);
+    border: 1px solid rgb(184, 218, 255);
+    color: rgb(0, 64, 133);
+    padding: 1em;
+    margin: 1em;
+}
+.Info::before {
+  font-weight: bold;
+  content: "🛈 Information";
+}
+</style>
+
+
+## Welcome, Junior Chefs of Data Cuisine! 🍳
+
+Hey there, chefs! Imagine you're whipping up a delicious dish. How do you show off your culinary masterpiece to the world? With a photo, of course! 📸 In the same way, visualizations let us show off the tasty details hidden in our data. They help us tell a mouth-watering story! 😋
+
+Today, we're going to learn about `ggplot`, a magical cookbook filled with recipes for creating all kinds of visual delights in R's Tidyverse kitchen.
+
+And guess what? We've got a buffet of resources for you to feast on:
+- 🥧 [The R Graph Gallery](https://r-graph-gallery.com/ggplot2-package.html): A smorgasbord of delightful plot examples with R recipes included!
+- 🍣 [From data to viz](https://www.data-to-viz.com/): A sushi conveyor belt of good plots for your specific data, and they even throw in the R recipe and cooking tips!
+- 📜 [The ggplot cheat sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf): A handy menu of all the ggplot goodies!
+- 📚 [Data Visualization](https://socviz.co/) by Kieran Healy: A complete cookbook that's free to read online!
+
+::: Info ::::::
+In this tutorial, we'll focus on the basic cooking techniques. We won't be adding the final garnishes, sauces, or fancy labels to our plots. But don't worry, we have a special section at the end, called *The Masterpiece*, that'll teach you how to plate your visual dishes like a pro!
+:::
+
+### Getting a Taste of ggplot Basics 🍴
+
+Alright, before we start cooking, let's see what ingredients we have. We're going to use a simple data set that's like a pantry stocked with information about different cars:
+
+```{r}
+# Let's open up our Tidyverse pantry and see what we got!
+library(tidyverse)
+# And here's our mtcars ingredient list
+data(mtcars)
+mtcars
+```
+
+```{r mtcars}
+# Here we're just making sure our Tidyverse pantry and mtcars ingredient list are ready for cooking!
+library(tidyverse)
+data(mtcars)
+```
+
+Now let's make our first dish: a simple scatter plot that shows the relationship between a car's engine power (`hp` - that's like the spice level 🌶️) and fuel economy (`mpg` - that's like how many bites you get out of a cookie 🍪).
+
+```{r basicplot, exercise=TRUE, exercise.setup='mtcars'}
+# This is our recipe for a scatter plot!
+ggplot(mtcars, 
+       aes(x = hp, y = mpg)) + 
+  geom_point()
+```
+
+```{r basicplot-solution}
+ggplot(mtcars, 
+       aes(x = wt, y = mpg)) + 
+  geom_point()
+```
+
+```{r basicplot-code-check}
+grade_code()
+```
+
+**Exercise:** First, try out the recipe as is by pressing the 'Run Code' button. Then, can you modify it so that `wt` (weight, think of it as the "heaviness of a cake 🍰") is on the x-axis?
+
+### Slicing and Dicing the Elements of a ggplot 🍉
+
+Making a ggplot is like baking a layered cake. Each layer adds something special to the final dish. For any graph, we usually have these three delicious layers:
+
+- The **data layer**: This is like our main ingredient, say chocolate 🍫. In the recipe above, `mtcars` is our main ingredient.
+- The **geometrical elements** or `geom` layer: Think of these as the shapes your food can take, like cookies 🍪 or cupcakes 🧁. Here, we used `geom_point` to make a scatter plot.
+- The **aesthetic mapping** or `aes` layer: This is like deciding how to decorate your cookies with sprinkles and icing. 🍩 We map our ingredients (`hp` and `mpg` columns) to different aspects like x and y positions in the graph.
+
+So, chefs, are you ready to stir, mix, and plot? 🌟 Let's cook up some data visualization magic! 🪄🍲
+
+
+### Time to Garnish Your Plots! 🌿🍒
+
+Alright, junior chefs! Our basic dishes—ahem, I mean plots—are out of the oven. But every chef knows that presentation is everything. So, let's add some finishing touches, like a sprinkle of parsley or a cherry on top, to make our plots not just tasty but also gorgeous! 🌟
+
+#### Add a Splash of Color and a Pinch of Style 🎨
+
+We can add more information to our plot by mapping other features, like the number of car cylinders, to colors. In cooking, think of this as adding spices for flavor profiles—sweet, sour, spicy, you name it!
+
+Plus, we'll add some more garnishes:
+
+- `scale`: Think of this as adjusting the seasoning in your dish. You can tweak color, size, and even the axis scales!
+- `ggtitle`: Like a dish name on a fancy menu, this gives people an idea of what they're about to enjoy.
+- `theme`: This sets the ambiance, like picking the perfect background music or lighting for your dinner party.
+
+```{r prettyplot, exercise=TRUE, exercise.setup='mtcars'}
+# Time to jazz up our scatter plot!
+ggplot(mtcars, aes(x = hp, y = mpg, color = cyl)) +
+  geom_point() +
+  scale_color_gradient(low = "darkgreen", high = "darkred") +
+  ggtitle("Car horsepower and fuel economy") +
+  theme_minimal()
+```
+
+Feel free to stir the pot—swap the x and y variables, add new colors, or even add axis labels using `+ xlab("Horsepower")`. Go ahead, get creative!
+
+## Stirring Up Scatter Plots 🍡
+
+Scatter plots are like fruit skewers; they give you a taste of how two flavors—or in our case, numeric variables—go together.
+
+The `geom_point()` is your skewer, threading pieces of data together. You get to pick what each piece represents—size, color, shape, and even transparency!
+
+For our next dish, let's consider a menu that tells us about population density and age demographics in Dutch municipalities:
+
+```{r point, exercise=TRUE}
+# Let's whip up another scatter plot with more flavors this time!
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  scale_color_gradient(low = "coral", high = "darkblue") +
+  geom_point(alpha = .6)
+```
+
+```{r point-solution}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v43_nl)) +
+  scale_color_gradient(low = "darkblue", high = "lightblue") +
+  geom_point(alpha = .6)
+```
+
+```{r point-code-check}
+grade_code()
+```
+
+**Exercise**: Can you season the plot differently by making colors represent the percentage of inhabitants without a migration history (`v43_nl`)? Give your color scale a twist from dark blue to light blue.
+
+👉 **Pro Tip**: The `alpha` is like the glaze on a pastry—by making points somewhat transparent, overlapping points become easier to see. This is like a constant seasoning you sprinkle over the whole dish, because we added these in the `geom(...)` call directly, i.e. not in an `aes(...)` call, which would map alpha levels to the data..
+
+**For Extra Fun**: Wanna try adding different shapes like `shape=21` or even houses `shape='🏠'` or a custom fill? It's like adding little edible decorations to your dish! (You can google 'ggplot shapes' for a menu of shape options.)
+
+So, junior chefs, ready to sprinkle some more creativity into your visual dishes? 🌈🍴
+
+## Cooking Up Line Graphs: The Timelines of Your Data Dish 📈
+
+Oh, you've been doing such a good job with your skewers and garnishes! Now let's switch gears a bit and make some spaghetti—well, in the plotting world, that's what we call Line Graphs! 🍝
+
+Line graphs are perfect for showing how something changes over time, just like how the flavors in a slow-cooked stew get richer as time passes. The `geom_line()` is our spaghetti noodle that connects the meatballs—err, I mean, the data points!
+
+### The Basic Line Graph: Plain Spaghetti 🍝
+
+First, let's look at the proportions of the popular vote for U.S. Presidential candidates since the year 2000:
+
+```{r line, exercise=TRUE}
+# The spaghetti starts cooking!
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+ggplot(elections,
+       aes(x = year, y = votes, color = party)) + 
+  geom_line()
+```
+
+### Adding Sauces and Toppings: Spaghetti Deluxe! 🍝🌿🧀
+
+Plain spaghetti is good, but let's make it irresistible with some delicious tweaks:
+
+- **Percentage**: Like changing grams to teaspoons, let's change the proportion range from 0-1 to 0-100% (which most people find easier to read).
+- **Proper Casing**: SHOUTY CAPS aren't appetizing. Let's switch those to Title Case like a fancy dish name.
+- **Color Coding**: Default colors are like using salt and pepper only; let's use our own spice blend to match the political parties, so they are easier to spot.
+- **Fill Missing Data**: Our data has gaps, like a sauce missing some ingredients. Let's fill in those gaps so we don't mislead our diners (`geom_line` always connects two points, even when there are no values for, let's say the Greens in 2010).
+- **Dotted Lines**: Let's use a different noodle cut—dotted lines—for the minor parties to distinguish them.
+
+These tweaks will come before we even start cooking the ggplot. We'll prep our ingredients using `complete` and `mutate` functions:
+
+```{r electiondata}
+# First, let's prep our data-ingredients!
+library(tidyverse)
+elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+```
+
+```{r line2, exercise=TRUE, exercise.setup='electiondata'}
+# Now, let's cook up our Deluxe Line Graph!
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN",
+         party = str_to_title(party)) |>
+  ggplot(aes(x = year, y = votes, color = party, linetype = major)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_linetype_manual(values = c("dashed", "solid"), guide = "none") +
+  scale_color_manual(breaks = c("Democrat", "Republican", "Green", "Libertarian", "Other"),
+                     values = c("blue", "red", "green4", "yellow4", "grey")) +
+  geom_line()
+```
+
+👩‍🍳 **Pro Tips**:
+
+- `scale_y_continuous(labels = scales::percent)`: Think of it as unit conversion for your recipe, from grams to teaspoons.
+- `scale_linetype_manual(...)`: It's like picking between linguine and penne. It lets you manually set line styles.
+- `scale_color_manual(...)`: Here's where you get to pick your own food coloring for your frosting!
+
+Alright, junior chefs, who's ready to create a timeline that tastes just right? 🕒🍲
+
+## Whipping Up Bar Plots: The Muffin Tin of Data Visualization 🧁
+
+Hey there, little chefs! Ready to take a break from spaghetti and get your hands on some dough? We're making muffins—no, wait, I mean Bar Plots! 😋 
+
+Bar plots are a whole different dish from scatter and line plots. Instead of displaying individual data points, they're more like a summary chart that shows how many of something you have. Imagine having a tray of muffins and you want to count how many muffins have chocolate chips, blueberries, or are just plain vanilla. A bar plot helps you do just that, but with data!
+
+### Preheat Your Oven: The Data Ingredients 📋
+
+First things first, let's look at our data recipe: the US Demographics.
+
+```{r usdemo}
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+```{r}
+library(tidyverse)
+us_demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Demographics.csv')
+us_demographics
+```
+
+### Counting Our Muffin Flavors: Simple Bar Plot 🧁
+
+Now, let's say we're curious about how many counties there are in each U.S. state. It's like counting how many blueberry muffins and how many chocolate chip muffins you have on your baking tray.
+
+```{r bar, exercise=TRUE, exercise.setup='usdemo'}
+# Time to count the muffin flavors, or rather, counties per state!
+ggplot(us_demographics, aes(y = state)) +
+  geom_bar()
+```
+
+In this example, we've set the `y` axis to `state`, and guess what? ggplot does the counting for you. It's like having a magical kitchen tool that tallies up your muffins automatically!
+
+👩‍🍳 **Key Ingredients Explained**:
+
+- `ggplot(us_demographics, aes(y = state))`: This line sets the foundation of your bar plot. Think of it like preparing your muffin tin.
+- `geom_bar()`: This is the magic batter that fills your muffin tin and creates those bars. 
+
+By default, `geom_bar()` will count how many of each `state` you have, kind of like how you would count how many of each muffin flavor you made.
+
+
+### Baking Histograms: The Pie Cutter of Data 🥧
+
+For variables that can have a lot of different values (like how much sugar is in different pies), histograms slice that range into "bins". These are like slices of your pie, where each slice tells you something about the data.
+
+Here's how you can slice your data pie (i.e., plot a histogram):
+
+```{r hist, exercise=TRUE, exercise.setup='usdemo'}
+# Time to slice our data pie, or in this case, show the number of counties by percentage non-white population.
+ggplot(us_demographics, aes(x = nonwhite_pct)) +
+  geom_histogram(bins = 10, color = "black")
+```
+
+🍴 **Pie Cutter Explained**:
+
+- `ggplot(us_demographics, aes(x = nonwhite_pct))`: This line sets up your pie, ready to be sliced. In this case, we look at percentage non-white population.
+- `geom_histogram(bins = 10, color = "black")`: This line does the slicing. You slice your pie into 10 pieces (or "bins" or deciles in this case).
+
+See how each "slice" (or bin) shows you the number of counties that fall into different ranges of non-white population percentages? Neat, huh?
+
+### Layering Cakes with geom_col: The Multi-Flavored Cake 🍰
+
+Okay, we've baked pies, but who can resist a multi-layered cake? Let's dive into a more advanced bar plot, which is almost like adding layers to a cake.
+
+#### The Layered Cake of Bar Plots 🍰
+
+```{r col, exercise=TRUE}
+# Baking our multi-layered cake, or a bar plot that shows election votes by party and year.
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+```
+```{r col-solution}
+# Option 1: You can add the as.factor(year) directly into the aesthetic : ----
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = as.factor(year))) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+
+# Option 2: You can also call mutate first : ----
+library(tidyverse)
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
+  mutate(year = as.factor(year)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ylab("")
+```
+```{r col-code-check}
+grade_code()
+```
+
+
+🎂 **Layers of the Cake Explained**:
+
+- `ggplot(aes(x = party, y = votes, fill = year))`: This sets the flavors and layers of your cake.
+- `geom_col(...)`: since our data already contains pre-counted summaries, we use `geom_col` rather than `geom_bar` and specify both `x` and `y` aesthetic.
+- `...position = position_dodge2()...`: This adds the layers to the cake, making sure each layer (year) is visible. (note: normally `position_dodge()` also works, but with a continuous grouping value like year you need `dodge2`.)
+- `scale_x_discrete(guide = guide_axis(angle = 45))`: This tilts the name tags (x labels) so that they don't smudge the icing.
+
+**Exercise**: In the recipe above, `year` is like a secret ingredient that has lots of values, so R treats it like a gradient. Want to make it more distinct? Try using `as.factor(year)` to treat each year as a unique layer in your cake! 🍰 How does that change the cake... erm, plot?
+
+
+Both ways will give your cake that unique, multi-layered look. Choose whichever feels right for you, aspiring chef!
+
+Alright, kids, roll up those sleeves! It's time to layer some cakes and slice some pies in the world of data! 🥧🍰📊
+
+## The Ultimate Fusion Data Dish: Combining Geoms 🍲🥕
+
+Ready to cook up something extraordinary? We're about to layer flavors, textures, and colors like never before. In cooking, layering elements creates a dish that's more than the sum of its parts. The same goes for data plots!
+
+For example, consider the scatter plot we created earlier:
+
+```{r dutchdemo}
+library(tidyverse)
+demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+```
+
+```{r multiple}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point()
+```
+
+### Adding Some Spice: Regression Line to Scatter Plot 🌶️
+
+Remember that scatter plot from earlier? Think of it as the base of our dish—a nice bowl of soup, if you will. But what if we add a sprinkle of herbs, a drizzle of olive oil? In other words, a regression line! Check it out:
+
+```{r multiple2, exercise=TRUE, exercise.setup='dutchdemo'}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+# Adding a regression line to our scatter plot "soup"
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+🍜 **Soup + Spice Explained**:
+
+- `ggplot(demographics, aes(x = v57_density, y = c_65plus)) + geom_point()`: This part creates our basic soup—the scatter plot.
+- `geom_smooth(method = lm)`: This is our drizzle of olive oil, the regression (or **l**inear **m**odel) line that gives an overall trend or direction to our data points.
+
+### A Side of Croutons: Adding Text Labels 🍞
+
+You know how croutons make a soup extra special? Well, labels in a plot can do the same! We can add names to specific data points to make them stand out.
+
+```{r multiple3, exercise=TRUE, exercise.setup='dutchdemo'}
+# Adding croutons (labels) to our scatter plot "soup"
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
+```
+```{r multiple3-solution}
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000 | c_65plus < 15)
+ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
+```
+```{r multiple3-code-check}
+grade_code()
+```
+
+🥄 **Croutons in the Soup Explained**:
+
+- `subset <- filter(demographics, c_65plus > 30 | v57_density > 4000)`: We're selecting our extra-special croutons (points) from the soup.
+- `geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)`: This is where we place the croutons delicately on top of our soup. Note that we make `data = subset`, since `geom_text` otherwise expects the mapping (`aes()`) to come first.
+
+**Special Tips** 📝:
+
+- We use `data = subset` to specify the croutons we want to use, so our soup doesn't get overcrowded.
+- We use `nudge_y = -.5` to adjust the position of our croutons, so they sit perfectly atop our delicious soup (I mean, so they don't cover and hide the points).
+
+**Exercise**: Can you add labels for the municipalities where less than 15% of the population is over 65? Think of this as adding a sprig of fresh herbs to our culinary masterpiece! (Hint: Use another `|` in your `filter` to add this extra condition.)
+
+So, chefs, are you ready to cook up a data feast? Let's combine those geoms and make our plots a multi-layered delight! 🍲👩‍🍳📊
+
+## The Masterpiece: Cooking Up High-Quality Graphs 🎨👩‍🎨🍽️
+
+Alright, kitchen superstars! Let's talk about plating—the presentation of your dish. Just like you wouldn't serve a gourmet meal on a paper plate, you shouldn't present your insightful data on a lackluster graph.
+
+When you're cooking just for yourself, plating might not be a big deal. But when you're serving up your culinary (or data) masterpiece to others, you want it to look its best, right? Let's spice up that data presentation with some `ggplot` finesse!
+
+### Checklist for the Perfect Plate 📝
+
+There are as many opinions about the perfect plating as there are chefs. But just as a rule of thumb, you should cover a few basics:
+
+- **Clarity**: The graph should tell its own story, no need for a narrator. Include a title and descriptive axis labels.
+- **Legibility**: Everything should be easily readable and distinct.
+- **Precision**: The scales and legends should help your audience understand the dish—err, data—at a glance. So make sure what you choose fits your data!
+
+### Dressing Up a Simple Salad 🥗
+
+Let's revisit one of our earlier dishes. Think of this as a basic salad that we're going to transform into a gastronomic delight.
+
+```{r ugly}
+# Our plain salad
+ggplot(demographics,
+       aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6)
+```
+
+And now let's plate it like a Michelin-starred chef!
+
+```{r pretty, exercise=TRUE}
+library(tidyverse)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+# Our gourmet salad
+highlight <- filter(demographics, v01_pop > 250000 |
+                      c_65plus > 30 |
+                      c_65plus > 25 & v57_density > 3000 |
+                      c_65plus < 15)
+ggplot(demographics,
+  aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6) +
+  xlim(0, 7000) +
+  geom_text(data = highlight, aes(label = gemeente), nudge_y = -1, size = 3, color = "coral") +
+  ggtitle("Where do older people live?",
+          "Selected characteristics of Dutch municipalities") +
+  xlab("Population density") +
+  ylab("Percentage of population aged 65+") +
+  scale_size(breaks = c(5000, 50000, 500000), labels = c("5.000", "50.000", "500.000"), name = "Population") +
+  scale_color_gradient(low = "coral", high = "darkblue", name = "Household\nIncome") +
+  theme_classic() +
+  theme(axis.title = element_text(size = 12))
+```
+
+**Let's Break Down the Recipe 🍲**:
+
+- `ggtitle(...)`: Just like the cherry on top of a cake, it tells you what the dish is all about.
+- `xlab(...)` & `ylab(...)`: Think of these as your serving utensils. They guide you through the dish.
+- `scale_size(...)`: We're resizing the croutons so everyone knows how big they are.
+- `scale_color_gradient(...)`: It's like adding a gradient of spices, from mild to hot.
+- `theme_classic()`: This is our table setting—elegant, classic, and timeless.
+- `theme(axis.title = element_text(size = 12))`: We're picking a readable font size, like choosing the right dish size for our meal.
+
+### **Practice**: The Signature Dish 🍜
+
+Pick any of the graphs you've cooked up so far and turn it into your signature dish—beautiful, informative, and irresistibly tasty! Can you tweak the highlighting criteria to make it your own?
+
+Bon Appétit, young chefs! You're now ready to serve up data like a pro. 🍽️👨‍🍳📊
