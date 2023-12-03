@@ -193,24 +193,32 @@ which is automatically loaded when you load tidyverse. See also the
 [lubridate page](https://lubridate.tidyverse.org/), which also links to
 the R4DS chapter and cheat sheet.
 
+Note: `lubridate` is part of the `tidyverse`, and should already be
+installed in your system. However, it is not loaded automatically when
+you `library(tidyverse)`. So, whenever you use the lubridate functions,
+explicitly activate the package with
+
+``` r
+library(lubridate)
+```
+
 ### Converting text to dates
 
 Many data sets contain a date or timestamp column, but often these are
 not directly recognized as dates. For example, they might be in German
 (4.11.2016), American (11/4/2016) or textual foramt (4 November 2016).
 
-The good news is that the `parse_date` (and `parse_date_time`) functions
-make this quite easy. The bad news is that you still need to tell the
-computer the **format** used: Is `11/4/2016` is a date in April or in
-November?
+The good news is that the `parse_date_time` functions make this quite
+easy. The bad news is that you still need to tell the computer the
+**format** used: Is `11/4/2016` is a date in April or in November?
 
 For example, the call below parses that date assuming it’s American
 notation:
 
 ``` r
-library(tidyverse)
+library(lubridate)
 date <- parse_date_time("11/4/2016", "dmy")
-date
+# date
 class(date)
 ```
 
@@ -234,20 +242,19 @@ For a full list of possible codes in this argument (like `m`), see the
 documentation](https://lubridate.tidyverse.org/reference/parse_date_time.html).
 The table below lists some of the most frequently used codes:
 
-| Code |
-|------|
-| y    |
-| m    |
-| d    |
-| H    |
-| M    |
-| S    |
-| \-   |
+| Code | Meaning                                    |
+|------|--------------------------------------------|
+| y    | The year, i.e. 2023 or 23                  |
+| m    | The month i.e. 4 or April                  |
+| d    | The day of the month, i.e. 11 for April 11 |
+| H    | The hour, i.e. 0-24                        |
+| M    | The minute, i.e. 0:59                      |
+| S    | The second, i.e. 0:59                      |
 
 Can you parse all of the dates below?
 
 ``` r
-library(tidyverse)
+library(lubridate)
 parse_date_time("4.11.2016", ____)
 parse_date_time("04-11-16", ____)
 parse_date_time("4 November 2016", ____)
@@ -256,7 +263,7 @@ parse_date_time("04-11-2016 11:23", ____)
 ```
 
 ``` r
-library(tidyverse)
+library(lubridate)
 parse_date_time("4.11.2016", "dmy")
 parse_date_time("04-11-16", "dmy")
 parse_date_time("4 November 2016", "dmy")
@@ -276,6 +283,7 @@ column?
 
 ``` r
 library(tidyverse)
+library(lubridate)
 daily = read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/daily-show-guests/daily_show_guests.csv")
 # daily <- daily |> mutate(date = parse_date_time(Show, ____))
 head(daily)
@@ -283,6 +291,7 @@ head(daily)
 
 ``` r
 library(tidyverse)
+library(lubridate)
 daily = read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/daily-show-guests/daily_show_guests.csv")
 daily <- daily |> mutate(date = parse_date_time(Show, "mdy"))
 head(daily)
@@ -309,6 +318,7 @@ first step and work on the second step once that works.
 
 ``` r
 library(tidyverse)
+library(lubridate)
 daily = read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/daily-show-guests/daily_show_guests.csv")
 daily <- daily |> 
   mutate(Date = parse_date_time(Show, "mdy")) |>

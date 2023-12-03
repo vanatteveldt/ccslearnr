@@ -10,7 +10,7 @@ learnr_to_md_options:
   keep_output: false
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, remove_for_md=TRUE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
 library(learnr)
 gradethis::gradethis_setup()

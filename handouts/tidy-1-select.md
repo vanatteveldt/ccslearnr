@@ -103,6 +103,7 @@ Let’s say our respondents are 24, 32 and 27 years old. Can you add a
 column called ‘age’ that specifies this age for the respondents?
 
 ``` r
+library(tidyverse)
 respondents <- tibble(resp_id = c(1,2,3), 
                       gender = c("M","M","F"))
 respondents
@@ -150,14 +151,14 @@ gunpolls
 (Note that you can safely ignore the (red) message, they simply tell you
 how each column was parsed)
 
-The shows the first ten rows of the data set, and for each column the
-data type is also mentioned: `<dbl>` stands for double, which is a
+The tibble shows the first ten rows of the data set, and for each column
+the data type is also mentioned: `<dbl>` stands for double, which is a
 *numeric* value; `<chr>` is textual or *character* data.
 
 Note that on your own computer, R will print a message if not all rows
 or columns could be printed. If you want to browse through your data,
 you can also click on the name of the data.frame (gunpolls) in the
-top-right window “Environment” tab or call `View(d)`.
+top-right window “Environment” tab or call `View(gunpolls)`.
 
 ### Exercise: downloading data
 
@@ -166,6 +167,7 @@ cabinet Rutte IV can be found at <https://i.amcat.nl/peiling.csv>. Can
 you download that file and assign it to an object called `polls`?
 
 ``` r
+library(tidyverse)
 polls <- ____
 polls
 ```
@@ -182,6 +184,7 @@ to change the *columns* of a data frame.
 In this section, we will continue with the gun polls data we used above:
 
 ``` r
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls
@@ -283,6 +286,7 @@ select only the Question, Pollster, and republicat/democratic support
 columns. Assign the result to the `gunpolls` object
 
 ``` r
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 ___
@@ -299,6 +303,7 @@ with the `filter` function.
 This section also uses the gun polls data we used above:
 
 ``` r
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls
@@ -309,7 +314,7 @@ gunpolls
 The `filter` function can be used to select a subset of rows. In the
 guns data, the `Question` column specifies which question was asked. We
 can select only those rows (polls) that asked whether the minimum
-purchage age for guns should be raised to 21:
+purchase age for guns should be raised to 21:
 
 ``` r
 age21 <- filter(gunpolls, Question == 'age-21')
@@ -317,12 +322,13 @@ age21
 ```
 
 This call is typical for a tidyverse function: the first argument is the
-data to be used (`d`), and the remaining argument(s) contain information
-on what should be done to the data.
+data to be used (`gunpolls`), and the remaining argument(s) contain
+information on what should be done to the data (selecting purchase age
+should be raised to 21).
 
 Note the use of `==` for comparison: In R, `=` means assingment and `==`
 means equals. Other comparisons are e.g. `>` (greather than), `<=` (less
-than or equal) and `!=` (not equal). Yodu can also combine multiple
+than or equal) and `!=` (not equal). You can also combine multiple
 conditions with logical (boolean) operators: `&` (and), `|` or, and `!`
 (not), and you can use parentheses like in mathematics.
 
@@ -351,6 +357,7 @@ For example, let’s look at a version of the gun polls data which has
 some missing value:
 
 ``` r
+library(tidyverse)
 gunpolls_dirty <- read_csv("https://cssbook.net/d/guns-polls-dirty.csv")
 gunpolls_dirty
 ```
@@ -379,6 +386,7 @@ was at least 70%, and assign that selection to a new object called
 `strict_polls`?
 
 ``` r
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 ___
@@ -399,6 +407,7 @@ with the 538 gun polls data used above:
 
 ``` r
 # unfortunately, this chunk won't be shown in the exercise, so we'll have to duplicate it...
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 
@@ -407,6 +416,7 @@ gunpolls <- select(gunpolls, Question, Support,
 ```
 
 ``` r
+library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 gunpolls <- read_csv(url)
 gunpolls <- select(gunpolls, Question, Support, 

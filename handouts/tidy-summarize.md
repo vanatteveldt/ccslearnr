@@ -4,6 +4,9 @@ R Tidyverse: Data Summarization with group_by, summarize, and mutate
 - [Introduction: Grouping and
   Summarizing](#introduction-grouping-and-summarizing)
   - [The role of grouping](#the-role-of-grouping)
+- [Before we start: Pipelines and the \|\>
+  symbol](#before-we-start-pipelines-and-the--symbol)
+  - [Pipelines: exercise](#pipelines-exercise)
 - [Summarizing data in R](#summarizing-data-in-r)
   - [Data](#data)
   - [Grouping rows](#grouping-rows)
@@ -50,17 +53,13 @@ used for data summarization.
 ### The role of grouping
 
 When we summarize data, we generally want to summarize some value per
-group of rows. For this reason, the process in R consists of two steps.
+group of rows. For this reason, the process in R consists of two steps:
+grouping the data and summarize the data.
 
 For this example, assume we have individual-level survey data with
 gender and age per respondent:
 
-<figure>
-<img
-src="https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/summarize1.png"
-alt="Data to summarize" />
-<figcaption aria-hidden="true">Data to summarize</figcaption>
-</figure>
+#### Grouping the data
 
 First, you define the groups by which you want to summarize. In this
 case, we want two groups (for male and female), but of course in other
@@ -73,6 +72,8 @@ src="https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/summar
 alt="Grouped data" />
 <figcaption aria-hidden="true">Grouped data</figcaption>
 </figure>
+
+#### Summarizing the data
 
 Now, the second step is to compute the summary statistics per group. For
 example, we could compute the average age for each group:
@@ -91,20 +92,95 @@ frame containing the summarized data.
 
 In the next section, we will look at these commands in detail.
 
-## Summarizing data in R
+## Before we start: Pipelines and the \|\> symbol
 
-Let’s look at how we can we summarize data in R:
+In Tidyverse, often you run many data cleaning or transformation
+commands in sequence. For example, you might want to read in data,
+select some columns, filter some rows, mutate a new value, and summarize
+some other values.
 
-### Data
+If we would do this with single commands, we would get a very repetitive
+script. For example,
 
-First, let’s fire up tidyverse and load the gun polls data used in the
-earlier example:
+``` r
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+polls <- read_csv(url)
+polls <- filter(polls, Question == "age-21")
+polls <- select(polls, Population, Pollster, Support)
+polls <- mutate(polls, Percent = Support / 100)
+```
+
+The code above runs fine, but as you can see it repeats the name `polls`
+an awful lot. Because this is such a common pattern, R has introduced a
+shortcut to express such a sequence, or **pipeline**, of operations: The
+pipeline operator `|>`.
+
+This operator works by chaining together multiple functions, such that
+the output of the first function is the input (first argument) of the
+second function. To see this in action, the following snippet can be
+rewritten as a pipeline like this:
 
 ``` r
 library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 polls <- read_csv(url) |>
-  select(Question, Population, Pollster, Support)
+  filter(Question == "age-21") |>
+  select(Population, Pollster, Support) |>
+  mutate(Percent = Support / 100)
+```
+
+The whole sequence of calls is now a single statement (‘sentence’),
+where the result of `read_csv` is the input of `filter`, the result of
+which is fed into `select`, etc., until the output of `mutate` is
+assigned to the polls variable.
+
+This technique is very convenient to group related calls together, and
+can make code more readable by making it clear that such a group of
+calls is a logical unit.
+
+The biggest **common mistake** is that you no longer supply the data to
+the functions in the pipeline (except the first), so instead of using
+`filter(data, ...) |> select(data, ...)` make sure you use
+`filter(data, ...) |> select( ...)`. Note that you can also feed the
+data into the first function, like `data |> filter(...)`.
+
+Whether you use pipelines or not yourself is a stylistic choice, but
+it’s important to be able to read them as they are often used in scripts
+(including this tutorial). Note that older code might use the `%>%`
+symbol, which was around longer and has the same function.
+
+### Pipelines: exercise
+
+Can you rewrite the calls from `read_csv` to `mutate` into a single
+pipeline?
+
+``` r
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+gunpolls <- read_csv(url)
+gunpolls <- select(gunpolls, Question, Support, 
+                   rep=`Republican Support`, dem=`Democratic Support`)
+gunpolls <- mutate(gunpolls, diff = rep - dem)
+head(gunpolls)
+```
+
+## Summarizing data in R
+
+Let’s look at how we can we summarize data in R. As mentioned before we
+first have to group the data and next we can summarize the data.
+
+### Data
+
+First, let’s fire up tidyverse and load the gun polls data used in the
+earlier example. Moreover we select only four columns
+
+``` r
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+polls <- read_csv(url) |>
+ select(Question, Pollster,Support,
+        Rep=`Republican Support`, Rem=`Democratic Support`) 
 polls
 ```
 
@@ -188,7 +264,7 @@ data frame, with one row per unique group and only keeps the grouping
 column(s) and the calculated column(s).
 
 Instead of `summarize`, you can also run `mutate` with summarization
-functions on grouped data. In that case, the summary is computer per
+functions on grouped data. In that case, the summary is computed per
 group, but instead of replacing the data frame with only the summarized
 data, the new column is added to the existing data frame, with the
 values repeated within a group:
@@ -264,7 +340,7 @@ differentiate the group level and individual level computations.)\`
 
 In the `group_by` function, you can also specify multiple columns. For
 example, the code below computes the average by question and by
-populuation category.
+population category.
 
 ``` r
 polls |> group_by(Question, Population) |> summarize(Support=mean(Support))
@@ -282,16 +358,16 @@ polls |> group_by(Question, Population) |> summarize(Support=mean(Support))
      [...]
 
 As you can see, the result is a data set with one row per unique group,
-that is, ther question - population combination. In the message above
-the output, and in the output itself, you can also see that the result
-it itself grouped by Question. When summarizing data with multiple
-grouping value, R by default removes the last grouping column, so
-instead of Question and Population it’s now just grouped by Question.
+that is, the question - population combination. In the message above the
+output, and in the output itself, you can also see that the result it
+itself grouped by Question. When summarizing data with multiple grouping
+value, R by default removes the last grouping column, so instead of
+Question and Population it’s now just grouped by Question.
 
 This behaviour can be quite useful if you want to compute new statistics
 for the remaining groups. Note that you can remove this grouping either
-by either adding `.groups=drop', or by calling the function`\|\>
-ungroup()\` on the result.
+by either adding `.groups=drop`, or by calling the function
+`|> ungroup()` on the result.
 
 ### Exercise: deviations from group means
 

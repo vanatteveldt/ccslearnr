@@ -40,8 +40,8 @@ combine academic performance of students with information about their
 school or courses.
 
 In such cases, you need to **join** two different data frames, adding
-the information about a *specific case or group* from one frame to the
-information about the *same group* from the other frame.
+the information about a *specific case or group* from one data frame to
+the information about the *same group* from the other data frame.
 
 ### Joining data
 
@@ -144,7 +144,8 @@ inner_join(demographics, results)
 
 This seems to work very well, but as you can see it now joins on all
 shared columns: state, county, and fips. This could be problematic if
-there are e.g. spelling variations in the county names.
+there are for example spelling variations in the values of one of the
+columns on which the data is joined.
 
 In fact, take a look at the county with fips 1049 in both demographics
 and results data sets. What do you notice? Can you see this county in
@@ -152,9 +153,15 @@ the result of the inner join?
 
 ``` r
 demographics |> filter(fips == 1049)
+results |> filter(fips == 1049)
 ```
 
-(add lines for the results and joined results above)
+As you can see the County DeKalb is spelled DeKalb in the demographics
+data frame but it is spelled Dekalb in the results data frame. In such a
+case the inner_join function will not join this row and in fact leave it
+out the result data frame. Therefore it is important to be sure not only
+the columns are identical in the joined data frames, also the spelling
+of all possible values should be equal!
 
 ### Specifying columns
 

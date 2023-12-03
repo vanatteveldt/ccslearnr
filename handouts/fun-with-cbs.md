@@ -39,18 +39,18 @@ statistics bureau) and voting results from the election board. Both of
 these can be downloaded from the respective sources, but to make it easy
 we use cleaned up versions from this repository.
 
-Note: As you can see below, R can read `csv` files (a common format that
-can also be imported or exported from e.g. Excel or SPSS) directly from
-the internet!
+Note: As you can see below, `R` can read `csv` files (a common format
+that can also be imported or exported from, e.g., Excel or SPSS)
+directly from the internet!
 
 ### Demographics data
 
 After running the code below with the `► Run Code` button, you will see
 a *data frame* on the screen. Data frames are the main data object in R.
 
-Generally, each row represents a unit of analysis or measurement (e.g. a
-case or respondent), and each column represents a quantity of
-information about that row, e.g. a measured or computed variable.
+Generally, each row represents a unit of analysis or measurement (e.g.,
+a case or respondent), and each column represents a quantity of
+information about that row, e.g., a measured or computed variable.
 
 In this case, each row represents a Dutch municipality (*gemeente*),
 with the columns being a selection of demographic information collected
@@ -59,8 +59,8 @@ figures](https://opendata.cbs.nl/statline/#/CBS/nl/dataset/70072ned/table?ts=169
 
 ``` r
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
-head(demographics)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+demographics
 ```
 
 Can you guess what the columns mean? Click ‘continue’ to get an
@@ -68,10 +68,10 @@ explanation of each column.
 
 <div class="Info">
 
-Note that you cannot break anything in these example code boxes!
-Everytime you hit the ‘Run code’ button, it will start over from
-scratch. Moreover, if you feel that you have messed up the code, you can
-press the `↻ Start Over` button and the original code will run.
+Note that you cannot break anything in these example code boxes! Every
+time you hit the ‘Run code’ button, it will start over from scratch.
+Moreover, if you feel that you have messed up the code, you can press
+the `↻ Start Over` button and the original code will run.
 
 </div>
 
@@ -96,10 +96,10 @@ Similar to above, we can load voting data per municipality. The code
 below will load data for each party in each municipality in the 2023
 provincial elections.
 
-R also has powerful commands to clean up and restructure data. For
+`R` also has powerful commands to clean up and restructure data. For
 example, the code below shows the results for a single municipality
 (Groningen), ordered by vote share. What happens if you remove the
-`desc(..)` function from arrange, i.e. change `arrange(desc(votes))`
+`desc(..)` function from arrange, i.e., change `arrange(desc(votes))`
 into `arrange(votes)`?
 
 **Exercise**: Can you change the code to show the results for the
@@ -107,9 +107,9 @@ municipality of Amsterdam, ordered by party (starting from A)?
 
 ``` r
 library(tidyverse)
-results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
-results |> 
-  filter(gemeente == "Groningen") |> 
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results |>
+  filter(gemeente == "Groningen") |>
   arrange(desc(votes))
 ```
 
@@ -119,8 +119,8 @@ The code box above is an exercise with a single correct solution. You
 need to change some code and click the `☑️Submit Answer` button to
 submit your answer. Don’t worry about making mistakes, you can try as
 often as you want and start over if needed. Some exercises (like this
-one) also contains `💡 Hints` which you can click if you are stuck.
-Also, if you submit an incorrect answer, R will do it’s best to pinpoint
+one) also contain `💡 Hints` which you can click if you are stuck. Also,
+if you submit an incorrect answer, `R` will do it’s best to pinpoint
 where the problem is (but of course it’s only a computer, so it’s not
 always very helpful…)
 
@@ -128,7 +128,7 @@ always very helpful…)
 
 ## Simple visualizations
 
-Besides the ability to read and clean up data, R has a very powerful
+Besides the ability to read and clean up data, `R` has a very powerful
 visualization suite called `ggplot`. Although this can be hard to
 master, there are many useful resources to learn more and it can be very
 rewarding (and fun!) to make nice visualizations.
@@ -137,8 +137,8 @@ For this section, we will use the same data as above:
 
 ``` r
 library(tidyverse)
-results <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv')
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
 ```
 
 ### A first scatter plots
@@ -149,8 +149,10 @@ population density and age: do older people live mostly in cities or in
 more rural regions?
 
 ``` r
-ggplot(demographics, 
-       aes(x=v57_density, y=c_65plus)) + 
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = c_65plus)
+) +
   geom_point()
 ```
 
@@ -159,12 +161,12 @@ municipalities. Have a quick look at the code above. The ggplot function
 takes two arguments, the data (`demographics`) and an *aesthetic
 mapping* (`aes(..)`). This mapping links columns in the the data frame
 (e.g. `v57_density`) to graphical elements of the plot (e.g. the x
-position of the scratter points). Finally, you add geometrical elements
+position of the scatter points). Finally, you add geometrical elements
 to the plot, in this case a `geom_point` or scatter point.
 
 What happens when you replace variables in the mapping with other
 variables, e.g. `v43_nl` or `v132_income`? You can also try adding
-another aesthetic, for example `fill=v43_nl` or `size=v01_pop`.
+another aesthetic, for example `color = v43_nl` or `size = v01_pop`.
 
 ### A prettier plot
 
@@ -181,39 +183,49 @@ repositioning the legend. Take a look at the code below:
 <div class="Info">
 
 Note: the code box below contains multiple *comments*. Every line
-starting with a `#` is called a comment, and is simply ignored by R so
+starting with a `#` is called a comment, and is simply ignored by `R` so
 can be used to explain your code.
 
 </div>
 
 ``` r
-# Basic ggplot 
+# Basic ggplot
 #    - data (demographics)
 #    - a mapping of density (y) against income (x), population size (dot size), and migration history (color),
 #    - and a geom (in this case geom_point to create a scatter plot)
-ggplot(demographics, 
-       aes(x=v57_density, y=v132_income, size=v01_pop, color=100-v43_nl)) + 
-  geom_point(alpha=.7) + 
-# All optional elements to change appearance
+ggplot(
+  data = demographics,
+  mapping = aes(x = v57_density, y = v132_income, size = v01_pop, color = 100 - v43_nl)
+) +
+  geom_point(alpha = .7) +
+  # All optional elements to change appearance
   # Add nice titles for the plot and axes
   ggtitle("Differences between rural and urban municipalities") +
-  xlab("Population density") + 
-  ylab("% of people older than 65") +  
+  xlab("Population density") +
+  ylab("% of people older than 65") +
   # Change the scale for migration history to go from light to dark blue:
-  scale_color_gradient(low="lightblue", high="darkblue") +
+  scale_color_gradient(low = "lightblue", high = "darkblue") +
   # Use the scale command to tweak the legend;
-  scale_size(breaks = c(5000, 50000, 500000), 
-             labels = c("5.000", "50.000", "500.000")) + 
+  scale_size(
+    breaks = c(5000, 50000, 500000),
+    labels = c("5.000", "50.000", "500.000")
+  ) +
   # Use the guide command to specify titles and direction for the legend
-  guides(size=guide_legend(title="Population", title.position="top", 
-                           override.aes=list(color='darkblue')),
-         color=guide_colorbar(title="% with Migration History",
-                              title.position="top", 
-                              direction = "horizontal")) + 
+  guides(
+    size = guide_legend(
+      title = "Population", title.position = "top",
+      override.aes = list(color = "darkblue")
+    ),
+    color = guide_colorbar(
+      title = "% with Migration History",
+      title.position = "top",
+      direction = "horizontal"
+    )
+  ) +
   # Use the 'classic' theme
   theme_classic() +
   # Tweak the theme to drop the background for legend keys
-  theme(legend.key=element_blank()) 
+  theme(legend.key = element_blank())
 ```
 
 In the code above, almost all lines are optional. What happens if you
@@ -235,8 +247,20 @@ contains a number of themes that mimic existing sources. Try using
 
 Often, we need to combine data from multiple sources. For example, it
 could be interesting to combine the election results in `results` with
-the demographic data. Fortunately, this is quite easy because they have
-a common key variable (`gm`) on which to join them.
+the demographic data. Fortunately, in our example both sets have a
+common key variable (`gm`) on which to join them.
+
+<div class="Info">
+
+Combining data frames is very often needed while doing data analysis. In
+order to be able to combine data sets in R it is necessary both data
+sets have at least one variable that overlaps, in other words, a
+variable with the same name representing the same aspect of the data,
+e.g. an Id or a name of a municipality. In the latter case it is also
+needed that all these names are spelled exactly the same, since the
+computer cannot know that ’s-Gravenhage is the same as Den Haag…
+
+</div>
 
 So, let’s see if we can plot the support for the farmer’s party BBB
 against the population density:
@@ -244,14 +268,18 @@ against the population density:
 ``` r
 bbb <- filter(results, party == "BBB")
 data <- inner_join(bbb, demographics)
-ggplot(data, aes(x=log10(v57_density), y=votes, color=party, size=v01_pop)) + 
-  geom_point(alpha=.5) + 
-  xlab("Population density (log scale)") + ylab("Relative support for party") +
-  scale_color_manual(values=c("BBB"="green", "Anti-immigration"="blue"))+  scale_size(guide="none") + 
-  ggtitle("Support for BBB and anti-immigration parties per municipality",
-          "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)") + 
-  theme_classic() + 
-  theme(legend.position = "top", legend.title = element_blank()) 
+ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
+  geom_point(alpha = .5) +
+  xlab("Population density (log scale)") +
+  ylab("Relative support for party") +
+  scale_color_manual(values = c("BBB" = "green", "Anti-immigration" = "blue")) +
+  scale_size(guide = "none") +
+  ggtitle(
+    "Support for BBB and anti-immigration parties per municipality",
+    "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)"
+  ) +
+  xkcd::theme_xkcd() +
+  theme(legend.position = "top", legend.title = element_blank())
 ```
 
 ## Plotting maps
@@ -261,24 +289,25 @@ insightful to plot variables on a map.
 
 ### Shape files
 
-To do this, R first needs to know the *shape* of the various regions
+To do this, `R` first needs to know the *shape* of the various regions
 (such as the municipalities used above). We can download a cleaned up
 Dutch ‘shapefile’ from the tutorial repository:
 
 ``` r
 library(tidyverse)
 library(sf)
-shapes = read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
-head(shapes)
+shapes <- read_rds("https://github.com/vanatteveldt/ccslearnr/raw/master/data/sf_nl.rds")
+shapes
 ```
 
 Now, we can plot this map using a regular ggplot command, using the
-`geom_sg` geometrical object, which can directly use the `geom` column
+`geom_sf` geometrical object, which can directly use the `geom` column
 from the shapefile. We can also specify the fill color of regions, for
 example using the province column:
 
 ``` r
-ggplot(shapes) + geom_sf(aes(geometry=geom, fill=provincie))
+ggplot(data = shapes) +
+  geom_sf(aes(geometry = geom, fill = provincie))
 ```
 
 ### Combining shapes and demographic information
@@ -293,11 +322,11 @@ the regions. For example, the code below plots the population density
 per municipality:
 
 ``` r
-inner_join(shapes, demographics) |> 
-  ggplot() + 
-  geom_sf(aes(geometry=geom, fill=v57_density)) + 
-  scale_fill_gradient(low="white", high="red", guide="none") + 
-  ggtitle("Population density per municipality") + 
+inner_join(shapes, demographics) |>
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = v57_density)) +
+  scale_fill_gradient(low = "white", high = "red", guide = "none") +
+  ggtitle("Population density per municipality") +
   theme_void()
 ```
 
@@ -305,11 +334,15 @@ We could compare this with the vote share of e.g. the (farmer’s) party
 BBB:
 
 ``` r
-bbb = results |> filter(party == "BBB")  
-inner_join(shapes, bbb) |> ggplot() + geom_sf(aes(geometry=geom, fill=votes)) +
+bbb <- results |> 
+  filter(party == "BBB")
+inner_join(shapes, bbb) |> 
+  ggplot() +
+  geom_sf(aes(geometry = geom, fill = votes)) +
   ggtitle("Support for BBB per municipality") +
-  scale_fill_gradient(low="white", high="green",name='% Support') +
-  theme_void() + theme(legend.position = "bottom")
+  scale_fill_gradient(low = "white", high = "green", name = "% Support") +
+  theme_void() +
+  theme(legend.position = "bottom")
 ```
 
 What does this tell us about the target constituency of the BBB party?
@@ -318,8 +351,8 @@ change the color scheme?
 
 ## Simple statistics
 
-Of course, R is also (and even at it’s core) a statistical toolkit. In
-this sub section, we will look at some simple statistical results.
+Of course, `R` is also (and even at it’s core) a statistical tool kit.
+In this sub section, we will look at some simple statistical results.
 
 ### Correlation
 
@@ -338,7 +371,7 @@ We can also plot this using the `ggcorrplot` package:
 library(ggcorrplot)
 vars <- select(demographics, v01_pop:c_65plus)
 correlations <- cor(vars, use = "pairwise")
-ggcorrplot(correlations, method="circle")
+ggcorrplot(correlations, method = "circle")
 ```
 
 ### Regression
@@ -351,18 +384,18 @@ create a nice looking regression table:
 
 ``` r
 library(sjPlot)
-bbb = filter(results, party == "BBB")
-data = inner_join(bbb, demographics)
-m = lm(data, formula=votes ~ v57_density + c_65plus)
+bbb <- filter(results, party == "BBB")
+data <- inner_join(bbb, demographics)
+m <- lm(data, formula = votes ~ v57_density + c_65plus)
 tab_model(m)
 ```
 
 So, BBB’s vote share can be predicted from population density (the
-denser the muncipality, the fewer votes), but not by the percentage of
+denser the municipality, the fewer votes), but not by the percentage of
 people over 65.
 
 **Exercise**: Change the code above predict the VVD’s vote share from
-`c65_plus`, `v43_nl`, and `v132_income`. How do you interpret this? Do
+`c_65plus`, `v43_nl`, and `v132_income`. How do you interpret this? Do
 the coefficients surprise you?
 
 (Note: Be sure to rename the `bbb` data to `vvd` to avoid confusing R’s

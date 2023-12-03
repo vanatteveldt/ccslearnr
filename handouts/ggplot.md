@@ -33,7 +33,7 @@ Visualizing data with ggplot
 ## Introduction
 
 Creating visualizations is one of the most useful and powerful ways to
-analyse and data and tell a convincing story with these data.
+analyse data and tell a convincing story with these data.
 
 In `ggplot`, R Tidyverse has a very powerful and well-designed
 visualization library. It can be used to make almost all kinds of
@@ -45,14 +45,14 @@ out the free online resources below:
 
 - [The R Graph
   gallery](https://r-graph-gallery.com/ggplot2-package.html) - contains
-  many examples of beautiful plots, all with R code included
+  many examples of beautiful plots, all with R code included.
 - [From data to viz](https://www.data-to-viz.com/) - an interactive site
   that showcases good plots based on your data, giving not just the R
   code but also best practices, common mistakes, and alternatives for
   each plot.
 - [The ggplot cheat
   sheet](https://github.com/rstudio/cheatsheets/blob/main/data-visualization.pdf)
-  with a nice overview of ggplot functions and options
+  with a nice overview of ggplot functions and options.
 - [Data Visualization](https://socviz.co/) by Kieran Healy - a
   completely free online book that discusses the principles of data
   visualization and the best ways to visualize various types of data,
@@ -89,7 +89,7 @@ We can visualize the relation between engine power and fuel economy:
 
 ``` r
 ggplot(mtcars, 
-       aes(x=hp, y=mpg)) + 
+       aes(x = hp, y = mpg)) + 
   geom_point()
 ```
 
@@ -136,10 +136,10 @@ Besides this, it adds three extra elements:
   match the house style of a company or journal.
 
 ``` r
-ggplot(mtcars, aes(x=hp, y=mpg, color=cyl)) + 
-  geom_point() + 
-  scale_color_gradient(low="darkgreen", high="darkred") +
-  ggtitle("Car horsepower and fuel economy") + 
+ggplot(mtcars, aes(x = hp, y = mpg, color = cyl)) +
+  geom_point() +
+  scale_color_gradient(low = "darkgreen", high = "darkred") +
+  ggtitle("Car horsepower and fuel economy") +
   theme_minimal()
 ```
 
@@ -153,7 +153,7 @@ useful if you want to express the relation between two numeric
 variables.
 
 As you saw above, scatter plots use the `geom_point()` geometry. For
-this plot type, you have to specify and **x** and **y** mapping. In
+this plot type, you have to specify an **x** and **y** mapping. In
 addition, you can specify a `color`, `fill`, and `alpha` (transparency)
 mapping, as well as `size` and `shape`.
 
@@ -162,29 +162,19 @@ density and percentage of people aged 65+ in Dutch municipalities. It
 also uses point size to indicate total population size, and color to
 indicate income (see
 e.g. <http://sape.inf.usi.ch/quick-reference/ggplot2/colour>) for a
-reference of color names in ggplot)
+reference of color names in ggplot).
 
 ``` r
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
-ggplot(demographics,
-       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v132_income)) +
-  scale_color_gradient(low="coral", high="darkblue") + 
-  geom_point(alpha=.6)
-```
-
-``` r
-library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
-ggplot(demographics,
-       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v43_nl)) +
-  scale_color_gradient(low="darkblue", high="lightblue") + 
-  geom_point(alpha=.6)
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+ggplot(demographics, aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  scale_color_gradient(low = "coral", high = "darkblue") +
+  geom_point(alpha = .6)
 ```
 
 **Exercise**: Can you change the code to make the colors represent the
 percentage of inhabitants without a migration history (`v43_nl`), and
-change the color scale to run from dark blue to light blue?s
+change the color scale to run from dark blue to light blue?
 
 Note the use of `alpha` to make the points somewhat transparent, making
 it a bit easier to see when points overlap. This is given as a constant
@@ -201,7 +191,7 @@ built-in default shapes, like the circles for 21)
 
 ## Line graphs
 
-Line graphs mostly useful to showcase change over time. This uses
+Line graphs are mostly useful to showcase change over time. This uses
 `geom_line`, which is in many ways similar to `geom_point`, but rather
 than drawing points, it will draw a line between all points. Besides the
 `x`, `y`, `color` and `alpha` mapping, it can have a `linetype`
@@ -214,30 +204,33 @@ for each US Presidential candidate since 2000:
 library(tidyverse)
 elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
 ggplot(elections,
-       aes(x=year, y=votes, color=party)) + 
+       aes(x = year, y = votes, color = party)) + 
   geom_line()
 ```
 
 ### Let’s make it pretty!
 
-To make this graph a bit nicer, let’s make some changes: - The votes are
-given as a proportion of 0-1, but most people prefer 0-100%. This can be
-changed in the `scale` by setting a labelling function. - The party
-names are in all capitals, which is ugly and distracting. We can use
-`str_to_title` to change them to Title Case. - This graph uses the
-default colors for parties, which do not match our normal ideas of which
-party should have which color. We can fix this by using a manual scale
-for the color: `scale_color_manual`, which allows us to specify exactly
-which value should get which color. - The data for the minor parties was
-sometimes missing. For example, the Greens were only included in 2000
-and 2020. By default, ggplot draws a line between those points, which
-misleadingly suggests that they had a result in the intervening years as
-well. We fix this using the `complete` function, which inserts missing
-combinations of `year` and `party`, setting the `vote` variable to
-zero. - Finally, let’s make the line for the minor parties dotted, using
-`mutate` to define major, and then using it as the linetype aesthetic,
-again setting a manual scale to force the FALSE values to be dashed (and
-removing the guide/legend).
+To make this graph a bit nicer, let’s make some changes:
+
+- The votes are given as a proportion of 0-1, but most people prefer
+  0-100%. This can be changed in the `scale` by setting a labelling
+  function.
+- The party names are in all capitals, which is ugly and distracting. We
+  can use `str_to_title` to change them to Title Case.
+- This graph uses the default colors for parties, which do not match our
+  normal ideas of which party should have which color. We can fix this
+  by using a manual scale for the color: `scale_color_manual`, which
+  allows us to specify exactly which value should get which color.
+- The data for the minor parties was sometimes missing. For example, the
+  Greens were only included in 2000 and 2020. By default, ggplot draws a
+  line between those points, which misleadingly suggests that they had a
+  result in the intervening years as well. We fix this using the
+  `complete` function, which inserts missing combinations of `year` and
+  `party`, setting the `vote` variable to zero.
+- Finally, let’s make the line for the minor parties dotted, using
+  `mutate` to define major, and then using it as the linetype aesthetic,
+  again setting a manual scale to force the FALSE values to be dashed
+  (and removing the guide/legend).
 
 To achieve these two changes, we need to preprocess the data before the
 `ggplot` command, using the `complete` and `mutate` functions. We do
@@ -251,15 +244,15 @@ elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/
 ```
 
 ``` r
-elections |> 
-  complete(year, party, fill=list(votes=0)) |>
+elections |>
+  complete(year, party, fill = list(votes = 0)) |>
   mutate(major = party == "DEMOCRAT" | party == "REPUBLICAN",
          party = str_to_title(party)) |>
-  ggplot(aes(x=year, y=votes, color=party, linetype=major)) + 
-  scale_y_continuous(labels = scales::percent) + 
-  scale_linetype_manual(values=c("dashed", "solid"), guide='none') + 
-  scale_color_manual(breaks=c("Democrat", "Republican", "Green", "Libertarian", "Other"),
-                     values=c("blue", "red", "green4", "yellow4", "grey")) + 
+  ggplot(aes(x = year, y = votes, color = party, linetype = major)) +
+  scale_y_continuous(labels = scales::percent) +
+  scale_linetype_manual(values = c("dashed", "solid"), guide = "none") +
+  scale_color_manual(breaks = c("Democrat", "Republican", "Green", "Libertarian", "Other"),
+                     values = c("blue", "red", "green4", "yellow4", "grey")) +
   geom_line()
 ```
 
@@ -287,7 +280,8 @@ be done using a bar plot, for which you only specify either the `y` or
 for each case representing this count:
 
 ``` r
-ggplot(us_demographics, aes(y=state)) + geom_bar()
+ggplot(us_demographics, aes(y = state)) +
+  geom_bar()
 ```
 
 ### Histograms
@@ -299,7 +293,8 @@ percentage non-white population, which is divided into 10 bins
 (deciles):
 
 ``` r
-ggplot(us_demographics, aes(x=nonwhite_pct)) + geom_histogram(bins=10, color="black")
+ggplot(us_demographics, aes(x = nonwhite_pct)) +
+  geom_histogram(bins = 10, color = "black")
 ```
 
 ### Using geom_col instead of geom_bar
@@ -310,27 +305,28 @@ showcased by the plot below:
 - You can also specify the summary value manually if you have already
   computed the statistic, for example for the votes in the election data
   loaded above. For this, use `geom_col` rather than `geom_bar` and
-  specify both `x` and `y` aesthetic
+  specify both `x` and `y` aesthetic.
 - To create a grouped bar plot, specify a `fill` aesthetic and add
   `position_dodge2()` to the geom. (note: normally `position_dodge()`
   also works, but with a continuous grouping value like year you need
-  `dodge2`)
+  `dodge2`.)
 - Often, a vertically arranged bar plot can be more readable than a
   horizontal one. However, if you prefer a horizontal plot, you can put
   the x markers at a 45 or 90 degree angle.
 
 ``` r
 library(tidyverse)
-elections <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv')
+elections <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/US_Elections_years.csv")
 elections |>
-  complete(year, party, fill=list(votes=0)) |>
-  ggplot(aes(x=party, y=votes, fill=year)) + geom_col(position=position_dodge2()) + 
-  scale_x_discrete(guide = guide_axis(angle = 45)) + 
+  complete(year, party, fill = list(votes = 0)) |>
+  ggplot(aes(x = party, y = votes, fill = year)) +
+  geom_col(position = position_dodge2()) +
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
   ylab("")
 ```
 
 (note the use of complete to ensure that missing year-party combinations
-are treated as zero).
+are treated as zero.)
 
 **Exercise:** In the code above, `year` is a numeric variable, causing R
 to create a gradient scale for it. Can you change year into a factor
@@ -352,7 +348,7 @@ demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslear
 
 ``` r
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
 ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
   geom_point()
 ```
@@ -363,9 +359,9 @@ the same aesthetics as the scatter plot:
 
 ``` r
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
 ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
-  geom_point() + 
+  geom_point() +
   geom_smooth(method = lm)
 ```
 
@@ -380,24 +376,27 @@ quickly become a mess. For that reason, we can create a subset of the
 data, and use that as the data for the `geom_text`:
 
 ``` r
-subset = filter(demographics, c_65plus > 30 | v57_density > 4000)
+subset <- filter(demographics, c_65plus > 30 | v57_density > 4000)
 ggplot(demographics, aes(x = v57_density, y = c_65plus)) +
-  geom_point() + 
-  geom_text(data=subset, aes(label=gemeente), nudge_y = -.5)
+  geom_point() +
+  geom_text(data = subset, aes(label = gemeente), nudge_y = -.5)
 ```
 
-Some things to note here: - ggplot wants the data as first argument, and
-the mapping as second. For geoms this is unfortunately the other way
-around, so we specify that the first argument is the data by using
-`data=subset` rather than just `geom_text(subset,...)` - `geom_text` now
-has it’s own data, and we also specify a label aesthetic. The x and y
-aesthetic (i.e. the label positions) are not overridden, so they use the
-mapping from the `ggplot` call. - Finally, we use `nudge_y` to move all
-labels a little bit down so they don’t overlap with the points.
+Some things to note here:
+
+- ggplot wants the data as first argument, and the mapping as second.
+  For geoms this is unfortunately the other way around, so we specify
+  that the first argument is the data by using `data = subset` rather
+  than just `geom_text(subset,...)`
+- `geom_text` now has it’s own data, and we also specify a label
+  aesthetic. The x and y aesthetic (i.e. the label positions) are not
+  overridden, so they use the mapping from the `ggplot` call.
+- Finally, we use `nudge_y` to move all labels a little bit down so they
+  don’t overlap with the points.
 
 **Exercise:** Can you add labels for the municipalities where less than
 15% of the population is over 65? (hint: you can add another condition
-to the existing filter call by adding another `|`)
+to the existing filter call by adding another `|`.)
 
 ## Creating high-quality graphs for reports
 
@@ -430,10 +429,10 @@ As an example, consider the first graph from the scatter plot section:
 
 ``` r
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
 ggplot(demographics,
-       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v132_income)) +
-  geom_point(alpha=.6)
+       aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6)
 ```
 
 This graph is fairly informative: we can see that older people mostly
@@ -447,7 +446,7 @@ These points can all be addressed by **adding extra elements** to the
 plot. Specifically:
 
 - You can add an overall `ggtitle` and horizontal and vertical axis
-  labels (`xlab` and `ylab`)
+  labels (`xlab` and `ylab`).
 - You can alter the way values are mapped between a column and the
   aesthetic element by adding the `scale_` functions. These functions
   are named for the aesthetic and optionally the data type, so for
@@ -466,23 +465,24 @@ using its own data and aesthetics (see the section on combining geoms).
 
 ``` r
 library(tidyverse)
-demographics <- read_csv('https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv')
-highlight <- filter(demographics, v01_pop > 250000 | 
-                      c_65plus > 30 | 
+demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
+highlight <- filter(demographics, v01_pop > 250000 |
+                      c_65plus > 30 |
                       c_65plus > 25 & v57_density > 3000 |
                       c_65plus < 15)
 ggplot(demographics,
-       aes(x = v57_density, y = c_65plus, size=v01_pop, color=v132_income)) +
-  geom_point(alpha=.6) + 
-  xlim(0, 7000) + 
-  geom_text(data=highlight, aes(label=gemeente), nudge_y = -1, size=3, color="coral") + 
+  aes(x = v57_density, y = c_65plus, size = v01_pop, color = v132_income)) +
+  geom_point(alpha = .6) +
+  xlim(0, 7000) +
+  geom_text(data = highlight, aes(label = gemeente), nudge_y = -1, size = 3, color = "coral") +
   ggtitle("Where do older people live?",
           "Selected characteristics of Dutch municipalities") +
-  xlab("Population density") + 
-  ylab("Percentage of population aged 65+") + 
-  scale_size(breaks=c(5000, 50000, 500000), labels=c("5.000", "50.000", "500.000"), name="Population") + 
-  scale_color_gradient(low="coral", high="darkblue", name="Household\nIncome") +
-  theme_classic() + theme(axis.title = element_text(size=12))
+  xlab("Population density") +
+  ylab("Percentage of population aged 65+") +
+  scale_size(breaks = c(5000, 50000, 500000), labels = c("5.000", "50.000", "500.000"), name = "Population") +
+  scale_color_gradient(low = "coral", high = "darkblue", name = "Household\nIncome") +
+  theme_classic() +
+  theme(axis.title = element_text(size = 12))
 ```
 
 Have a look at the code above and see if you understand how the

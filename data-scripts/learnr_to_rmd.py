@@ -84,15 +84,19 @@ if __name__ == "__main__":
         print("* New README.md written")
 
     if not (args.tutorials or args.readme):
-        print("Please select one or more tutorial to render:")
+        print("Please select one or more tutorial to render, or use .all to render all:")
         for file in infolder.glob("*/*.Rmd"):
             print(f"- {file.with_suffix('').name:40} ({file})")
         sys.exit()
 
-    infiles = [infolder / name / f"{name}.Rmd" for name in args.tutorials]
+    if args.tutorials == [".all"]:
+        infiles = list(infolder.glob("*/*.Rmd"))
+        print(infiles)
+    else:
+        infiles = [infolder / name / f"{name}.Rmd" for name in args.tutorials]
     for infile in infiles:
         if not infile.exists():
-            raise Exception("File {infile} does not exist!")
+            raise Exception(f"File {infile} does not exist!")
 
     for infile in infiles:
         out = outfolder / infile.name
