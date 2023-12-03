@@ -47,17 +47,18 @@ This tutorial will explain how these functions work and how they can be used for
 ### The role of grouping
 
 When we summarize data, we generally want to summarize some value per group of rows.
-For this reason, the process in R consists of two steps.
+For this reason, the process in R consists of two steps: grouping the data and summarize the data.
 
 For this example, assume we have individual-level survey data with gender and age per respondent:
 
-![Data to summarize](https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/summarize1.png)
-
+#### Grouping the data 
 First, you define the groups by which you want to summarize.
 In this case, we want two groups (for male and female), but of course in other cases there can be many more groups. The result of *grouping* is a very similar data frame, but in this case the groups are explicitly marked: 
 
 ![Grouped data](https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/summarize2.png)
 
+
+#### Summarizing the data 
 Now, the second step is to compute the summary statistics per group. For example, we could compute the average age for each group:
 
 ![Summarized data](https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/summarize3.png)
@@ -72,7 +73,7 @@ In the next section, we will look at these commands in detail.
 
 In Tidyverse, often you run many data cleaning or transformation commands in sequence.
 For example, you might want to read in data, select some columns, filter some rows,
-mutate a new calue, and summarize some other values. 
+mutate a new value, and summarize some other values. 
 
 If we would do this with single commands, we would get a very repetitive script.
 For example, 
@@ -91,7 +92,7 @@ Because this is such a common pattern, R has introduced a shortcut to express su
 of operations: The pipeline operator `|>`. 
 
 This operator works by chaining together multiple functions, such that the output of the first function is the input
-(first argument) of the second functoin. To see this in action, the following snippet can be rewritten as a pipeline like this:
+(first argument) of the second function. To see this in action, the following snippet can be rewritten as a pipeline like this:
 
 ```{r pipe2}
 library(tidyverse)
@@ -142,17 +143,19 @@ grade_code()
 
 ## Summarizing data in R
 
-Let's look at how we can we summarize data in R:
+Let's look at how we can we summarize data in R. As mentioned before we first have to group the data and next we can summarize the data.
 
 ### Data
 
-First, let's fire up tidyverse and load the gun polls data used in the earlier example:
+First, let's fire up tidyverse and load the gun polls data used in the earlier example. Moreover we select only four columns
 
 ```{r pollsdata, echo=FALSE}
 library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 polls <- read_csv(url) |>
-  select(Question, Population, Pollster, Support)
+ select(Question, Pollster,Support,
+        Rep=`Republican Support`, Rem=`Democratic Support`) 
+polls
 ```
 
 
@@ -160,7 +163,8 @@ polls <- read_csv(url) |>
 library(tidyverse)
 url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
 polls <- read_csv(url) |>
-  select(Question, Population, Pollster, Support)
+ select(Question, Pollster,Support,
+        Rep=`Republican Support`, Rem=`Democratic Support`) 
 polls
 ```
 ```
@@ -240,7 +244,7 @@ As you could see, this creates a new and often much smaller 'summarized' data fr
 with one row per unique group and only keeps the grouping column(s) and the calculated column(s).
 
 Instead of `summarize`, you can also run `mutate` with summarization functions on grouped data.
-In that case, the summary is computer per group, but instead of replacing the data frame with only the summarized data, the new column is added to the existing data frame, with the values repeated within a group:
+In that case, the summary is computed per group, but instead of replacing the data frame with only the summarized data, the new column is added to the existing data frame, with the values repeated within a group:
 
 ```{r mutate, exercise=TRUE, exercise.setup='pollsdata'}
 polls |> group_by(Question) |> mutate(Mean_Support=mean(Support))
@@ -311,7 +315,7 @@ but it is a bit more readable to create a new mutate to differentiate the group 
 ## Grouping by multiple columns
 
 In the `group_by` function, you can also specify multiple columns.
-For example, the code below computes the average by question and by populuation category.
+For example, the code below computes the average by question and by population category.
 
 ```{r group-multiple, eval=F}
 polls |> group_by(Question, Population) |> summarize(Support=mean(Support))
@@ -328,30 +332,41 @@ polls |> group_by(Question, Population) |> summarize(Support=mean(Support))
  4 arm-teachers                Registered Voters    41.3
  [...]
 ```
-
-As you can see, the result is a data set with one row per unique group, that is, ther question - population combination.
+As you can see, the result is a data set with one row per unique group, that is, the question - population combination.
 In the message above the output, and in the output itself, you can also see that the result it itself grouped by Question. 
 When summarizing data with multiple grouping value, R by default removes the last grouping column, so instead of Question and Population it's now just grouped by Question. 
 
 This behaviour can be quite useful if you want to compute new statistics for the remaining groups.
-Note that you can remove this grouping either by either adding `.groups=drop', or by calling the function `|> ungroup()` on the result.
+Note that you can remove this grouping either by either adding `.groups=drop`, or by calling the function `|> ungroup()` on the result.
 
 ### Exercise: deviations from group means
 
 Starting from the code above, and taking into account that after the summarize function the data is grouped by question, can you calculate the deviation from the average support per population within each question? So, the adults are `-0.95` point away from the average support for age-21: the average support for age-21 is `75.4`, and `74.5 - 75.4 = -0.95`.
 
-```{r group-multiple-ex, exercise=TRUE, exercise.setup='pollsdata', eval=FALSE}
+```{r pollsdata2, echo=FALSE}
+library(tidyverse)
+url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
+polls <- read_csv(url) |>
+ select(Question, Pollster,Population,Support,
+        Rep=`Republican Support`, Rem=`Democratic Support`) 
+polls
+```
+
+```{r group-multiple-ex, exercise=TRUE, exercise.setup='pollsdata2', eval=FALSE}
 polls |> 
   group_by(Question, Population) |> 
   summarize(Support=mean(Support)) |> 
   mutate(mean_support=____, deviation=____)
 ```
+
 ```{r group-multiple-ex-solution}
 polls |> 
   group_by(Question, Population) |> 
   summarize(Support=mean(Support)) |> 
   mutate(mean_support=mean(Support), deviation=Support - mean_support)
 ```
+
+
 ```{r group-multiple-ex-code-check}
 grade_code()
 ```
