@@ -7,27 +7,18 @@ Available tutorials:
 <!-- Tutorial table -->
 
 
-| Name  | Tutorial | Handout |
+| Name  | Description | Tutorial | Handout |
 |-|-|-|
-tidy-join | [link](https://vanatteveldt.shinyapps.io/tidy-join) | [link](handouts/tidy-join.md)
-fun-with-cbs_for_Rockstars | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_for_Rockstars) | [link](handouts/fun-with-cbs_for_Rockstars.md)
-fun-with-cbs | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs) | [link](handouts/fun-with-cbs.md)
-svd | [link](https://vanatteveldt.shinyapps.io/svd) | [link](handouts/svd.md)
-tidy-stringr | [link](https://vanatteveldt.shinyapps.io/tidy-stringr) | [link](handouts/tidy-stringr.md)
-rvest | [link](https://vanatteveldt.shinyapps.io/rvest) | [link](handouts/rvest.md)
-tidy-summarize | [link](https://vanatteveldt.shinyapps.io/tidy-summarize) | [link](handouts/tidy-summarize.md)
-tidy-pivot | [link](https://vanatteveldt.shinyapps.io/tidy-pivot) | [link](handouts/tidy-pivot.md)
-ggplot | [link](https://vanatteveldt.shinyapps.io/ggplot) | [link](handouts/ggplot.md)
-fun-with-cbs_for_young_audience | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_for_young_audience) | [link](handouts/fun-with-cbs_for_young_audience.md)
-fun-with-cbs_engaging_language | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_engaging_language) | [link](handouts/fun-with-cbs_engaging_language.md)
-svd-recommender | [link](https://vanatteveldt.shinyapps.io/svd-recommender) | [link](handouts/svd-recommender.md)
-fun-with-cbs_for_artlovers | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_for_artlovers) | [link](handouts/fun-with-cbs_for_artlovers.md)
-fun-with-cbs_ai_helper | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_ai_helper) | [link](handouts/fun-with-cbs_ai_helper.md)
-tidy-1-select | [link](https://vanatteveldt.shinyapps.io/tidy-1-select) | [link](handouts/tidy-1-select.md)
-functions | [link](https://vanatteveldt.shinyapps.io/functions) | [link](handouts/functions.md)
-fun-with-cbs_for_gourmets | [link](https://vanatteveldt.shinyapps.io/fun-with-cbs_for_gourmets) | [link](handouts/fun-with-cbs_for_gourmets.md)
-recoding | [link](https://vanatteveldt.shinyapps.io/recoding) | [link](handouts/recoding.md)
-
+fun-with-cbs | Demo of some fun stuff you can do in R |  [link](https://vanatteveldt.shinyapps.io/fun-with-cbs) | [link](handouts/fun-with-cbs.md)
+tidy-1-select | Tidyverse basics | [link](https://vanatteveldt.shinyapps.io/tidy-1-select) | [link](handouts/tidy-1-select.md)
+tidy-summarize | Tidyverse: Grouping and summarizing | [link](https://vanatteveldt.shinyapps.io/tidy-summarize) | [link](handouts/tidy-summarize.md)
+ggplot | GGPlot Visualizations | [link](https://vanatteveldt.shinyapps.io/ggplot) | [link](handouts/ggplot.md)
+tidy-join | Tidyverse: Joinging datasets | [link](https://vanatteveldt.shinyapps.io/tidy-join) | [link](handouts/tidy-join.md)
+tidy-pivot | Tidyverse: Reshaping data | [link](https://vanatteveldt.shinyapps.io/tidy-pivot) | [link](handouts/tidy-pivot.md)
+recoding | Recoding data | [link](https://vanatteveldt.shinyapps.io/recoding) | [link](handouts/recoding.md)
+tidy-stringr | Basic text handling | [link](https://vanatteveldt.shinyapps.io/tidy-stringr) | [link](handouts/tidy-stringr.md)
+rvest | Basics of web scraping | [link](https://vanatteveldt.shinyapps.io/rvest) | [link](handouts/rvest.md)
+functions | Basics of R functions | [link](https://vanatteveldt.shinyapps.io/functions) | [link](handouts/functions.md)
 
 <!-- /Tutorial table -->
 
