@@ -8,7 +8,7 @@ Available tutorials:
 
 
 | Name  | Description | Tutorial | Handout |
-|-|-|-|
+|-|-|-|-|
 fun-with-cbs | Demo of some fun stuff you can do in R |  [link](https://vanatteveldt.shinyapps.io/fun-with-cbs) | [link](handouts/fun-with-cbs.md)
 tidy-1-select | Tidyverse basics | [link](https://vanatteveldt.shinyapps.io/tidy-1-select) | [link](handouts/tidy-1-select.md)
 tidy-summarize | Tidyverse: Grouping and summarizing | [link](https://vanatteveldt.shinyapps.io/tidy-summarize) | [link](handouts/tidy-summarize.md)
