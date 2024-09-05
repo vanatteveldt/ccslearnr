@@ -1,4 +1,4 @@
-gm,gemeente,id,party,percentage,votes,Color
+gm,gemeente,id,party,votes,count,Color
 GM1680,Aa en Hunze,744082,PVV,19.402149574563367,3466,#FF00FF
 GM1680,Aa en Hunze,744082,PvdA/GL,17.95230631437528,3207,#A90000
 GM1680,Aa en Hunze,744082,VVD,16.222570532915363,2898,#0101DF
