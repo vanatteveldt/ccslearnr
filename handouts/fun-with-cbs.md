@@ -77,24 +77,27 @@ the `↻ Start Over` button and the original code will run.
 
 ### An explanation of the columns
 
-| Variable        | Explanation                                                                  |
-|-----------------|------------------------------------------------------------------------------|
-| gm              | Unique code for each municipality                                            |
-| gemeente        | Unique name of each municipality                                             |
-| v01_pop         | Total population                                                             |
-| v57_density     | Population Density                                                           |
-| v43_nl          | Percentage of population without a migration history                         |
-| v122_disposable | Average disposable income per household                                      |
-| v132_income     | Average standardized income per household                                    |
-| v142_wealth     | Median household wealth                                                      |
-| v153_uitkering  | Percentage of population receiving social benefits (excluding state pension) |
-| c_65plus        | Percentage of population older than 65                                       |
+| Variable                 | Explanation                                          |
+|--------------------------|------------------------------------------------------|
+| gm                       | Unique code for each municipality                    |
+| gemeente                 | Unique name of each municipality                     |
+| v01_pop                  | Total population                                     |
+| v57_density              | Population Density                                   |
+| v43_nl                   | Percentage of population without a migration history |
+| v122_disposable          | Average disposable income per household              |
+| v132_income              | Average standardized income per household            |
+| v142_wealth              | Median household wealth                              |
+| v153_pensioen            | Percentage of population receiving state pension     |
+| v212_distance_hospital   | Distance to nearest hospital                         |
+| v212_distance_school     | Distance to nearest primary school                   |
+| v225_density_restaurants | Density of restaurants in neighbourhood              |
+| c_65plus                 | Percentage of population older than 65               |
 
 ### Voting data
 
 Similar to above, we can load voting data per municipality. The code
 below will load data for each party in each municipality in the 2023
-provincial elections.
+national elections.
 
 `R` also has powerful commands to clean up and restructure data. For
 example, the code below shows the results for a single municipality
@@ -107,7 +110,7 @@ municipality of Amsterdam, ordered by party (starting from A)?
 
 ``` r
 library(tidyverse)
-results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023.csv")
 results |>
   filter(gemeente == "Groningen") |>
   arrange(desc(votes))
@@ -137,7 +140,7 @@ For this section, we will use the same data as above:
 
 ``` r
 library(tidyverse)
-results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023ps.csv")
+results <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_elections_2023.csv")
 demographics <- read_csv("https://raw.githubusercontent.com/vanatteveldt/ccslearnr/master/data/dutch_demographics.csv")
 ```
 
@@ -262,18 +265,22 @@ computer cannot know that ’s-Gravenhage is the same as Den Haag…
 
 </div>
 
-So, let’s see if we can plot the support for the farmer’s party BBB
-against the population density:
+So, let’s see if we can plot the support for the Labour/Greens
+(PvdA/GL), farmer’s party (BBB), and radical-right party (PVV) against
+the population density, using the colors provided in the dataset, and
+using a fun theme just because we can:
 
 ``` r
-bbb <- filter(results, party == "BBB")
+colors = results |> select(party, Color) |> unique()
+
+bbb <- filter(results, party %in% c("PvdA/GL", "BBB", "PVV"))
 data <- inner_join(bbb, demographics)
 ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = party, size = v01_pop)) +
-  geom_point(alpha = .5) +
+  geom_point(alpha = .4) +
   xlab("Population density (log scale)") +
   ylab("Relative support for party") +
-  scale_color_manual(values = c("BBB" = "green", "Anti-immigration" = "blue")) +
   scale_size(guide = "none") +
+  scale_color_manual(breaks=colors$party, values=colors$Color) + 
   ggtitle(
     "Support for BBB and anti-immigration parties per municipality",
     "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)"
@@ -330,22 +337,22 @@ inner_join(shapes, demographics) |>
   theme_void()
 ```
 
-We could compare this with the vote share of e.g. the (farmer’s) party
-BBB:
+We could compare this with the vote share of e.g. the (anti-immigration)
+party PVV:
 
 ``` r
-bbb <- results |> 
-  filter(party == "BBB")
-inner_join(shapes, bbb) |> 
+pvv <- results |> 
+  filter(party == "PVV")
+inner_join(shapes, pvv) |> 
   ggplot() +
   geom_sf(aes(geometry = geom, fill = votes)) +
-  ggtitle("Support for BBB per municipality") +
-  scale_fill_gradient(low = "white", high = "green", name = "% Support") +
+  ggtitle("Support for PVV per municipality") +
+  scale_fill_gradient(low = "white", high = "darkblue", name = "% Support") +
   theme_void() +
   theme(legend.position = "bottom")
 ```
 
-What does this tell us about the target constituency of the BBB party?
+What does this tell us about the target constituency of the PVV party?
 Can you plot the same maps for other parties or variables? Can you
 change the color scheme?
 
@@ -371,7 +378,8 @@ We can also plot this using the `ggcorrplot` package:
 library(ggcorrplot)
 vars <- select(demographics, v01_pop:c_65plus)
 correlations <- cor(vars, use = "pairwise")
-ggcorrplot(correlations, method = "circle")
+ggcorrplot(correlations, method = "circle", show.diag = F) + 
+  scale_fill_gradient2(low="darkred", mid="white", high="darkblue")
 ```
 
 ### Regression
@@ -387,7 +395,7 @@ library(sjPlot)
 bbb <- filter(results, party == "BBB")
 data <- inner_join(bbb, demographics)
 m <- lm(data, formula = votes ~ v57_density + c_65plus)
-tab_model(m)
+tab_model(m, show.std = TRUE)
 ```
 
 So, BBB’s vote share can be predicted from population density (the
