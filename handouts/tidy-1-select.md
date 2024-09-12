@@ -56,11 +56,11 @@ install.packages('tidyverse') # only needed once
 library(tidyverse)
 ```
 
-Note: don’t be scared if you see a red message after calling `library`.
-RStudio doesn’t see the difference between messages, warnings, and
-errors, so it displays all three in red. You need to read the message,
-and it will contain the word ‘error’ if there is an error, such as a
-misspelled package.
+Note: If you run this on in RStudio, don’t be scared if you see a red
+message after calling `library`. RStudio doesn’t see the difference
+between messages, warnings, and errors, so it displays all three in red.
+You need to read the message, and it will contain the word ‘error’ if
+there is an error, such as a misspelled package.
 
 As a fairly trivial example, try running the (error) code below, have a
 look at the error message, and fix the problem:
@@ -71,15 +71,16 @@ library(tidyvers)
 
 ## Reading Data
 
-\[Note: Please review [R Basics Tutorial](R-tidy-4-basics.md) if you are
-uncertain about objects, values, and functions.\]
+(Note: You can review [R Basics
+Tutorial](https://github.com/ccs-amsterdam/r-course-material/blob/master/tutorials/R-tidy-4-basics.md)
+if you would like to learn more about objects, values, and functions.)
 
 As in most packages, the functionality in dplyr is offered through
 functions. In general, a function can be seen as a command or
 instruction to the computer to do something and (generally) return the
 result.
 
-In the tidverse packages, almost all `functions` primarily operate on
+In the tidyverse packages, almost all `functions` primarily operate on
 data sets, for example for filtering and sorting data.
 
 With a data set we mean a rectangular data frame consisting of rows
@@ -148,12 +149,13 @@ gunpolls <- read_csv(url)
 gunpolls
 ```
 
-(Note that you can safely ignore the (red) message, they simply tell you
-how each column was parsed)
+(Note that if you run this in RStudio, you will probably see a (red)
+message in the console. This is simply telling you how each column was
+parsed (as a number, text, date, etc.), and is generally safe to ignore)
 
 The tibble shows the first ten rows of the data set, and for each column
 the data type is also mentioned: `<dbl>` stands for double, which is a
-*numeric* value; `<chr>` is textual or *character* data.
+*numeric* value; `<chr>` stands for character or *textual* data.
 
 Note that on your own computer, R will print a message if not all rows
 or columns could be printed. If you want to browse through your data,
@@ -275,7 +277,7 @@ This is useful if you will not need to data you discarded. To summarize:
 ``` r
 some_function(data)          # <-- print on screen and forget
 data2 <- some_function(data) # <-- create a new object and keep both
-data2 <- some_function(data) # <-- overwrite the old object
+data <- some_function(data) # <-- overwrite the old object
 ```
 
 ### Exercise
@@ -343,7 +345,7 @@ Note that this command did not assign the result to an object. So, as
 explained above, the result is only displayed on the screen but not
 remembered. This can be a great way to quickly inspect your data, but if
 you want to continue analysing this subset you need to assign it to an
-object as above.
+object, e.g. using `subset <- filter(...)`
 
 ### Removing missing values
 
@@ -354,12 +356,12 @@ missing value are automatically missing as well. To check if a value is
 missing, you should use the function `is.na(column)`.
 
 For example, let’s look at a version of the gun polls data which has
-some missing value:
+some missing values:
 
 ``` r
 library(tidyverse)
 gunpolls_dirty <- read_csv("https://cssbook.net/d/guns-polls-dirty.csv")
-gunpolls_dirty
+head(gunpolls_dirty)
 ```
 
 As you can see, the Support column has a missing value for CBS news. To
@@ -404,16 +406,6 @@ The mutate function makes it easy to create new variables or to modify
 existing ones. For those more familiar with SPSS, this is what you would
 do with `compute` and `recode`. As a simple example, let’s start again
 with the 538 gun polls data used above:
-
-``` r
-# unfortunately, this chunk won't be shown in the exercise, so we'll have to duplicate it...
-library(tidyverse)
-url <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/poll-quiz-guns/guns-polls.csv"
-gunpolls <- read_csv(url)
-
-gunpolls <- select(gunpolls, Question, Support, 
-                   rep=`Republican Support`, dem=`Democratic Support`)
-```
 
 ``` r
 library(tidyverse)
