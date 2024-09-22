@@ -356,12 +356,17 @@ Besides looking for numbers, sometimes we want to look for letters as
 part of a pattern. For example, we could look for hashtags as a
 hash-character followed by one or more letters.
 
-We can use the special symbol `\\b` to find so called ‘**w**ord
+We can use the special symbol `\\w` to find so called ‘**w**ord
 characters’. Interestingly, this includes numbers and the underscore
 sign (`_`) as well as letters:
 
-So, we can use the pattern `#\\w+` to find hashtags: a hash sign
-followed by one or more word characters.
+If we are only looking for letters, we can use `\\p{L}` – where a bit
+confusingly the curly braces are used to select a set of characters (in
+this case, **L**etters) rather than to indidate the quantity. So, to
+find exactly two letters, we could use `\\p{L}{2}`.
+
+As an examples, we can use the pattern `#\\w+` to find hashtags: a hash
+sign followed by one or more word characters.
 
 ``` r
 tweets = tibble(tweet=c("I love #hashtags #rad", "@vanatteveldt is inactive", "Don't mail me at noreply@example.com #wontwork"))
@@ -508,7 +513,7 @@ regular expressions (patterns) in this tutorial
 | \d{4,}                    | At least four digits, i.e. 1984 or 90210                     |
 | \d+                       | One or more digits                                           |
 | \w                        | A word character (letter, number, or underscore)             |
-|                           | A letter                                                     |
+| \p{L}                     | A letter                                                     |
 
 This is only a (small) part of everything that’s possible with regular
 expressions. See e.g. [this
