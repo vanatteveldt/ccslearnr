@@ -124,7 +124,12 @@ library(tidyverse)
 responses <- tibble(resp_id=c(1:5), name=c("Harry", "Shrek", "Homer", "Winnie", "Lurch"), 
                     answer=c("Owls, of course", "DONKEYS", NA, "owl", ""))
 ```
-```{r exercise=TRUE, showresponses, exercise.setup='responses'}
+```{r echo=F}
+library(tidyverse)
+responses <- tibble(resp_id=c(1:5), name=c("Harry", "Shrek", "Homer", "Winnie", "Lurch"), 
+                    answer=c("Owls, of course", "DONKEYS", NA, "owl", ""))
+```
+```{r}
 responses
 ```
 
@@ -139,6 +144,12 @@ we can use it within a `mutate` call to change a text within a column:
 
 ```{r mutate, exercise=TRUE,  exercise.setup='responses'}
 mutate(responses, answer=str_to_lower(answer))
+```
+
+Similarly, you can use `str_remove_all` to remove words from a text. For example, we can remove the ", of course" part in the first answer:
+
+```{r remove, exercise=TRUE,  exercise.setup='responses'}
+mutate(responses, answer=str_remove_all(answer, ", of course"))
 ```
 
 ### Filtering texts 

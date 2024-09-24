@@ -164,6 +164,13 @@ call to change a text within a column:
 mutate(responses, answer=str_to_lower(answer))
 ```
 
+Similarly, you can use `str_remove_all` to remove words from a text. For
+example, we can remove the “, of course” part in the first answer:
+
+``` r
+mutate(responses, answer=str_remove_all(answer, ", of course"))
+```
+
 ### Filtering texts
 
 Now, we can use `str_detect` within a `filter` function to select only
