@@ -1,0 +1,53 @@
+---
+title: "Digital exam using BruceR"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+editor_options: 
+  chunk_output_type: console
+learnr_to_md_options:
+  keep_output: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, fig.path = "img/")
+library(learnr)
+```
+
+```{r setup2}
+library(bruceR)
+```
+
+Je kan zelf tekst schrijven en ook R code laten zien. Bijvoorbeeld:
+
+Gegeven de volgende dataset:
+
+```{r}
+head(airquality)
+```
+
+**Vraag 1**: Maak twee modellen en geef daar een mooie model_summary van:
+
+```{r q1, exercise=T, exercise.setup='setup2'}
+# vul hier je antwoord in
+```
+
+Je kan ook code deels al geven, bijvoorbeeld:
+
+
+**Vraag 2**: Maak de volgende code af:
+
+```{r q2, exercise=T, exercise.setup='setup2'}
+lm1 = lm(___)
+lm2 = lm(___)
+___
+```
+
+Hieronder wat code die je kan runnen (met dus model_summary en airquality uit bruceR):
+
+```{r q3, exercise=T, exercise.setup='setup2'}
+lm1 = lm(Temp ~ Month + Day, data=airquality)
+lm2 = lm(Temp ~ Month + Day + Wind + Solar.R, data=airquality)
+model_summary(list(lm1, lm2))
+```
