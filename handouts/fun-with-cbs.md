@@ -285,7 +285,7 @@ ggplot(data = data, mapping = aes(x = log10(v57_density), y = votes, color = par
     "Support for BBB and anti-immigration parties per municipality",
     "(Dutch 2023 provincial elections; note: size of point relative to logged municipality population)"
   ) +
-  xkcd::theme_xkcd() +
+  ggthemes::theme_economist() + 
   theme(legend.position = "top", legend.title = element_blank())
 ```
 

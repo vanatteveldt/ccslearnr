@@ -444,7 +444,7 @@ Using the `gunpolls` data as defined above, can you create a new column
 `party_diff` that contains the absolute value of the difference between
 republican and democratic support? That is, if republican support is 61
 and democratic support is 86 (or the other way around), the difference
-should be 17. Overwrite the gunpolls object with the result (i.e. add
+should be 25. Overwrite the gunpolls object with the result (i.e. add
 the column to the existing data set).
 
 ``` r
