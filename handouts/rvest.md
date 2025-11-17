@@ -104,15 +104,15 @@ happy_tables <- read_html("https://en.wikipedia.org/wiki/World_Happiness_Report"
   html_table()
 
 ## The third table (at the time of writing) is 2020, the newer ones are empty :(
-happy_table_2020 <- happy_tables[[3]]
-head(happy_table_2020)
+happy_table <- happy_tables[[1]]
+head(happy_table)
 
 ## Plot relationship wealth and life expectancy
-ggplot(happy_table_2020, aes(x=`GDP per capita`, y=`Healthy life expectancy`)) + 
+ggplot(happy_table, aes(x=`Log GDP per capita`, y=`Healthy life expectancy`)) + 
   geom_point() + geom_smooth(method = 'lm')
 ```
 
-**Exercise:** What happens when you change `[[3]]` into `[[4]]` in the
+**Exercise:** What happens when you change `[[1]]` into `[[2]]` in the
 code above? Can you create a plot of hapiness score (y) against freedom
 to make life choices (x)?
 
